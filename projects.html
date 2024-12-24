@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Projects</title>
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Header Section -->
   <header>
-    <nav>
-      <ul>
+    <nav class="navbar">
+      <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
+      <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
@@ -20,16 +23,28 @@
     </nav>
   </header>
 
+  <!-- Projects Section -->
   <section class="projects">
-    <h1>Projects</h1>
-    <div>
-      <h2>Origiorange Website</h2>
-      <p>A website designed to brand Changxing Island citrus using cultural and creative methods.</p>
-    </div>
-    <div>
-      <h2>Automatic Water Quality Monitor</h2>
-      <p>Built a low-cost, time-saving water quality monitor using STM32 and TDS sensors.</p>
+    <h1>My Projects</h1>
+    <div class="projects-grid">
+      <div class="project-item">
+        <h2>Origiorange Website</h2>
+        <p>
+          Designed and developed a website to promote Changxing Island citrus branding using cultural and creative methods.
+        </p>
+      </div>
+      <div class="project-item">
+        <h2>Automatic Water Quality Monitor</h2>
+        <p>
+          Built a low-cost water quality monitor using STM32 and TDS sensors for time-saving and efficient water analysis.
+        </p>
+      </div>
     </div>
   </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>© 2024 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
+  </footer>
 </body>
 </html>
