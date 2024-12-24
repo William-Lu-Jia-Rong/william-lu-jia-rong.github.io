@@ -4,7 +4,8 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  color: #333;
+  color: #fff;
+  background-color: #0A192F; /* Dark Blue Background */
 }
 
 h1, h2 {
@@ -19,7 +20,7 @@ a {
 
 /* Header */
 header {
-  background: linear-gradient(45deg, #6A11CB, #2575FC);
+  background: linear-gradient(90deg, #112240, #0A192F);
   padding: 20px 0;
 }
 
@@ -33,7 +34,7 @@ header {
 
 .logo a {
   font-size: 1.8rem;
-  color: #fff;
+  color: #64FFDA;
   font-weight: bold;
 }
 
@@ -44,24 +45,23 @@ header {
 }
 
 .nav-links a {
-  color: #fff;
+  color: #CCD6F6;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #FFD700;
+  color: #64FFDA;
 }
 
 /* Hero Section */
 .hero {
   height: 90vh;
-  background: linear-gradient(45deg, #FFAFBD, #FFC3A0);
+  background: linear-gradient(135deg, #0A192F, #112240);
   display: flex;
   justify-content: space-around;
   align-items: center;
   text-align: center;
-  color: #fff;
 }
 
 .hero-content h1 {
@@ -69,22 +69,22 @@ header {
 }
 
 .hero-content .highlight {
-  color: #FFD700;
+  color: #64FFDA;
 }
 
 .hero-content .cta-btn {
   display: inline-block;
   margin-top: 20px;
   padding: 10px 20px;
-  background: #FFD700;
-  color: #333;
+  background: #64FFDA;
+  color: #0A192F;
   font-weight: bold;
   border-radius: 5px;
   transition: background 0.3s ease;
 }
 
 .hero-content .cta-btn:hover {
-  background: #FFC300;
+  background: #52E3C2;
 }
 
 .hero-image img {
@@ -100,21 +100,21 @@ header {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   padding: 50px 10%;
-  background: #f9f9f9;
+  background: #112240;
 }
 
 .highlight-item {
   text-align: center;
-  background: #fff;
+  background: #0A192F;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .highlight-item:hover {
   transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 .highlight-item img {
@@ -127,27 +127,27 @@ header {
 
 .highlight-item h2 {
   font-size: 1.5rem;
-  color: #6A11CB;
+  color: #64FFDA;
 }
 
 .highlight-item p {
-  color: #555;
+  color: #CCD6F6;
 }
 
 /* Footer */
 footer {
   text-align: center;
   padding: 20px 0;
-  background: #333;
-  color: #fff;
+  background: #0A192F;
+  color: #CCD6F6;
 }
 
 footer a {
-  color: #FFD700;
+  color: #64FFDA;
   font-weight: bold;
   transition: color 0.3s ease;
 }
 
 footer a:hover {
-  color: #FFC300;
+  color: #52E3C2;
 }
