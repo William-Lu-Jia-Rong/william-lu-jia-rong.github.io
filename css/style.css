@@ -1,6 +1,7 @@
 /* General Section Styles */
 section {
   padding: 50px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
   color: #fff;
   text-align: center;
 }
