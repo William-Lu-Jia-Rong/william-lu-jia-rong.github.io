@@ -151,3 +151,53 @@ footer a {
 footer a:hover {
   color: #52E3C2;
 }
+
+/* Skills Section */
+.skills {
+  padding: 50px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
+  color: #fff;
+  text-align: center;
+}
+
+.skills h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #64FFDA;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.skill-item {
+  background: #0A192F;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.skill-item h2 {
+  font-size: 1.5rem;
+  color: #64FFDA;
+  margin-bottom: 15px;
+}
+
+.skill-item ul {
+  list-style: none;
+  padding: 0;
+}
+
+.skill-item ul li {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #CCD6F6;
+}
