@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact</title>
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Header Section -->
   <header>
-    <nav>
-      <ul>
+    <nav class="navbar">
+      <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
+      <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
@@ -20,10 +23,31 @@
     </nav>
   </header>
 
+  <!-- Contact Section -->
   <section class="contact">
-    <h1>Contact Me</h1>
-    <p>Email: j94lu@uwaterloo.ca</p>
-    <p>Phone: 226-989-5986</p>
+    <div class="contact-container">
+      <h1>Contact Me</h1>
+      <p>Feel free to reach out to me through the contact form below or via email or phone. I look forward to hearing from you!</p>
+
+      <!-- Contact Form -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="contact-form">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+        <button type="submit" class="cta-btn">Send Message</button>
+      </form>
+
+      <!-- Direct Contact Info -->
+      <div class="contact-info">
+        <p><strong>Email:</strong> <a href="mailto:j94lu@uwaterloo.ca">j94lu@uwaterloo.ca</a></p>
+        <p><strong>Phone:</strong> <a href="tel:+12269895986">+1 226-989-5986</a></p>
+      </div>
+    </div>
   </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>© 2024 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
+  </footer>
 </body>
 </html>
