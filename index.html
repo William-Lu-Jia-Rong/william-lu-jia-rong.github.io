@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jiarong (Bill) Lu</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Header Section -->
   <header>
-    <nav class="navbar">
+    <nav class="navbar" data-aos="fade-down">
       <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
       <ul class="nav-links">
         <li><a href="about.html">About</a></li>
@@ -24,29 +24,30 @@
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-content">
+    <div class="hero-content" data-aos="fade-right">
       <h1>Hello, I'm <span class="highlight">Jiarong (Bill) Lu</span></h1>
       <p class="tagline">Innovative Computer Engineering student at the University of Waterloo</p>
       <a href="about.html" class="cta-btn">Discover More</a>
     </div>
-    <div class="hero-image">
+    <div class="hero-image" data-aos="fade-left">
       <img src="images/profile.jpg" alt="Jiarong Lu's Profile Picture">
     </div>
   </section>
 
   <!-- Highlights Section -->
   <section class="highlights">
-    <div class="highlight-item">
+    <h1 data-aos="fade-up">What I Do</h1>
+    <div class="highlight-item" data-aos="zoom-in">
       <img src="images/skills.jpg" alt="Technical Skills">
       <h2>Technical Skills</h2>
       <p>Expert in C, Python, HTML, video editing, and embedded systems.</p>
     </div>
-    <div class="highlight-item">
+    <div class="highlight-item" data-aos="zoom-in" data-aos-delay="200">
       <img src="images/projects.jpg" alt="Creative Projects">
       <h2>Creative Projects</h2>
       <p>Designed impactful projects like a water quality monitor and Origiorange website.</p>
     </div>
-    <div class="highlight-item">
+    <div class="highlight-item" data-aos="zoom-in" data-aos-delay="400">
       <img src="images/leadership.jpg" alt="Leadership">
       <h2>Leadership</h2>
       <p>Managed teams to deliver large-scale events and technical solutions.</p>
@@ -54,8 +55,16 @@
   </section>
 
   <!-- Footer Section -->
-  <footer>
+  <footer data-aos="fade-up">
     <p>© 2024 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
   </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  </script>
 </body>
 </html>
