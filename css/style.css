@@ -82,7 +82,6 @@ header {
 
 /* Hero Section */
 
-
 .hero {
   height: 90vh;
   background: linear-gradient(90deg, #112240, #0A192F); /* Match Header Gradient */
@@ -99,6 +98,19 @@ header {
 .hero-content .highlight {
   color: #64FFDA;
 }
+
+.hero, .about {
+  height: 100vh; /* Make it take up the full height of the viewport */
+  margin: 0; /* Remove any margin around the section */
+  padding: 0; /* Remove unnecessary padding */
+  display: flex; /* Center content vertically and horizontally */
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+  text-align: center; /* Center the text inside */
+  background: linear-gradient(180deg, #0B2447, #19376D); /* Keep the dark blue gradient */
+  color: #fff; /* Text color */
+}
+
 
 .hero-content .cta-btn {
   display: inline-block;
