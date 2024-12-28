@@ -1,6 +1,7 @@
 /* General Section Styles */
 section {
   padding: 50px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
   color: #fff;
   text-align: center;
 }
@@ -8,7 +9,7 @@ section {
 h1 {
   font-size: 2.5rem;
   color: #64FFDA;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 p {
@@ -16,49 +17,32 @@ p {
   line-height: 1.6;
 }
 
-/* Universal Block Styles (For Experience, Projects, Skills, etc.) */
-.content-block {
+/* Grid Layout for Sections */
+.projects-grid, .experience-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.project-item, .experience-item, .skill-item {
   background: #0A192F;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  text-align: left;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 30px; /* Adds space between blocks */
 }
 
-.content-block:hover {
+.project-item:hover, .experience-item:hover, .skill-item:hover {
   transform: translateY(-10px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
 
-.content-block h2 {
+h2 {
   font-size: 1.5rem;
   color: #64FFDA;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-.content-block p {
-  color: #CCD6F6;
-  margin-bottom: 10px;
-}
-
-.content-block strong {
-  color: #64FFDA;
-}
-
-/* Grid Layouts for Different Pages */
-.grid-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px; /* Adds space between blocks in a flex layout */
-}
-
-@media screen and (max-width: 768px) {
-  .content-block {
-    margin-bottom: 40px; /* Adds more space on smaller screens */
-  }
-}
 
 /* Header */
 header {
@@ -395,4 +379,3 @@ footer a:hover {
 .experience-item strong {
   color: #64FFDA;
 }
-
