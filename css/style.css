@@ -316,3 +316,54 @@ footer a:hover {
 .contact-info a:hover {
   color: #52E3C2;
 }
+
+/* Experience Section */
+.experience {
+  padding: 50px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F);
+  color: #fff;
+  text-align: center;
+}
+
+.experience h1 {
+  font-size: 2.5rem;
+  color: #64FFDA;
+  margin-bottom: 30px;
+}
+
+.experience-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.experience-item {
+  background: #0A192F;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.experience-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.experience-item h2 {
+  font-size: 1.5rem;
+  color: #64FFDA;
+  margin-bottom: 10px;
+}
+
+.experience-item p {
+  color: #CCD6F6;
+  margin-bottom: 10px;
+}
+
+.experience-item strong {
+  color: #64FFDA;
+}
+
