@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Experience</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Header Section -->
@@ -25,19 +25,31 @@
 
   <!-- Experience Section -->
   <section class="experience">
-    <h1>My Experience</h1>
-    <div class="experience-grid">
-      <div class="experience-item">
+    <h1 data-aos="fade-up">My Experience</h1>
+    <div class="experience-timeline">
+      <div class="experience-item" data-aos="fade-right">
         <h2>Waterloo Aerial Robotics Group (WARG)</h2>
-        <p>
-          Member of the Embedded Flight Software team, focusing on drone motor control development.
-        </p>
+        <p><strong>Position:</strong> Embedded Flight Software Team Member</p>
+        <p><strong>Timeline:</strong> Oct 2024 - Present</p>
+        <p>Developing EFS (Embedded Flight Software) drivers for drones and fixed-wing aerial robots. Currently focused on motor control systems.</p>
       </div>
-      <div class="experience-item">
+      <div class="experience-item" data-aos="fade-left">
         <h2>Bopoda Technology Co., Ltd</h2>
-        <p>
-          Interned for two weeks, creating user guide videos for broadcasting platforms and learning streaming technologies.
-        </p>
+        <p><strong>Position:</strong> Student Intern</p>
+        <p><strong>Timeline:</strong> July 2023 - Aug 2023</p>
+        <p>Created user guide videos for broadcasting platforms and learned about the application of ChatGPT in real-world business scenarios. Gained experience as a director during live-streamed events using OBS and vMix.</p>
+      </div>
+      <div class="experience-item" data-aos="fade-right">
+        <h2>High School Activity Website</h2>
+        <p><strong>Position:</strong> Founder and Director</p>
+        <p><strong>Timeline:</strong> Sept 2021 - June 2024</p>
+        <p>Created and maintained the high school activity website, organizing a team of 4 to store information for 60+ clubs and provide tech support for large school events. Managed tasks such as video editing, lighting, and audio for events like New Year’s Eve parties.</p>
+      </div>
+      <div class="experience-item" data-aos="fade-left">
+        <h2>High School Alumni Association</h2>
+        <p><strong>Position:</strong> Technical Advisor</p>
+        <p><strong>Timeline:</strong> May 2024 - Present</p>
+        <p>Provided technical advice and support during online and in-person events. Organized and led technical support teams during events.</p>
       </div>
     </div>
   </section>
@@ -46,5 +58,13 @@
   <footer>
     <p>© 2024 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  </script>
 </body>
 </html>
