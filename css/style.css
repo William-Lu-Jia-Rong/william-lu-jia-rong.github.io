@@ -368,25 +368,35 @@ footer a:hover {
   color: #64FFDA;
 }
 
-/* Reset Default Margins and Padding */
+/* General Reset for Fullscreen Layout */
 html, body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     width: 100%;
-    min-height: 100vh; /* Changed from height to min-height for flexibility */
-    overflow-x: hidden; /* Prevents horizontal scroll */
-}
-
-/* Hero Section: Full Screen Effect Without Content Cut-off */
-.hero-section {
     min-height: 100vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 50px 10%;
-    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto; /* Prevent vertical scrolling when content fits */
 }
 
+/* Fix for Flexbox Alignment and Footer Handling */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
+/* Main Content Section Styling */
+.main-content {
+    flex: 1; /* Makes sure the content takes the full space without overflow */
+    padding-bottom: 50px; /* Prevents content from touching the footer */
+}
+
+/* Footer Styling to Stick at the Bottom */
+footer {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    background-color: #0D1B2A;
+    color: white;
+}
