@@ -1,3 +1,37 @@
+/* General Reset for Fullscreen Layout */
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto; /* Prevent vertical scrolling when content fits */
+}
+
+/* Fix for Flexbox Alignment and Footer Handling */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Main Content Section Styling */
+.main-content {
+    flex: 1; /* Makes sure the content takes the full space without overflow */
+    padding-bottom: 50px; /* Prevents content from touching the footer */
+}
+
+/* Footer Styling to Stick at the Bottom */
+footer {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    background-color: #0D1B2A;
+    color: white;
+}
+
+
 /* General Section Styles */
 section {
   padding: 50px 10%;
@@ -81,8 +115,6 @@ header {
 }
 
 /* Hero Section */
-
-
 .hero {
   height: 90vh;
   background: linear-gradient(90deg, #112240, #0A192F); /* Match Header Gradient */
@@ -368,35 +400,3 @@ footer a:hover {
   color: #64FFDA;
 }
 
-/* General Reset for Fullscreen Layout */
-html, body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto; /* Prevent vertical scrolling when content fits */
-}
-
-/* Fix for Flexbox Alignment and Footer Handling */
-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Main Content Section Styling */
-.main-content {
-    flex: 1; /* Makes sure the content takes the full space without overflow */
-    padding-bottom: 50px; /* Prevents content from touching the footer */
-}
-
-/* Footer Styling to Stick at the Bottom */
-footer {
-    width: 100%;
-    padding: 10px 0;
-    text-align: center;
-    background-color: #0D1B2A;
-    color: white;
-}
