@@ -374,8 +374,19 @@ html, body {
     padding: 0;
     box-sizing: border-box;
     width: 100%;
-    height: 100%;
+    min-height: 100vh; /* Changed from height to min-height for flexibility */
     overflow-x: hidden; /* Prevents horizontal scroll */
+}
+
+/* Hero Section: Full Screen Effect Without Content Cut-off */
+.hero-section {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 10%;
+    box-sizing: border-box;
 }
 
 
