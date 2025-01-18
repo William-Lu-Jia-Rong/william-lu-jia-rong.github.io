@@ -378,10 +378,4 @@ html, body {
     overflow-x: hidden; /* Prevents horizontal scroll */
 }
 
-/* Ensure the Main Section Covers Full Viewport */
-.hero-section {
-    min-height: 100vh;
-    width: 100vw;
-    padding: 0;
-    margin: 0;
-}
+
