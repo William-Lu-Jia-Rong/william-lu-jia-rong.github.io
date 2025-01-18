@@ -368,20 +368,4 @@ footer a:hover {
   color: #64FFDA;
 }
 
-/* Reset Default Margins and Padding */
-html, body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden; /* Prevents horizontal scroll */
-}
 
-/* Ensure the Main Section Covers Full Viewport */
-.hero-section {
-    min-height: 100vh;
-    width: 100vw;
-    padding: 0;
-    margin: 0;
-}
