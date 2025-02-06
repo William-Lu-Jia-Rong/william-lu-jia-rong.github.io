@@ -220,7 +220,7 @@ footer a:hover {
 
 /* Skills Section */
 .skills {
-  padding: 50px 10%;
+  padding: 160px 10%;
   background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
   color: #fff;
   text-align: center;
@@ -400,3 +400,18 @@ footer a:hover {
   color: #64FFDA;
 }
 
+/* About Section */
+.about {
+  padding: 250px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
+  color: #fff;
+  text-align: center;
+}
+
+/* Projects Section */
+.projects {
+  padding: 230px 10%;
+  background: linear-gradient(90deg, #112240, #0A192F); /* Dark Blue Theme */
+  color: #fff;
+  text-align: center;
+}
