@@ -547,3 +547,39 @@ footer a:hover {
     padding: 12px 2px;
   }
 }
+
+@media (max-width: 600px) {
+  .projects-grid, .experience-timeline {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .flip-card {
+    min-height: 140px;
+    height: 160px;
+    max-width: 98vw;
+    margin: 0 auto 12px auto;
+  }
+  .flip-card-front, .flip-card-back {
+    padding: 10px 4px;
+    font-size: 0.98rem;
+  }
+  .company {
+    font-size: 1.05rem;
+  }
+  .position, .timeline {
+    font-size: 0.95rem;
+  }
+  .flip-content p {
+    font-size: 0.98rem;
+    margin-bottom: 12px;
+  }
+  .flip-card .cta-btn {
+    font-size: 0.98rem;
+    padding: 10px 18px;
+  }
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg) !important;
+}
