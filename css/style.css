@@ -584,6 +584,54 @@ footer a:hover {
   transform: rotateY(180deg) !important;
 }
 
+/* ===== Mobile Nav Toggle (Hamburger) ===== */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 200;
+  margin-left: 8px;
+}
+.nav-toggle .bar {
+  display: block;
+  width: 26px;
+  height: 3px;
+  margin: 4px 0;
+  background: #222;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: flex;
+  }
+  .nav-links.collapsed {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: rgba(255,255,255,0.98);
+    position: absolute;
+    top: 68px;
+    left: 0;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+    padding: 0;
+    z-index: 150;
+  }
+  .nav-links.collapsed.open {
+    display: flex;
+  }
+  .navbar {
+    position: relative;
+  }
+}
+
 /* ===== 移动端优化：增强响应式布局 ===== */
 @media (max-width: 600px) {
   html, body {

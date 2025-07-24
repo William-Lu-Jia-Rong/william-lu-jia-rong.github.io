@@ -12,6 +12,11 @@
   <header>
     <nav class="navbar">
       <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
+      <button class="nav-toggle" aria-label="Toggle navigation" style="display:none;">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
@@ -76,5 +81,30 @@
   <footer>
     <p>© 2025 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
   </footer>
+  <script>
+    // 手机端菜单折叠功能
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    function checkMobileMenu() {
+      if (window.innerWidth <= 900) {
+        navToggle.style.display = 'block';
+        navLinks.classList.add('collapsed');
+      } else {
+        navToggle.style.display = 'none';
+        navLinks.classList.remove('collapsed');
+        navLinks.style.display = '';
+      }
+    }
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      if (navLinks.classList.contains('open')) {
+        navLinks.style.display = 'flex';
+      } else {
+        navLinks.style.display = 'none';
+      }
+    });
+    window.addEventListener('resize', checkMobileMenu);
+    window.addEventListener('DOMContentLoaded', checkMobileMenu);
+  </script>
 </body>
 </html>
