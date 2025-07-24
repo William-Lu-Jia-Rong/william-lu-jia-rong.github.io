@@ -22,21 +22,76 @@
   </header>
   <main>
     <section class="about-container">
-      <h1>Automatic Water Quality Monitor</h1>
-      <p><strong>Overview:</strong> A cost-effective water quality monitoring device using TDS sensors and STM32 microcontrollers, designed for real-time water analysis and data collection.</p>
-      <h2>Technologies Used</h2>
+      <h1>🌊 Automatic Water Quality Monitoring Device</h1>
+      <div style="margin-bottom:18px;">
+        <a href="https://github.com/1eoN-G/ECE-198-project" target="_blank" class="cta-btn" style="display:inline-block;margin-bottom:8px;">View Project Code @GitHub</a>
+      </div>
+      <h2>📌 Overview</h2>
+      <p>Our team developed a low-cost, remotely operated Automatic Water Quality Monitoring Boat designed to assess real-time water conditions. This solution addresses growing concerns over water quality, particularly in the Waterloo region. The boat collects Total Dissolved Solids (TDS) data using onboard sensors, transmits readings through STM32 microcontrollers, and can be upgraded for Bluetooth communication and full autonomy.</p>
+      <div style="text-align:center;margin:18px 0;">
+        <img src="images/automatic water quality monitoring device/boatv2 - Copy.jpg" alt="Boat Prototype" style="max-width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:8px;">
+        <div style="font-size:0.98em;color:#555;">Prototype of the Automatic Water Quality Monitoring Boat</div>
+      </div>
+      <h2>🧠 Motivation</h2>
+      <p>Local residents have raised concerns about turbid and potentially unsafe tap water. However, traditional monitoring approaches are costly, time-consuming, and sometimes unsafe. Our goal was to create an affordable, efficient, and scalable solution that enables government agencies, businesses, and individuals to monitor water quality effortlessly.</p>
+      <h2>🛠️ Features & Capabilities</h2>
       <ul>
-        <li>STM32 Microcontroller (C/C++)</li>
-        <li>TDS Sensors</li>
-        <li>3D Modeling & Printing (Autodesk Inventor)</li>
-        <li>Embedded Systems Design</li>
+        <li><strong>TDS Measurement:</strong> Measures water purity (0–500 ppm) with high accuracy.</li>
+        <li><strong>Autonomous Navigation:</strong> Dual DC motors controlled via STM32 and H-bridge circuitry.</li>
+        <li><strong>Remote Control:</strong> Bluetooth-compatible (optional HC-05 module).</li>
+        <li><strong>Waterproof Design:</strong> Operates in rain, high humidity (IP68), and temperatures from -10°C to 50°C.</li>
+        <li><strong>Modular Design:</strong> Built for ease of maintenance, upgradeability, and portability.</li>
+        <li><strong>Sustainable Power Use:</strong> Efficient energy management with low-power microcontroller modes.</li>
       </ul>
-      <h2>Responsibilities & Highlights</h2>
+      <div style="text-align:center;margin:18px 0;">
+        <img src="images/automatic water quality monitoring device/Overall_Connection_design.png" alt="Overall Connection Design" style="max-width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:8px;">
+        <div style="font-size:0.98em;color:#555;">Overall system connection design</div>
+      </div>
+      <h2>🔍 Technical Highlights</h2>
       <ul>
-        <li>Designed and implemented embedded firmware for sensor data acquisition and processing.</li>
-        <li>Developed 3D models for device housing and managed 3D printing and assembly.</li>
-        <li>Integrated hardware and software for real-time water quality monitoring.</li>
-        <li>Enabled efficient, low-cost water analysis for practical applications.</li>
+        <li><strong>Core Components:</strong>
+          <ul>
+            <li>STM32F401RE Microcontrollers</li>
+            <li>TDS Sensor Module</li>
+            <li>Dual underwater motors</li>
+            <li>TIP120-based H-Bridge (with upgrade option to L293D IC)</li>
+            <li>3D-Printed Boat Shell: Custom-designed for buoyancy and electronics housing.</li>
+            <li>PCB Design: Proposed as an enhancement to reduce wiring clutter and debugging complexity.</li>
+          </ul>
+        </li>
+        <li><strong>Data Communication:</strong> Wired by default; Bluetooth integration in development</li>
+        <li><strong>Testing & Validation:</strong> Passed tests for sensor accuracy, propulsion, transmission integrity, power endurance, and environmental safety.</li>
+      </ul>
+      <div style="text-align:center;margin:18px 0;">
+        <img src="images/automatic water quality monitoring device/Wire_connection_Between_STM32.png" alt="Wire Connection Between STM32" style="max-width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:8px;">
+        <div style="font-size:0.98em;color:#555;">Wiring between STM32 microcontrollers</div>
+      </div>
+      <div style="text-align:center;margin:18px 0;">
+        <img src="images/automatic water quality monitoring device/TDS_Sensor_Design.png" alt="TDS Sensor Design" style="max-width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:8px;">
+        <div style="font-size:0.98em;color:#555;">TDS sensor module and integration</div>
+      </div>
+      <div style="text-align:center;margin:18px 0;">
+        <img src="images/automatic water quality monitoring device/H_Bridge_design_with_TIP_120.png" alt="H-Bridge Design with TIP120" style="max-width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:8px;">
+        <div style="font-size:0.98em;color:#555;">H-Bridge motor driver circuit (TIP120)</div>
+      </div>
+      <h2>💡 Innovation</h2>
+      <ul>
+        <li>Replaces traditional manual sampling methods with a smart, mobile platform.</li>
+        <li>Provides near real-time water quality feedback.</li>
+        <li>Designed with upgradability in mind: from PCB integration to solar-powered charging and AI-based navigation.</li>
+      </ul>
+      <h2>🧪 Project Impact</h2>
+      <ul>
+        <li>Offers a practical solution for monitoring urban and natural water bodies.</li>
+        <li>Supports environmental protection efforts by enabling accessible data collection.</li>
+        <li>Scalable for municipal and individual deployment.</li>
+      </ul>
+      <h2>👥 Team</h2>
+      <ul>
+        <li>Zhuoyan Zhang</li>
+        <li>Bill Lu</li>
+        <li>Leo Gao</li>
+        <li style="font-size:0.95em;color:#888;">(Course: ECE 198, Instructor: David Lau, TA: Shadi Vandvajdi)</li>
       </ul>
       <a href="projects.html" class="cta-btn">Back to Projects</a>
     </section>
