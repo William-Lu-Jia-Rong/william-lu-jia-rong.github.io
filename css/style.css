@@ -583,3 +583,87 @@ footer a:hover {
 .flip-card.flipped .flip-card-inner {
   transform: rotateY(180deg) !important;
 }
+
+/* ===== 移动端优化：增强响应式布局 ===== */
+@media (max-width: 600px) {
+  html, body {
+    font-size: 15px;
+    padding: 0;
+  }
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 0 8px;
+    gap: 8px;
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  .hero {
+    flex-direction: column;
+    padding: 32px 4px 16px 4px;
+  }
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+  .hero-image img {
+    width: 90vw;
+    height: auto;
+    max-width: 320px;
+    border-radius: 18px;
+  }
+  .about-container, .contact-container, .skills-grid, .projects-grid, .experience-timeline {
+    width: 100%;
+    padding: 0 4px;
+    margin: 0;
+    box-sizing: border-box;
+    grid-template-columns: 1fr !important;
+    display: block !important;
+  }
+  .projects-grid, .skills-grid, .experience-timeline {
+    gap: 16px !important;
+  }
+  .project-item, .skill-item, .experience-item, .highlight-item, .flip-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 auto 16px auto !important;
+    box-sizing: border-box;
+  }
+  .flip-card {
+    height: auto !important;
+    min-height: 180px !important;
+  }
+  .flip-card-front, .flip-card-back {
+    min-height: 180px !important;
+    padding: 16px 8px !important;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  footer {
+    font-size: 0.95rem;
+    padding: 12px 0;
+    text-align: center;
+  }
+  .cta-btn, .btn-portfolio {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1rem;
+    padding: 12px 0;
+  }
+  /* 隐藏不必要的动画或装饰（如有） */
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
