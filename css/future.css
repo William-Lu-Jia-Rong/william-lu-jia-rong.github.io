@@ -292,6 +292,19 @@ section {
   font-size: 1.08rem;
 }
 
+.hero-copy,
+.section-heading,
+.about-container,
+.contact-card,
+.panel,
+.project-item,
+.skill-item,
+.timeline-card,
+.experience-container,
+.project-container {
+  min-width: 0;
+}
+
 .hero-actions,
 .chip-row,
 .meta-row,
@@ -832,19 +845,99 @@ footer {
 
   .hero {
     min-height: auto;
-    padding-top: 34px;
+    padding-top: 22px;
+    padding-bottom: 24px;
   }
 
   .hero-visual {
-    min-height: 420px;
+    min-height: 360px;
+    order: -1;
   }
 
   .hero-portrait {
-    width: min(76%, 290px);
+    width: min(72%, 250px);
+    inset: auto 50% 22px auto;
+    transform: translateX(50%);
+  }
+
+  .hero-copy h1,
+  .page-hero h1 {
+    font-size: clamp(2.7rem, 13vw, 4.1rem);
+    line-height: 0.96;
+  }
+
+  .section-heading h2,
+  .detail-shell h1 {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+
+  .hero-copy p,
+  .page-hero p,
+  .section-heading p {
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .eyebrow {
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    max-width: 100%;
+    flex-wrap: wrap;
   }
 
   .stats-row {
     grid-template-columns: 1fr;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 14px 16px;
+  }
+
+  .chip-row {
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .chip {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+
+  .floating-card {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  .floating-card.top {
+    top: 16px;
+    left: 16px;
+    right: 16px;
+  }
+
+  .floating-card.bottom {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .orb {
+    width: 180px;
+    height: 180px;
+    top: -28px;
+    right: -18px;
+  }
+
+  .orb-small {
+    width: 110px;
+    height: 110px;
+    left: 18px;
+    bottom: 88px;
   }
 
   .panel,
@@ -875,5 +968,123 @@ footer {
   .cta-btn,
   .ghost-btn {
     width: 100%;
+  }
+
+  .contact-grid,
+  .projects-grid,
+  .skills-grid,
+  .panel-grid,
+  .feature-grid,
+  .experience-timeline,
+  .two-column {
+    gap: 16px;
+  }
+
+  .feature-visual {
+    height: 180px;
+    margin-top: 18px;
+  }
+
+  .footer-inner,
+  .footer-links {
+    width: 100%;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  .detail-shell {
+    padding-top: 32px;
+    padding-bottom: 72px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-shell,
+  .detail-shell {
+    width: calc(100% - 16px);
+  }
+
+  section {
+    padding: 56px 0;
+  }
+
+  .navbar {
+    gap: 12px;
+  }
+
+  .nav-links {
+    left: 8px;
+    right: 8px;
+    top: calc(100% + 6px);
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .logo a {
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
+  }
+
+  .hero-visual {
+    min-height: 320px;
+  }
+
+  .hero-portrait {
+    width: min(72%, 210px);
+    bottom: 18px;
+  }
+
+  .hero-arc {
+    inset: 14px;
+  }
+
+  .hero-grid-lines {
+    background-size: 56px 56px;
+  }
+
+  .floating-card strong {
+    font-size: 0.72rem;
+  }
+
+  .floating-card span {
+    font-size: 0.88rem;
+  }
+
+  .panel,
+  .project-item,
+  .skill-item,
+  .contact-card,
+  .about-container,
+  .contact-container,
+  .experience-container,
+  .project-container,
+  .timeline-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .detail-shell .about-container,
+  .detail-shell .experience-container,
+  .detail-shell .project-container {
+    padding: 22px 18px;
+  }
+
+  .stats-row {
+    gap: 8px;
+  }
+
+  .stat strong {
+    font-size: 1.15rem;
+  }
+
+  .chip {
+    padding: 9px 12px;
+  }
+
+  .feature-visual {
+    height: 160px;
   }
 }
