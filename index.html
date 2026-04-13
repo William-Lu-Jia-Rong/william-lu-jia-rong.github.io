@@ -1,112 +1,47 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jiarong (Bill) Lu</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
-  <link rel="stylesheet" href="css/style.css">
-  <!-- Font Awesome for social icons -->
+  <title>Jiarong (Bill) Lu | Embedded Systems and Hardware</title>
+  <meta name="description" content="Personal website of Jiarong (Bill) Lu, a University of Waterloo Computer Engineering student building embedded systems, robotics software, and applied AI tools.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/future.css">
 </head>
 <body>
-  <!-- Header Section -->
+  <div class="progress-line"></div>
   <header>
-    <nav class="navbar" data-aos="fade-down">
-      <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation" style="display:none;">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-      <ul class="nav-links">
-        <li><a href="about.html">About</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-social" style="display:flex;gap:16px;align-items:center;">
-        <a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" aria-label="GitHub" style="color:#222;font-size:1.5rem;"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" aria-label="LinkedIn" style="color:#0077b5;font-size:1.5rem;"><i class="fab fa-linkedin"></i></a>
-      </div>
+    <nav class="navbar site-shell">
+      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
+      <button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links"><li><a class="active" href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="skills.html">Skills</a></li><li><a href="contact.html">Contact</a></li></ul>
+      <div class="nav-social"><a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></div>
     </nav>
   </header>
-
   <main>
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-content" data-aos="fade-right">
-        <h1 style="font-size:3.2rem;line-height:1.1;margin-bottom:24px;">Jiarong (Bill) Lu</h1>
-        <p class="tagline" style="font-size:1.3rem;color:#555;margin-bottom:12px;">Computer Engineering Student @ University of Waterloo</p>
-        <p style="color:#888;margin-bottom:12px;">Email: <a href="mailto:j94lu@uwaterloo.ca" style="color:#0071e3;">j94lu@uwaterloo.ca</a></p>
-        <p style="color:#888;margin-bottom:32px;">Passionate about embedded systems, robotics, and AI-driven solutions.</p>
-        <a href="about.html" class="cta-btn" style="font-size:1.15rem;padding:16px 44px;">Learn More</a>
-      </div>
-      <div class="hero-image" data-aos="fade-left">
-        <img src="images/profile.jpg" alt="Jiarong Lu's Profile Picture" style="box-shadow:0 12px 48px rgba(0,0,0,0.10);border-radius:32px;width:340px;height:340px;object-fit:cover;">
-      </div>
-    </section>
-
-    <!-- Highlights Section -->
-    <section class="highlights" style="margin-top:64px;">
-      <h1 data-aos="fade-up" style="font-size:2.2rem;margin-bottom:48px;letter-spacing:-0.01em;">Profile Highlights</h1>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px;max-width:1100px;margin:0 auto;">
-        <div class="highlight-item" data-aos="zoom-in" style="padding:40px 28px;">
-          <img src="images/skills.jpg" alt="Technical Skills" style="border-radius:18px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,0.06);height:230px;object-fit:cover;width:100%;object-position:20% 15%;">
-          <h2 style="font-size:1.3rem;margin-bottom:12px;">Technical Skills</h2>
-          <p style="color:#555;">Languages: C, C++, Python, VHDL, Lean, HTML<br>Tools: VS Code, GitHub, WordPress, Premiere Pro, STM32CubeIDE, Docker, CAD, Unreal Engine, Dify, and more.</p>
+    <section class="hero site-shell">
+      <div class="hero-grid">
+        <div class="hero-copy" data-reveal>
+          <span class="eyebrow">Embedded Systems / Robotics / Applied AI</span>
+          <h1>Building hardware that feels precise, intelligent, and alive.</h1>
+          <p>I am Jiarong (Bill) Lu, a Computer Engineering student at the University of Waterloo focused on embedded flight software, STM32 firmware, compact PCB systems, and AI-assisted engineering workflows.</p>
+          <div class="hero-actions"><a class="cta-btn" href="projects.html">Explore Projects</a><a class="ghost-btn" href="Resume_Hardware.pdf" target="_blank" rel="noreferrer">Open Resume</a></div>
+          <div class="chip-row"><span class="chip">University of Waterloo BASc Candidate</span><span class="chip">WARG Embedded Flight Software</span><span class="chip">STM32, BLDC, FOC, PID</span></div>
+          <div class="stats-row"><div class="stat" data-reveal><strong>5</strong><span>STM32 hardware products supported at Studica</span></div><div class="stat" data-reveal><strong>&lt;0.1 deg</strong><span>Target angular positioning precision in motor control</span></div><div class="stat" data-reveal><strong>2</strong><span>Microsoft certifications in cloud and AI fundamentals</span></div></div>
         </div>
-        <div class="highlight-item" data-aos="zoom-in" data-aos-delay="200" style="padding:40px 28px;">
-          <img src="images/projects.jpg" alt="Projects" style="border-radius:18px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,0.06);height:230px;object-fit:cover;width:100%;object-position:20% 15%;">
-          <h2 style="font-size:1.3rem;margin-bottom:12px;">Projects</h2>
-          <p style="color:#555;">• Water Quality Monitor: STM32-based, TDS sensors, 3D-printed housing.<br>• Glory Media AI Transformation: Led AI workflow automation for digital publishing.<br>• High School Activity Website: WordPress, managed 60+ clubs.</p>
-        </div>
-        <div class="highlight-item" data-aos="zoom-in" data-aos-delay="400" style="padding:40px 28px;">
-          <img src="images/leadership.jpg" alt="Experience" style="border-radius:18px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,0.06);height:230px;object-fit:cover;width:100%;object-position:20% 15%;">
-          <h2 style="font-size:1.3rem;margin-bottom:12px;">Experience</h2>
-          <p style="color:#555;">• Waterloo Aerial Robotics Group: Embedded flight software, motor driver, PID control.<br>• Mindmatrix Technology: Embedded firmware, PCB design, mechanical testing.<br>• Bopoda Technology: Video production, streaming tech, ChatGPT business use.</p>
+        <div class="hero-visual" data-reveal data-tilt>
+          <div class="hero-grid-lines"></div><div class="hero-arc"></div><div class="orb"></div><div class="orb-small"></div>
+          <div class="floating-card top"><strong>Current Focus</strong><span>Motor drivers, flight software, intelligent tooling</span></div>
+          <div class="floating-card bottom"><strong>Based In</strong><span>Waterloo, Ontario</span></div>
+          <img class="hero-portrait" src="images/profile.jpg" alt="Portrait of Jiarong Bill Lu">
         </div>
       </div>
     </section>
+    <section class="site-shell"><div class="section-heading" data-reveal><h2>Engineering across firmware, mechanics, and intelligent systems.</h2><p>My best work sits at the boundary between software and hardware: control systems, embedded products, test rigs, AI-assisted calibration tools, and interfaces that make complex systems easier to use.</p></div><div class="feature-grid"><article class="panel feature-panel large" data-reveal data-tilt><span class="panel-kicker">Featured Experience</span><h3>Waterloo Aerial Robotics Group</h3><p>Contributing to embedded flight software for student-built aerial robots, including motor-driver architecture, attitude management with PID control, and thrust modeling for aircraft motors and propellers.</p><div class="feature-visual"><img src="images/leadership.jpg" alt="Robotics themed visual"></div></article><article class="panel feature-panel" data-reveal data-tilt><span class="panel-kicker">Hardware Build</span><h3>Mindmatrix BLDC Control Platform</h3><p>Designed compact multi-layer driver boards, built torque-testing workflows, and pushed toward precise closed-loop angular positioning on STM32.</p><a class="mini-link" href="experience-mindmatrix.html">View work</a></article><article class="panel feature-panel" data-reveal data-tilt><span class="panel-kicker">Applied AI</span><h3>Glory Media Transformation</h3><p>Explored deployable AI workflows for media, knowledge systems, recommendation engines, and domain-specific expert agents.</p><a class="mini-link" href="project-glory-media.html">See project</a></article></div></section>
+    <section class="site-shell"><div class="section-heading" data-reveal><h2>Selected work.</h2><p>Projects that show how I turn ideas into working systems, from embedded devices to AI-driven platforms.</p></div><div class="projects-grid"><article class="project-item" data-reveal data-tilt><span class="panel-kicker">Embedded Project</span><h3>Automatic Water Quality Monitor</h3><p>Built a cost-effective STM32-based monitoring boat using TDS sensing, motor control, and a custom 3D-printed structure for real-time water analysis.</p><div class="project-meta-line">C / C++ / STM32 / Autodesk Inventor / Sensor integration</div><div class="button-row"><a class="ghost-btn" href="project-water-quality.html">Project details</a></div></article><article class="project-item" data-reveal data-tilt><span class="panel-kicker">AI Platform</span><h3>BridgeNet</h3><p>Built an education and networking platform for students and job seekers with modern web tooling, AI support, and production-minded system design.</p><div class="project-meta-line">React / TypeScript / Node.js / PostgreSQL</div><div class="button-row"><a class="ghost-btn" href="project-bridgenet.html">Project details</a></div></article><article class="project-item" data-reveal data-tilt><span class="panel-kicker">Workflow Tooling</span><h3>AI-Assisted Calibration Concepts</h3><p>Explored AI-driven engineering workflows to replace repetitive manual calibration and accelerate firmware development, testing, and visualization.</p><div class="project-meta-line">AI tooling / CNC workflows / Automation thinking</div><div class="button-row"><a class="ghost-btn" href="experience.html">See experience</a></div></article></div></section>
+    <section class="site-shell"><div class="panel-grid"><article class="panel" data-reveal><span class="panel-kicker">Education</span><h3>University of Waterloo</h3><p>Candidate for a Bachelor of Applied Science in Computer Engineering, expected June 2029. I am building depth in embedded systems, hardware-software integration, and engineering design.</p></article><article class="panel" data-reveal><span class="panel-kicker">Certifications</span><h3>Microsoft Fundamentals</h3><p>Microsoft Certified: Azure Fundamentals and Azure AI Fundamentals, both issued in June 2025.</p></article><article class="panel" data-reveal><span class="panel-kicker">Contact</span><h3>Open to internships and technical collaboration.</h3><p>If you are building in robotics, embedded systems, or applied AI, I would love to connect.</p><a class="mini-link" href="contact.html">Start a conversation</a></article></div></section>
   </main>
-
-  <!-- Footer Section -->
-  <footer data-aos="fade-up">
-    <p>© 2025 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
-  </footer>
-  
-  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-  <script>
-    AOS.init({
-      duration: 1000,
-      once: true,
-    });
-  </script>
-  <script>
-    // 手机端菜单折叠功能
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    function checkMobileMenu() {
-      if (window.innerWidth <= 900) {
-        navToggle.style.display = 'block';
-        navLinks.classList.add('collapsed');
-      } else {
-        navToggle.style.display = 'none';
-        navLinks.classList.remove('collapsed');
-        navLinks.style.display = '';
-      }
-    }
-    navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
-      if (navLinks.classList.contains('open')) {
-        navLinks.style.display = 'flex';
-      } else {
-        navLinks.style.display = 'none';
-      }
-    });
-    window.addEventListener('resize', checkMobileMenu);
-    window.addEventListener('DOMContentLoaded', checkMobileMenu);
-  </script>
+  <footer><div class="footer-inner site-shell"><p>(c) 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script src="js/site.js"></script>
 </body>
 </html>

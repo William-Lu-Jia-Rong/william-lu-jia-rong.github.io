@@ -1,122 +1,44 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skills</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Skills | Jiarong (Bill) Lu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/future.css">
 </head>
 <body>
-  <!-- Header Section -->
+  <div class="progress-line"></div>
   <header>
-    <nav class="navbar">
-      <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation" style="display:none;">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
+    <nav class="navbar site-shell">
+      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
+      <button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
         <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
+        <li><a class="active" href="skills.html">Skills</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
+      <div class="nav-social"><a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></div>
     </nav>
   </header>
-
-  <!-- Skills Section -->
-  <section class="skills">
-    <h1>My Skills</h1>
-    <div class="skills-grid">
-      <div class="skill-item">
-        <h2>Programming Languages</h2>
-        <ul>
-          <li>C</li>
-          <li>C++</li>
-          <li>Python</li>
-          <li>VHDL</li>
-          <li>Lean</li>
-          <li>HTML</li>
-        </ul>
+  <main class="site-shell">
+    <section class="page-hero"><div class="section-heading" data-reveal><span class="eyebrow">Skills</span><h1>Technical depth from low-level control to polished interfaces.</h1><p>My toolkit spans firmware, hardware-adjacent engineering, modern web development, and the creative software I use to prototype, document, and communicate technical work.</p></div></section>
+    <section>
+      <div class="skills-grid">
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">Languages</span><h3>Programming</h3><ul><li>C, C++, Python, VHDL, Lean</li><li>JavaScript, TypeScript, HTML, CSS</li><li>G-code and scripting for hardware workflows</li></ul></article>
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">Embedded</span><h3>Hardware and control</h3><ul><li>STM32 microcontrollers and STM32CubeIDE</li><li>BLDC motor control, PWM, ADC, PID, FOC concepts</li><li>PCB design, test rigs, 3D modeling and printing</li></ul></article>
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">Software</span><h3>Application development</h3><ul><li>React, React Native, Node.js, Express.js</li><li>PostgreSQL, Tailwind CSS, Radix UI</li><li>API design, frontend systems, product implementation</li></ul></article>
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">AI Tooling</span><h3>Practical AI workflows</h3><ul><li>Ollama, Open WebUI, Dify, OpenAI-powered tooling</li><li>Knowledge-base and agent workflow experimentation</li><li>Automation and engineering productivity use cases</li></ul></article>
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">Tools</span><h3>Build stack</h3><ul><li>GitHub, Docker, VS Code, WordPress</li><li>Autodesk Inventor, CAD workflows, CNC-adjacent tooling</li><li>Photoshop, Premiere Pro, After Effects, DaVinci Resolve</li></ul></article>
+        <article class="skill-item" data-reveal data-tilt><span class="panel-kicker">Credentials</span><h3>Certifications</h3><ul><li>Microsoft Certified: Azure Fundamentals</li><li>Microsoft Certified: Azure AI Fundamentals</li></ul></article>
       </div>
-      <div class="skill-item">
-        <h2>Tools & Software</h2>
-        <ul>
-          <li>VS Code</li>
-          <li>GitHub</li>
-          <li>WordPress</li>
-          <li>Premiere Pro</li>
-          <li>Photoshop</li>
-          <li>DaVinci Resolve</li>
-          <li>Autodesk Inventor</li>
-          <li>OBS</li>
-          <li>After Effect</li>
-          <li>Logic Pro</li>
-          <li>Adobe Audition</li>
-          <li>CAD</li>
-          <li>Unreal Engine</li>
-          <li>VMIX</li>
-          <li>Ollama</li>
-          <li>Docker</li>
-          <li>Open WebUI</li>
-          <li>STM32CubeIDE</li>
-          <li>Dify</li>
-        </ul>
-      </div>
-      <div class="skill-item">
-        <h2>Hardware & Systems</h2>
-        <ul>
-          <li>STM32 Microcontrollers</li>
-          <li>PCB Design (Altium Designer, JLCPCB)</li>
-          <li>3D Modeling & Printing</li>
-          <li>Drone Systems</li>
-          <li>Embedded Systems</li>
-        </ul>
-      </div>
-      <div class="skill-item">
-        <h2>Other Skills</h2>
-        <ul>
-          <li>Video & Audio Production</li>
-          <li>Technical Project Management</li>
-          <li>Team Leadership</li>
-          <li>Event Tech Support</li>
-          <li>Documentation & Training</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer Section -->
-  <footer>
-    <p>© 2025 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
-  </footer>
-  <script>
-    // 手机端菜单折叠功能
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    function checkMobileMenu() {
-      if (window.innerWidth <= 900) {
-        navToggle.style.display = 'block';
-        navLinks.classList.add('collapsed');
-      } else {
-        navToggle.style.display = 'none';
-        navLinks.classList.remove('collapsed');
-        navLinks.style.display = '';
-      }
-    }
-    navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
-      if (navLinks.classList.contains('open')) {
-        navLinks.style.display = 'flex';
-      } else {
-        navLinks.style.display = 'none';
-      }
-    });
-    window.addEventListener('resize', checkMobileMenu);
-    window.addEventListener('DOMContentLoaded', checkMobileMenu);
-  </script>
+    </section>
+  </main>
+  <footer><div class="footer-inner site-shell"><p>? 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script src="js/site.js"></script>
 </body>
 </html>
+
