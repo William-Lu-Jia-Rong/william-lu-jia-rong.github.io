@@ -63,12 +63,68 @@ function setupNav() {
   });
 }
 
+function setupContactForms() {
+  const forms = document.querySelectorAll('[data-formspree-form]');
+
+  forms.forEach((form) => {
+    const submitButton = form.querySelector('button[type="submit"]');
+    const status = form.querySelector('[data-form-status]');
+    if (!submitButton || !status) return;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
+      status.hidden = false;
+      status.className = 'form-status';
+      status.textContent = 'Sending your message...';
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method || 'POST',
+          body: new FormData(form),
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          let errorMessage = 'Something went wrong. Please try again in a moment.';
+
+          try {
+            const data = await response.json();
+            if (Array.isArray(data?.errors) && data.errors.length > 0) {
+              errorMessage = data.errors.map((item) => item.message).join(' ');
+            }
+          } catch (parseError) {
+            // Keep the fallback message when the API does not return JSON.
+          }
+
+          throw new Error(errorMessage);
+        }
+
+        form.reset();
+        status.className = 'form-status is-success';
+        status.textContent = 'Message sent successfully. I will get back to you soon.';
+      } catch (error) {
+        status.className = 'form-status is-error';
+        status.textContent = error.message || 'Unable to send the message right now. Please email me directly instead.';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send message';
+      }
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateScrollProgress();
   setupReveal();
   setupTilt();
   setupCursorGlow();
   setupNav();
+  setupContactForms();
 });
 
 window.addEventListener('scroll', updateScrollProgress, { passive: true });
