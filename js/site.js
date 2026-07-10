@@ -17,7 +17,7 @@ function setupReveal() {
         }
       });
     },
-    { threshold: 0.16 }
+    { threshold: 0.12 }
   );
 
   revealItems.forEach((item) => observer.observe(item));
@@ -52,6 +52,7 @@ function setupCursorGlow() {
 
 function setupNav() {
   const toggle = document.querySelector('.nav-toggle');
+  const header = document.querySelector('header');
   if (!toggle) return;
 
   toggle.addEventListener('click', () => {
@@ -61,6 +62,91 @@ function setupNav() {
   document.querySelectorAll('.nav-links a').forEach((link) => {
     link.addEventListener('click', () => document.body.classList.remove('nav-open'));
   });
+
+  if (header) {
+    const onScroll = () => {
+      header.classList.toggle('nav-scrolled', window.scrollY > 80);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+}
+
+function setupSlideButtons() {
+  document.querySelectorAll('.slide-btn').forEach((btn) => {
+    const label = btn.querySelector('span');
+    if (!label) return;
+    btn.setAttribute('data-hover', label.textContent);
+  });
+}
+
+function setupCounters() {
+  const counters = document.querySelectorAll('[data-counter]');
+  if (!counters.length) return;
+
+  const animateCounter = (el) => {
+    const target = Number(el.dataset.counter);
+    const suffix = el.dataset.counterSuffix || '';
+    const duration = 1400;
+    const start = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(target * eased);
+      el.textContent = `${value}${suffix}`;
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+
+  counters.forEach((counter) => observer.observe(counter));
+}
+
+function setupTicker() {
+  document.querySelectorAll('[data-ticker]').forEach((wrap) => {
+    wrap.addEventListener('mouseenter', () => {
+      const track = wrap.querySelector('.ticker-track');
+      if (track) track.style.animationPlayState = 'paused';
+    });
+    wrap.addEventListener('mouseleave', () => {
+      const track = wrap.querySelector('.ticker-track');
+      if (track) track.style.animationPlayState = 'running';
+    });
+  });
+}
+
+function setupLenis() {
+  if (typeof Lenis === 'undefined') return null;
+
+  const lenis = new Lenis({
+    duration: 1.1,
+    smoothWheel: true,
+    smoothTouch: false
+  });
+
+  lenis.on('scroll', updateScrollProgress);
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+
+  requestAnimationFrame(raf);
+  return lenis;
 }
 
 function setupContactForms() {
@@ -71,11 +157,16 @@ function setupContactForms() {
     const status = form.querySelector('[data-form-status]');
     if (!submitButton || !status) return;
 
+    const defaultLabel = submitButton.querySelector('span')?.textContent || submitButton.textContent;
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       submitButton.disabled = true;
-      submitButton.textContent = 'Sending...';
+      const span = submitButton.querySelector('span');
+      if (span) span.textContent = 'Sending...';
+      else submitButton.textContent = 'Sending...';
+
       status.hidden = false;
       status.className = 'form-status';
       status.textContent = 'Sending your message...';
@@ -112,7 +203,8 @@ function setupContactForms() {
         status.textContent = error.message || 'Unable to send the message right now. Please email me directly instead.';
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = 'Send message';
+        if (span) span.textContent = defaultLabel;
+        else submitButton.textContent = defaultLabel;
       }
     });
   });
@@ -120,12 +212,18 @@ function setupContactForms() {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateScrollProgress();
+  setupLenis();
   setupReveal();
   setupTilt();
   setupCursorGlow();
   setupNav();
+  setupSlideButtons();
+  setupCounters();
+  setupTicker();
   setupContactForms();
 });
 
-window.addEventListener('scroll', updateScrollProgress, { passive: true });
+if (typeof Lenis === 'undefined') {
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+}
 window.addEventListener('resize', updateScrollProgress);
