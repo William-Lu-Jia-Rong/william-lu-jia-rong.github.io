@@ -63,6 +63,10 @@ function setupNav() {
     link.addEventListener('click', () => document.body.classList.remove('nav-open'));
   });
 
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') document.body.classList.remove('nav-open');
+  });
+
   if (header) {
     const onScroll = () => {
       header.classList.toggle('nav-scrolled', window.scrollY > 80);
@@ -131,6 +135,7 @@ function setupTicker() {
 
 function setupLenis() {
   if (typeof Lenis === 'undefined') return null;
+  if (window.matchMedia('(pointer: coarse)').matches) return null;
 
   const lenis = new Lenis({
     duration: 1.1,
