@@ -38,12 +38,15 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Manrope', 'Segoe UI', sans-serif;
   background:
     radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.08), transparent 26%),
     linear-gradient(180deg, #0a0a0a 0%, #050505 42%, #000000 100%);
   color: var(--text);
   overflow-x: hidden;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 body::before,
@@ -1173,6 +1176,7 @@ footer {
   max-width: 14ch;
   margin-left: auto;
   margin-right: auto;
+  color: var(--text);
 }
 
 .hero-full .hero-copy p {
@@ -1648,12 +1652,18 @@ footer {
 @media (max-width: 860px) {
   :root {
     --nav-height: 74px;
+    --section-pad: 80px;
+  }
+
+  .navbar {
+    position: relative;
   }
 
   .nav-toggle {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
+    flex-shrink: 0;
   }
 
   .nav-links {
@@ -1662,17 +1672,37 @@ footer {
     left: 20px;
     right: 20px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 20px;
+    align-items: stretch;
+    gap: 4px;
+    padding: 16px;
     border-radius: 24px;
     border: 1px solid var(--border);
-    background: rgba(6, 10, 19, 0.94);
+    background: rgba(0, 0, 0, 0.96);
+    backdrop-filter: blur(20px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transform: translateY(-8px);
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    z-index: 130;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 14px 12px;
+    border-radius: 14px;
+    font-size: 1rem;
+    min-height: 44px;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    background: rgba(255, 255, 255, 0.06);
+    transform: none;
+  }
+
+  body.nav-open {
+    overflow: hidden;
   }
 
   body.nav-open .nav-links {
@@ -1690,60 +1720,238 @@ footer {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .section-heading {
+    margin-bottom: 28px;
+  }
+
+  .cta-band-inner {
+    gap: 32px;
+  }
 }
 
 @media (max-width: 640px) {
   :root {
-    --section-pad: 72px;
+    --section-pad: 64px;
   }
 
   .site-shell,
   .detail-shell {
-    width: min(calc(100% - 24px), var(--max-width));
+    width: min(calc(100% - 28px), var(--max-width));
   }
 
   section {
     padding: var(--section-pad) 0;
   }
 
+  .section-label {
+    margin-bottom: 14px;
+    font-size: 0.76rem;
+  }
+
+  .section-heading {
+    margin-bottom: 24px;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(1.75rem, 8.5vw, 2.5rem);
+    line-height: 1.02;
+    margin: 12px 0;
+  }
+
+  .section-heading p {
+    font-size: 0.94rem;
+    line-height: 1.62;
+  }
+
   .hero-full {
-    min-height: auto;
-    padding: calc(var(--nav-height) + 24px) 0 56px;
+    min-height: calc(100svh - var(--nav-height));
+    min-height: calc(100dvh - var(--nav-height));
+    padding: calc(var(--nav-height) + 20px) 0 48px;
+    justify-content: flex-end;
+  }
+
+  .hero-full .hero-copy {
+    width: 100%;
   }
 
   .hero-full .hero-copy h1 {
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
-    max-width: 12ch;
+    font-size: clamp(2.35rem, 10.5vw, 3.2rem);
+    max-width: none;
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+    margin: 14px 0;
+  }
+
+  .hero-full .hero-copy p {
+    font-size: 0.96rem;
+    line-height: 1.62;
+    max-width: none;
+    padding: 0 4px;
+  }
+
+  .hero-full .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 12px;
+    margin-top: 28px;
   }
 
   .hero-bg-visual {
-    opacity: 0.2;
+    opacity: 0.14;
+    align-items: flex-end;
   }
 
   .hero-bg-visual .hardware-visual-hero {
-    width: min(90vw, 300px);
+    width: min(78vw, 280px);
+    transform: translateY(18%);
   }
 
-  .tech-title {
-    font-size: clamp(1.8rem, 8vw, 2.6rem);
+  .slide-btn,
+  .cta-btn,
+  .ghost-btn {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+  }
+
+  .capability-grid,
+  .metrics-grid,
+  .case-grid {
+    gap: 14px;
+  }
+
+  .capability-card {
+    padding: 24px 20px;
+  }
+
+  .capability-card h3 {
+    font-size: 1.18rem;
+  }
+
+  .metrics-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 14px;
+    margin-inline: -4px;
+    padding: 4px 4px 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .metrics-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .metric-card {
+    flex: 0 0 min(78vw, 290px);
+    scroll-snap-align: start;
+    padding: 24px 20px;
+  }
+
+  .metric-before,
+  .metric-after,
+  .metric-single {
+    font-size: clamp(1.9rem, 8vw, 2.4rem);
+  }
+
+  .tech-blocks {
+    gap: 32px;
   }
 
   .tech-block {
-    padding: 36px 0;
+    padding: 28px 0;
   }
 
-  .metric-card,
-  .capability-card,
+  .tech-title {
+    font-size: clamp(1.65rem, 7.5vw, 2.2rem);
+    line-height: 1.08;
+    margin-bottom: 14px;
+  }
+
+  .tech-desc {
+    font-size: 0.94rem;
+    margin-bottom: 20px;
+  }
+
+  .use-case-list {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .use-case-list li {
+    gap: 12px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
   .case-card {
-    padding: 22px;
+    padding: 22px 20px;
   }
 
-  .cta-form {
-    padding: 22px;
+  .case-card h3 {
+    font-size: 1.15rem;
+  }
+
+  .case-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 0;
+  }
+
+  .ticker-section {
+    padding: 56px 0;
   }
 
   .ticker-track {
-    animation-duration: 48s;
+    animation-duration: 40s;
+    gap: 32px;
+  }
+
+  .ticker-item {
+    font-size: 1.05rem;
+  }
+
+  .cta-band {
+    padding: 64px 0 calc(64px + env(safe-area-inset-bottom));
+  }
+
+  .cta-copy h2 {
+    font-size: clamp(1.75rem, 8vw, 2.4rem);
+    line-height: 1.04;
+  }
+
+  .cta-copy p {
+    font-size: 0.94rem;
+    max-width: none;
+  }
+
+  .cta-form {
+    padding: 20px;
+  }
+
+  .cta-form input,
+  .cta-form textarea,
+  .contact-form input,
+  .contact-form textarea {
+    font-size: 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .section-actions {
+    margin-top: 24px;
+  }
+
+  .section-actions .slide-btn {
+    max-width: 100%;
+  }
+
+  footer {
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
   }
 
   .hero-grid {
@@ -2025,34 +2233,86 @@ footer {
 
 @media (max-width: 480px) {
   :root {
-    --section-pad: 56px;
+    --section-pad: 52px;
+    --nav-height: 68px;
   }
 
   .site-shell,
   .detail-shell {
-    width: calc(100% - 16px);
+    width: calc(100% - 20px);
   }
 
   section {
     padding: var(--section-pad) 0;
   }
 
+  .hero-full {
+    padding-top: calc(var(--nav-height) + 16px);
+    padding-bottom: 40px;
+  }
+
+  .hero-full .hero-copy h1 {
+    font-size: clamp(2rem, 9.8vw, 2.65rem);
+    line-height: 1.06;
+  }
+
+  .hero-full .hero-copy p {
+    font-size: 0.9rem;
+  }
+
   .hero-bg-visual {
     display: none;
   }
 
-  .hero-full .hero-copy h1 {
-    font-size: clamp(2rem, 10.8vw, 2.8rem);
+  .section-heading h2 {
+    font-size: clamp(1.55rem, 8vw, 2.1rem);
+  }
+
+  .metric-card {
+    flex-basis: min(84vw, 270px);
+    padding: 20px 18px;
   }
 
   .metric-before,
   .metric-after,
   .metric-single {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
+  }
+
+  .metric-label {
+    font-size: 0.88rem;
+  }
+
+  .tech-title {
+    font-size: clamp(1.45rem, 7vw, 1.9rem);
+  }
+
+  .use-case-num {
+    min-width: 24px;
+    font-size: 0.76rem;
+  }
+
+  .ticker-wrap {
+    mask-image: none;
+    overflow: visible;
+  }
+
+  .ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 14px;
+    width: auto;
   }
 
   .ticker-item {
-    font-size: 1rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.62);
   }
 
   .navbar {
@@ -2188,5 +2448,45 @@ footer {
 
   .hero-copy p {
     font-size: 0.9rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .capability-card:hover,
+  .metric-card:hover,
+  .case-card:hover,
+  .cta-btn:hover,
+  .ghost-btn:hover,
+  .mini-link:hover {
+    transform: none;
+  }
+
+  .slide-btn:hover span,
+  .slide-btn:hover::after {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+
+  .slide-btn span,
+  .slide-btn::after {
+    transition: none;
   }
 }
