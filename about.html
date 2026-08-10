@@ -1,87 +1,152 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>About | Jiarong (Bill) Lu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta name="description" content="About Jiarong (Bill) Lu, a University of Waterloo Computer Engineering student building embedded systems, motor-control hardware, robotics software, native apps, and practical AI workflows.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/about.html">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="About | Jiarong (Bill) Lu">
+  <meta property="og:description" content="Computer Engineering, embedded systems, robotics, native products, and practical AI.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/about.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="Computer Engineering, embedded systems, robotics, native products, and practical AI.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/future.css">
 </head>
-<body>
-  <div class="progress-line"></div>
-  <header>
-    <nav class="navbar site-shell">
-      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </button>
-      <ul class="nav-links">
+<body class="about-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
         <li><a href="index.html">Home</a></li>
-        <li><a class="active" href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
         <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
+        <li><a class="active" aria-current="page" href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
-      <div class="nav-social">
-        <a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-      </div>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
     </nav>
   </header>
-  <main class="site-shell">
-    <section class="page-hero">
+
+  <main id="main-content">
+    <section class="page-hero site-shell about-hero case-grid--profile" aria-labelledby="about-title">
       <div class="section-heading" data-reveal>
-        <span class="eyebrow">About Me</span>
-        <h1>Engineering systems that connect code, hardware, and real-world behavior.</h1>
-        <p>I enjoy solving problems that span firmware, electrical design, mechanics, and human interaction. That often means building tools that are technical under the hood but feel clear and purposeful on the surface.</p>
+        <p class="eyebrow">About Bill</p>
+        <h1 id="about-title">I build at the boundary between code and the physical world.</h1>
+        <p>I&rsquo;m a University of Waterloo Computer Engineering student focused on embedded control, robotics, PCB design, and software products that make complex systems easier to use.</p>
+        <div class="button-row"><a class="cta-btn" href="projects.html">Explore my work</a><a class="ghost-btn" href="contact.html">Contact me</a></div>
+      </div>
+      <figure class="case-media profile-media" data-reveal>
+        <img src="images/profile.jpg" width="2042" height="2407" alt="Portrait of Jiarong (Bill) Lu" fetchpriority="high">
+        <figcaption>Jiarong (Bill) Lu &middot; Computer Engineering</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="approach-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">How I work</p>
+          <h2 id="approach-title">Follow the system across its interfaces.</h2>
+        </div>
+        <div class="panel" data-reveal>
+          <p>I enjoy problems where firmware, circuits, mechanics, data, and human interaction all have to agree. Recent work has taken me from STM32 motor drivers and flight-control software to a native iOS product and AI-assisted operating workflows.</p>
+          <p>That range has made me especially attentive to clear boundaries: what a component owns, how it fails, how it can be tested, and how another person understands it.</p>
+        </div>
       </div>
     </section>
-    <section>
-      <div class="two-column">
-        <article class="about-container" data-reveal>
-          <span class="detail-kicker">Profile</span>
-          <h2>What I care about</h2>
-          <p>I am a University of Waterloo Computer Engineering student with hands-on experience in embedded firmware, motor-control systems, robotics software, and AI-assisted workflow design. I am especially drawn to projects where physical systems and software have to work together cleanly under real constraints.</p>
-          <p>My recent work has included STM32-based product development, BLDC control, flight software for student-built aircraft, and AI tooling for media and engineering workflows. I like precise systems, collaborative teams, and products that turn complex behavior into something useful.</p>
+
+    <section class="case-section site-shell" id="skills" aria-labelledby="skills-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Skills</p>
+        <h2 id="skills-title">A hardware core with a broad software toolkit.</h2>
+      </div>
+      <div class="case-grid case-grid--cards">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Embedded &amp; control</span>
+          <h3>Make the physical system respond.</h3>
+          <div class="chip-row" role="group" aria-label="Embedded and control skills">
+            <span class="chip">C</span><span class="chip">C++</span><span class="chip">STM32</span><span class="chip">PWM</span><span class="chip">ADC</span><span class="chip">PID</span><span class="chip">FOC</span><span class="chip">VHDL</span>
+          </div>
         </article>
-        <article class="about-container" data-reveal data-tilt>
-          <span class="detail-kicker">Education</span>
-          <h2>Academic path</h2>
-          <ul>
-            <li>University of Waterloo, Candidate for Bachelor of Applied Science in Computer Engineering, expected June 2029.</li>
-            <li>Shanghai Weiyu High School, IBDP, completed June 2024.</li>
-          </ul>
-          <div class="chip-row">
-            <span class="chip">Embedded Systems</span>
-            <span class="chip">Robotics</span>
-            <span class="chip">AI Systems</span>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Electronics &amp; mechanical</span>
+          <h3>Design around real constraints.</h3>
+          <div class="chip-row" role="group" aria-label="Electronics and mechanical skills">
+            <span class="chip">Altium Designer</span><span class="chip">KiCad</span><span class="chip">Multilayer PCB</span><span class="chip">BLDC</span><span class="chip">Autodesk Inventor</span><span class="chip">CAD</span><span class="chip">CNC</span><span class="chip">G-code</span>
+          </div>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Software &amp; product</span>
+          <h3>Build the interface around the system.</h3>
+          <div class="chip-row" role="group" aria-label="Software and product skills">
+            <span class="chip">Swift</span><span class="chip">SwiftUI</span><span class="chip">TypeScript</span><span class="chip">JavaScript</span><span class="chip">Python</span><span class="chip">React</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span><span class="chip">REST APIs</span>
+          </div>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Tools &amp; workflows</span>
+          <h3>Keep iteration visible and repeatable.</h3>
+          <div class="chip-row" role="group" aria-label="Tools and workflow skills">
+            <span class="chip">GitHub</span><span class="chip">Docker</span><span class="chip">STM32CubeIDE</span><span class="chip">WordPress</span><span class="chip">AI automation</span><span class="chip">Testing</span><span class="chip">Technical visualization</span>
           </div>
         </article>
       </div>
     </section>
-    <section>
-      <div class="panel-grid">
+
+    <section class="case-section site-shell" aria-labelledby="education-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Education</p>
+        <h2 id="education-title">Computer Engineering at Waterloo.</h2>
+      </div>
+      <div class="case-grid">
         <article class="panel" data-reveal>
-          <span class="panel-kicker">Build Style</span>
-          <h3>Full-stack engineer with a hardware mindset</h3>
-          <p>I like instrumented systems, robust debugging, and designs that stay compact without becoming fragile.</p>
+          <span class="panel-kicker">Sep 2024&ndash;Expected Jun 2029</span>
+          <h3>University of Waterloo</h3>
+          <p>Bachelor of Applied Science candidate in Computer Engineering.</p>
         </article>
         <article class="panel" data-reveal>
-          <span class="panel-kicker">Outside Class</span>
-          <h3>Creative production and communication</h3>
-          <p>Beyond engineering, I work with video, audio, and visual storytelling tools, which helps me present technical ideas clearly and build polished experiences.</p>
-        </article>
-        <article class="panel" data-reveal>
-          <span class="panel-kicker">Long-Term Goal</span>
-          <h3>Make intelligent hardware more usable</h3>
-          <p>I want to build systems that combine sensing, control, and intelligent interfaces to solve practical problems in the physical world.</p>
+          <span class="panel-kicker">Sep 2021&ndash;Jun 2024</span>
+          <h3>Shanghai Weiyu High School</h3>
+          <p>International Baccalaureate Diploma Programme.</p>
         </article>
       </div>
     </section>
+
+    <section class="case-section site-shell" aria-labelledby="certifications-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Certifications</p>
+          <h2 id="certifications-title">Cloud and AI foundations.</h2>
+        </div>
+        <div class="case-grid">
+          <article class="panel" data-reveal><span class="panel-kicker">Issued Jun 2025</span><h3>Microsoft Certified: Azure AI Fundamentals</h3></article>
+          <article class="panel" data-reveal><span class="panel-kicker">Issued Jun 2025</span><h3>Microsoft Certified: Azure Fundamentals</h3></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-label="Contact call to action">
+      <div class="panel callout-panel" data-reveal>
+        <p class="eyebrow">What comes next</p>
+        <h2>I&rsquo;m looking for teams building serious systems with practical impact.</h2>
+        <a class="cta-btn" href="contact.html">Start a conversation</a>
+      </div>
+    </section>
   </main>
-  <footer><div class="footer-inner site-shell"><p>? 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
-  <script src="js/site.js"></script>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
 </body>
 </html>
-

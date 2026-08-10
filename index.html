@@ -1,283 +1,344 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Jiarong (Bill) Lu | Embedded Systems and Hardware</title>
-  <meta name="description" content="Personal website of Jiarong (Bill) Lu, a University of Waterloo Computer Engineering student building embedded systems, robotics software, and applied AI tools.">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050607">
+  <title>Jiarong (Bill) Lu | Embedded Systems, PCB Design & Applied AI</title>
+  <meta name="description" content="Jiarong (Bill) Lu is a University of Waterloo Computer Engineering student building embedded control systems, PCBs, robotics software, and practical AI products.">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Jiarong (Bill) Lu | Precision, from the PCB up.">
+  <meta property="og:description" content="Embedded control, PCB systems, robotics software, PocketPilot, and practical AI engineering.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Jiarong (Bill) Lu | Precision, from the PCB up.">
+  <meta name="twitter:description" content="Embedded control, PCB systems, robotics software, PocketPilot, and practical AI engineering.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" href="images/cinematic/pcb-hero.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="css/future.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://william-lu-jia-rong.github.io/#person",
+        "name": "Jiarong (Bill) Lu",
+        "url": "https://william-lu-jia-rong.github.io/",
+        "email": "mailto:j94lu@uwaterloo.ca",
+        "jobTitle": "Computer Engineering Student and Embedded Systems Engineer",
+        "affiliation": {"@type": "CollegeOrUniversity", "name": "University of Waterloo"},
+        "sameAs": [
+          "https://github.com/William-Lu-Jia-Rong",
+          "https://www.linkedin.com/in/jiarong-lu-03b025212/"
+        ],
+        "knowsAbout": ["Embedded systems", "PCB design", "STM32", "Motor control", "Robotics", "SwiftUI", "AI automation"]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "PocketPilot",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "iOS 17 or later",
+        "url": "https://apps.apple.com/ca/app/pocketpilot/id6783054106",
+        "author": {"@id": "https://william-lu-jia-rong.github.io/#person"},
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CAD"}
+      }
+    ]
+  }
+  </script>
 </head>
-<body>
-  <div class="progress-line"></div>
-  <header>
-    <nav class="navbar site-shell">
-      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-      <ul class="nav-links">
-        <li><a class="active" href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-social">
-        <a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+<body class="home-page is-loading">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="boot-loader" data-loader role="status" aria-live="polite">
+    <div class="boot-loader__inner">
+      <div class="boot-loader__mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p class="mono-label">BILL LU / SYSTEM START</p>
+      <div class="boot-loader__track"><span data-loader-bar></span></div>
+      <p class="boot-loader__status" data-loader-status>Calibrating embedded portfolio...</p>
+    </div>
+  </div>
+
+  <canvas class="signal-canvas" data-signal-canvas aria-hidden="true"></canvas>
+  <div class="noise-layer" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <header class="site-header" data-header>
+    <nav class="site-nav site-shell" aria-label="Primary navigation">
+      <a class="wordmark" href="index.html" aria-label="Bill Lu, home">
+        <span class="wordmark__main">BILL LU</span>
+        <span class="wordmark__sub">EMBEDDED / AI</span>
+      </a>
+      <div class="chapter-nav" aria-label="Homepage chapters">
+        <a href="#intro" data-chapter-link="intro">Intro</a>
+        <a href="#pocketpilot" data-chapter-link="pocketpilot">PocketPilot</a>
+        <a href="#warg" data-chapter-link="warg">Flight</a>
+        <a href="#embedded" data-chapter-link="embedded">Control</a>
+        <a href="#ai" data-chapter-link="ai">AI</a>
+      </div>
+      <div class="nav-actions">
+        <a class="contact-pill" href="contact.html">Contact</a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-panel" data-menu-toggle>
+          <span class="sr-only">Open menu</span><span></span><span></span>
+        </button>
       </div>
     </nav>
+    <div class="menu-panel" id="menu-panel" data-menu-panel hidden>
+      <div class="menu-panel__inner site-shell">
+        <p class="mono-label">Navigate / 01—05</p>
+        <div class="menu-panel__links">
+          <a href="index.html">Home</a>
+          <a href="projects.html">Work</a>
+          <a href="experience.html">Experience</a>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div class="menu-panel__meta">
+          <a href="mailto:j94lu@uwaterloo.ca">j94lu@uwaterloo.ca</a>
+          <a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub ↗</a>
+          <a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+        </div>
+      </div>
+    </div>
   </header>
-  <main>
-    <section class="hero hero-full">
-      <div class="hero-bg-visual" aria-hidden="true">
-        <div class="hero-grid-lines"></div>
-        <div class="hero-arc"></div>
-        <div class="orb"></div>
-        <div class="orb-small"></div>
-        <div class="hardware-visual hardware-visual-hero">
-          <div class="board-plane"></div>
-          <div class="board-glow"></div>
-          <div class="motor-assembly">
-            <div class="motor-ring motor-ring-outer"></div>
-            <div class="motor-ring motor-ring-mid"></div>
-            <div class="motor-ring motor-ring-inner"></div>
-            <div class="motor-spokes">
-              <span></span><span></span><span></span><span></span><span></span><span></span>
+
+  <main id="main-content">
+    <section class="cinematic-scene hero-scene" id="intro" data-scene="intro" data-theme="copper">
+      <div class="scene-stage">
+        <div class="hero-backdrop" aria-hidden="true">
+          <img src="images/cinematic/pcb-hero.webp" alt="" width="1672" height="941" fetchpriority="high" data-parallax="0.13">
+          <div class="hero-backdrop__wash"></div>
+        </div>
+        <div class="scene-grid" aria-hidden="true"></div>
+        <div class="site-shell scene-layout hero-layout">
+          <div class="hero-copy" data-scene-copy>
+            <p class="eyebrow"><span></span> Jiarong (Bill) Lu / Computer Engineering</p>
+            <h1>Precision,<br>from the <em>PCB</em> up.</h1>
+            <p class="hero-lede">I build embedded control systems, compact hardware, robotics software, and practical AI products—turning complex behavior into tools people can trust.</p>
+            <div class="hero-actions">
+              <a class="primary-action" href="#pocketpilot">Explore the system <span aria-hidden="true">↓</span></a>
+              <a class="text-action" href="projects.html">View all work <span aria-hidden="true">↗</span></a>
             </div>
-            <div class="motor-core"></div>
-            <div class="motor-readout">BLDC rotor</div>
           </div>
-          <div class="hex-chip"><span>DRV</span></div>
+          <div class="hero-hud" aria-label="Engineering focus areas">
+            <div class="hud-card hud-card--a"><span>CONTROL BUS</span><strong>STM32 / C++</strong></div>
+            <div class="hud-card hud-card--b"><span>BOARD LAYER</span><strong>PCB / BLDC</strong></div>
+            <div class="hud-card hud-card--c"><span>RESEARCH</span><strong>APPLIED AI</strong></div>
+          </div>
+          <div class="scene-index" aria-hidden="true"><span>01</span><span>INTRO</span></div>
         </div>
+        <a class="scroll-cue" href="#pocketpilot"><span>Scroll to explore</span><i aria-hidden="true">↓</i></a>
       </div>
-      <div class="hero-inner site-shell">
-        <div class="hero-copy centered" data-reveal>
-          <span class="section-label">embedded systems</span>
-          <h1>Pushing precision into real hardware.</h1>
-          <p>I am Jiarong (Bill) Lu, a Computer Engineering student at the University of Waterloo building embedded flight software, STM32 firmware, compact PCB systems, and AI-assisted engineering workflows.</p>
-          <div class="hero-actions">
-            <a class="slide-btn cta-btn" href="projects.html"><span>Explore Projects</span></a>
-            <a class="slide-btn ghost-btn" href="Resume_Hardware.pdf" target="_blank" rel="noreferrer"><span>Open Resume</span></a>
+    </section>
+
+    <section class="cinematic-scene pocketpilot-scene" id="pocketpilot" data-scene="pocketpilot" data-theme="blue">
+      <div class="scene-stage pocketpilot-stage">
+        <div class="scene-grid scene-grid--blue" aria-hidden="true"></div>
+        <div class="pocket-orbit" aria-hidden="true"></div>
+        <div class="site-shell scene-layout pocketpilot-layout">
+          <div class="scene-copy scene-copy--left">
+            <p class="eyebrow"><span></span> Flagship product / July 2026</p>
+            <h2>Money tracking<br>that keeps its<br><em>distance.</em></h2>
+            <p>Solo-designed and engineered for Automate Agency, PocketPilot logs spending quickly while keeping storage under the user’s control.</p>
+            <div class="metric-strip" aria-label="PocketPilot facts">
+              <div><strong>iOS 17+</strong><span>Native SwiftUI</span></div>
+              <div><strong>5.5 MB</strong><span>App Store size</span></div>
+              <div><strong>3 modes</strong><span>Local / iCloud / self-hosted</span></div>
+            </div>
+            <div class="scene-actions">
+              <a class="primary-action primary-action--blue" href="https://apps.apple.com/ca/app/pocketpilot/id6783054106" target="_blank" rel="noreferrer">View on the App Store ↗</a>
+              <a class="text-action" href="project-pocketpilot.html">Read the case study</a>
+            </div>
           </div>
+
+          <div class="phone-system" aria-label="PocketPilot application screens">
+            <div class="app-icon-orbit"><img src="images/pocketpilot/app-icon.webp" alt="PocketPilot app icon" width="1024" height="1024" loading="lazy"></div>
+            <div class="phone-card phone-card--rear" data-phone="rear">
+              <img src="images/pocketpilot/screenshot-storage-sync.webp" alt="PocketPilot storage and sync options" width="1242" height="2688" loading="lazy">
+            </div>
+            <div class="phone-card phone-card--mid" data-phone="mid">
+              <img src="images/pocketpilot/screenshot-insights.webp" alt="PocketPilot monthly spending insights" width="1242" height="2688" loading="lazy">
+            </div>
+            <div class="phone-card phone-card--front" data-phone="front">
+              <img src="images/pocketpilot/screenshot-scan.webp" alt="PocketPilot on-device receipt scan screen" width="1242" height="2688" loading="lazy">
+            </div>
+            <div class="phone-scanline" aria-hidden="true"></div>
+          </div>
+
+          <div class="chapter-steps" data-scene-steps aria-label="PocketPilot system stages">
+            <article data-step="0"><span>01 / Capture</span><p>Screenshot OCR, Shortcuts, CSV, or manual entry.</p></article>
+            <article data-step="1"><span>02 / Process</span><p>Apple Vision runs on-device; duplicate entries are flagged for review.</p></article>
+            <article data-step="2"><span>03 / Store</span><p>Choose local-only, private CloudKit sync, or a self-hosted Raspberry Pi.</p></article>
+            <article data-step="3"><span>04 / Understand</span><p>Monthly totals, categories, search, multi-currency views, and widgets.</p></article>
+          </div>
+          <div class="scene-index" aria-hidden="true"><span>02</span><span>POCKETPILOT</span></div>
         </div>
       </div>
     </section>
 
-    <section class="site-shell section-about">
-      <div class="section-heading" data-reveal>
-        <span class="section-label">about</span>
-        <h2>From firmware to field-ready systems — one engineering loop.</h2>
-        <p>I build embedded software and hardware-adjacent systems that prioritize stability, compact design, and product-level clarity.</p>
-        <a class="mini-link" href="about.html">Learn more</a>
-      </div>
-      <div class="capability-grid">
-        <article class="capability-card" data-reveal data-reveal-delay="0">
-          <h3>Firmware</h3>
-          <p>STM32 firmware, interrupt-safe state machines, sensing pipelines, and telemetry — built for real-time constraints and clean integration.</p>
-          <a class="mini-link" href="experience.html">Learn more</a>
-        </article>
-        <article class="capability-card" data-reveal data-reveal-delay="1">
-          <h3>Motor Control</h3>
-          <p>BLDC drivers, FOC current loops, PID tuning, and closed-loop control — from compact driver boards to precise angular positioning.</p>
-          <a class="mini-link" href="experience-mindmatrix.html">Learn more</a>
-        </article>
-        <article class="capability-card" data-reveal data-reveal-delay="2">
-          <h3>Systems</h3>
-          <p>Hardware integration, compact PCB design, AI-assisted engineering workflows, and product-level thinking across firmware and mechanics.</p>
-          <a class="mini-link" href="project-glory-media.html">Learn more</a>
-        </article>
+    <section class="cinematic-scene flight-scene" id="warg" data-scene="warg" data-theme="cyan">
+      <div class="scene-stage flight-stage">
+        <div class="flight-map" aria-hidden="true">
+          <div class="flight-grid-plane"></div>
+          <div class="flight-path flight-path--one"></div>
+          <div class="flight-path flight-path--two"></div>
+          <span class="flight-node n1"></span><span class="flight-node n2"></span><span class="flight-node n3"></span><span class="flight-node n4"></span>
+          <div class="attitude-ring"><span></span><i></i><b></b></div>
+        </div>
+        <div class="site-shell scene-layout flight-layout">
+          <div class="scene-copy scene-copy--wide">
+            <p class="eyebrow"><span></span> Waterloo Aerial Robotics Group / Current</p>
+            <h2>Stability is<br>a software decision.</h2>
+            <p>Embedded flight software for aerial robotics: motor-driver architecture, PID attitude management, and thrust modeling across motors and propellers.</p>
+            <a class="text-action" href="experience-warg.html">Open flight systems case study ↗</a>
+          </div>
+          <div class="telemetry-stack" aria-label="Flight software work">
+            <div><span>ATTITUDE LOOP</span><strong>PID / ACTIVE</strong></div>
+            <div><span>PROPULSION MODEL</span><strong>THRUST / IN REVIEW</strong></div>
+            <div><span>DRIVER LAYER</span><strong>MOTOR / INTEGRATED</strong></div>
+          </div>
+          <div class="scene-index" aria-hidden="true"><span>03</span><span>FLIGHT CONTROL</span></div>
+        </div>
       </div>
     </section>
 
-    <section class="dark-band metrics-band">
+    <section class="cinematic-scene control-scene" id="embedded" data-scene="embedded" data-theme="amber">
+      <div class="scene-stage control-stage">
+        <div class="control-backdrop" aria-hidden="true"><img src="images/cinematic/pcb-hero.webp" alt="" width="1672" height="941" loading="lazy"></div>
+        <div class="site-shell scene-layout control-layout">
+          <div class="scene-copy">
+            <p class="eyebrow"><span></span> Embedded control / 2025—2026</p>
+            <h2>Close the loop.<br>Then make it<br><em>smaller.</em></h2>
+            <p>From compact BLDC driver boards and torque rigs to production firmware across five STM32 products, I work through the full control stack.</p>
+            <a class="text-action" href="experience-embedded-control.html">Read the embedded control case ↗</a>
+          </div>
+          <div class="spec-lines" aria-label="Embedded control specifications">
+            <article><span>BOARD ENVELOPE</span><strong>1.8 × 3.0 cm</strong><p>Compact STM32F446 motor-control board.</p></article>
+            <article><span>POSITIONING TARGET</span><strong>&lt;0.1°</strong><p>FOC and tuned PID angular control target.</p></article>
+            <article><span>PRODUCTION SCOPE</span><strong>5 products</strong><p>Motion, motor, distance, and color-sensing firmware.</p></article>
+            <article><span>CALIBRATION FLOW</span><strong>AI + CNC</strong><p>Visual tooling to replace repetitive G-code work.</p></article>
+          </div>
+          <div class="scene-index" aria-hidden="true"><span>04</span><span>EMBEDDED CONTROL</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cinematic-scene ai-scene" id="ai" data-scene="ai" data-theme="blue">
+      <div class="scene-stage ai-stage">
+        <div class="ai-backdrop" aria-hidden="true"><img src="images/cinematic/ai-automation.webp" alt="" width="1672" height="941" loading="lazy"></div>
+        <div class="site-shell scene-layout ai-layout">
+          <div class="scene-copy scene-copy--left">
+            <p class="eyebrow"><span></span> Automate Agency / Current</p>
+            <h2>AI that moves<br>through a real<br><em>workflow.</em></h2>
+            <p>I investigate where AI earns a place in production—connecting generation, human review, scheduling, publishing, and logs into systems teams can actually operate.</p>
+            <div class="scene-actions">
+              <a class="text-action" href="experience-automate-agency.html">Open AI automation case ↗</a>
+              <a class="text-action" href="https://www.automateagency.ca/" target="_blank" rel="noreferrer">Visit Automate Agency ↗</a>
+            </div>
+          </div>
+          <ol class="pipeline" aria-label="AI automation stages">
+            <li><span>01</span><strong>Generate</strong><small>Ideas, captions, scripts, creative assets</small></li>
+            <li><span>02</span><strong>Review</strong><small>Human approval and quality gates</small></li>
+            <li><span>03</span><strong>Schedule</strong><small>Cadence, assets, and publishing state</small></li>
+            <li><span>04</span><strong>Observe</strong><small>Delivery logs and recurring improvement</small></li>
+          </ol>
+          <div class="scene-index" aria-hidden="true"><span>05</span><span>APPLIED AI</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cinematic-scene water-scene" id="water" data-scene="water" data-theme="aqua">
+      <div class="scene-stage water-stage">
+        <div class="water-photo" aria-hidden="true"><img src="images/Automatic_Water_Quality_Monitoring_Device/boatv2 - Copy.jpg" alt="" width="2237" height="1308" loading="lazy"></div>
+        <div class="water-blueprint" aria-hidden="true"><img src="images/Automatic_Water_Quality_Monitoring_Device/Overall_Connection_design.png" alt="" width="625" height="435" loading="lazy"></div>
+        <div class="site-shell scene-layout water-layout">
+          <div class="scene-copy">
+            <p class="eyebrow"><span></span> Early physical build / 2024</p>
+            <h2>Sense the water.<br>Build the whole<br><em>system.</em></h2>
+            <p>A cost-conscious STM32 platform combining TDS sensing, propulsion, C/C++ firmware, CAD, and a custom physical enclosure.</p>
+            <a class="text-action" href="project-water-quality.html">Inspect the build ↗</a>
+          </div>
+          <div class="scene-index" aria-hidden="true"><span>06</span><span>PHYSICAL SYSTEM</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="work-index content-section" id="work">
       <div class="site-shell">
-        <div class="section-heading centered" data-reveal>
-          <span class="section-label">by the numbers</span>
-          <h2>Results, proven on real projects.</h2>
+        <div class="section-intro" data-reveal>
+          <p class="eyebrow"><span></span> Selected systems</p>
+          <h2>Five builds.<br>One engineering loop.</h2>
+          <p>Understand the problem, instrument the system, close the loop, and make the result usable.</p>
         </div>
-        <div class="metrics-grid">
-          <article class="metric-card" data-reveal data-reveal-delay="0">
-            <div class="metric-values">
-              <span class="metric-before" data-counter="0">0</span>
-              <span class="metric-arrow">→</span>
-              <span class="metric-after" data-counter="5" data-counter-suffix="">5</span>
-            </div>
-            <span class="metric-delta">+5</span>
-            <p class="metric-label">STM32 hardware products supported at Studica</p>
-            <a class="mini-link" href="experience.html">View case</a>
-          </article>
-          <article class="metric-card" data-reveal data-reveal-delay="1">
-            <div class="metric-values">
-              <span class="metric-after metric-single">&lt;0.1°</span>
-            </div>
-            <span class="metric-delta metric-delta-neutral">precision</span>
-            <p class="metric-label">Target angular positioning in motor control loops</p>
-            <a class="mini-link" href="experience-mindmatrix.html">View case</a>
-          </article>
-          <article class="metric-card" data-reveal data-reveal-delay="2">
-            <div class="metric-values">
-              <span class="metric-before" data-counter="0">0</span>
-              <span class="metric-arrow">→</span>
-              <span class="metric-after" data-counter="2" data-counter-suffix="">2</span>
-            </div>
-            <span class="metric-delta">+2</span>
-            <p class="metric-label">Microsoft Azure and AI fundamentals certifications</p>
-            <a class="mini-link" href="skills.html">View case</a>
-          </article>
+        <div class="work-grid">
+          <a class="work-card work-card--feature" href="project-pocketpilot.html" data-reveal>
+            <span class="work-card__index">01</span><span class="work-card__tag">Native iOS / Privacy</span>
+            <h3>PocketPilot</h3><p>Offline-first expense capture with on-device OCR and user-controlled storage.</p><i>View case ↗</i>
+          </a>
+          <a class="work-card" href="experience-warg.html" data-reveal>
+            <span class="work-card__index">02</span><span class="work-card__tag">Robotics / Flight</span>
+            <h3>WARG Flight Software</h3><p>Motor drivers, attitude control, and propulsion modeling for aerial robotics.</p><i>View case ↗</i>
+          </a>
+          <a class="work-card" href="experience-embedded-control.html" data-reveal>
+            <span class="work-card__index">03</span><span class="work-card__tag">PCB / Firmware</span>
+            <h3>Embedded Control</h3><p>BLDC boards, FOC/PID control, product firmware, and calibration tooling.</p><i>View case ↗</i>
+          </a>
+          <a class="work-card" href="experience-automate-agency.html" data-reveal>
+            <span class="work-card__index">04</span><span class="work-card__tag">AI / Operations</span>
+            <h3>Automate Agency</h3><p>Production content pipelines with human gates and operational logging.</p><i>View case ↗</i>
+          </a>
+          <a class="work-card" href="project-water-quality.html" data-reveal>
+            <span class="work-card__index">05</span><span class="work-card__tag">STM32 / Physical</span>
+            <h3>Water Quality Monitor</h3><p>Sensing, propulsion, firmware, CAD, and fabrication in one compact platform.</p><i>View case ↗</i>
+          </a>
         </div>
+        <div class="section-actions" data-reveal><a class="primary-action" href="projects.html">Browse the full archive ↗</a></div>
       </div>
     </section>
 
-    <section class="site-shell section-focus">
-      <div class="section-heading centered" data-reveal>
-        <span class="section-label">focus areas</span>
-        <h2>Core technical domains.</h2>
-      </div>
-      <div class="tech-blocks">
-        <article class="tech-block" data-reveal>
-          <h2 class="tech-title"><span class="tech-prefix">//</span> Embedded</h2>
-          <p class="tech-desc">Firmware and flight software for robotics platforms — interrupt-safe control, sensing, and integration under real hardware constraints.</p>
-          <ol class="use-case-list">
-            <li><span class="use-case-num">01</span> WARG embedded flight software and motor-driver architecture</li>
-            <li><span class="use-case-num">02</span> Mindmatrix BLDC driver boards and control loops</li>
-            <li><span class="use-case-num">03</span> Automatic Water Quality Monitor — STM32 sensing and propulsion</li>
-            <li><span class="use-case-num">04</span> Studica STM32 product firmware support</li>
-          </ol>
-          <a class="slide-btn ghost-btn" href="experience-warg.html"><span>Learn more</span></a>
-        </article>
-        <article class="tech-block" data-reveal>
-          <h2 class="tech-title"><span class="tech-prefix">//</span> Robotics</h2>
-          <p class="tech-desc">Motor control, attitude management, and thrust modeling — precise closed-loop systems for aerial and compact electromechanical platforms.</p>
-          <ol class="use-case-list">
-            <li><span class="use-case-num">01</span> PID-based attitude management and thrust modeling</li>
-            <li><span class="use-case-num">02</span> BLDC torque testing and FOC current loop tuning</li>
-            <li><span class="use-case-num">03</span> Compact PCB systems with mechanical integration</li>
-            <li><span class="use-case-num">04</span> Sub-degree angular positioning targets</li>
-          </ol>
-          <a class="slide-btn ghost-btn" href="experience-mindmatrix.html"><span>Learn more</span></a>
-        </article>
-        <article class="tech-block" data-reveal>
-          <h2 class="tech-title"><span class="tech-prefix">//</span> Applied AI</h2>
-          <p class="tech-desc">Production-minded AI workflows, analytics systems, and engineering tooling that accelerate repetitive calibration and testing work.</p>
-          <ol class="use-case-list">
-            <li><span class="use-case-num">01</span> Glory Media knowledge-based AI workflows</li>
-            <li><span class="use-case-num">02</span> BridgeNet education platform with AI-assisted support</li>
-            <li><span class="use-case-num">03</span> AI-assisted calibration and CNC workflow concepts</li>
-            <li><span class="use-case-num">04</span> Azure and AI fundamentals certification depth</li>
-          </ol>
-          <a class="slide-btn ghost-btn" href="project-glory-media.html"><span>Learn more</span></a>
-        </article>
-      </div>
-    </section>
-
-    <section class="site-shell section-cases">
-      <div class="section-heading" data-reveal>
-        <span class="section-label">case studies</span>
-        <h2>Selected work.</h2>
-        <p>Embedded systems, motor control, and applied AI — verified on real engineering projects.</p>
-      </div>
-      <div class="case-grid">
-        <article class="case-card" data-reveal data-reveal-delay="0">
-          <span class="case-tag">Embedded</span>
-          <h3>Waterloo Aerial Robotics Group</h3>
-          <p class="case-meta">Flight Software · Waterloo · 2025</p>
-          <p class="case-metric">PID attitude control, motor-driver architecture, thrust modeling</p>
-          <a class="case-link" href="experience-warg.html">View case →</a>
-        </article>
-        <article class="case-card" data-reveal data-reveal-delay="1">
-          <span class="case-tag">Motor Control</span>
-          <h3>Mindmatrix BLDC Driver</h3>
-          <p class="case-meta">STM32 / FOC · Compact PCB · 2025</p>
-          <p class="case-metric">&lt;0.1° positioning, closed-loop torque testing</p>
-          <a class="case-link" href="experience-mindmatrix.html">View case →</a>
-        </article>
-        <article class="case-card" data-reveal data-reveal-delay="2">
-          <span class="case-tag">Embedded Project</span>
-          <h3>Water Quality Monitor</h3>
-          <p class="case-meta">STM32 · Sensing · Custom Build · 2024</p>
-          <p class="case-metric">C/C++ firmware, propulsion, Autodesk Inventor mechanical design</p>
-          <a class="case-link" href="project-water-quality.html">View case →</a>
-        </article>
-        <article class="case-card" data-reveal data-reveal-delay="3">
-          <span class="case-tag">AI Platform</span>
-          <h3>BridgeNet</h3>
-          <p class="case-meta">React / TypeScript · Node.js · 2024</p>
-          <p class="case-metric">Education platform with AI-assisted networking support</p>
-          <a class="case-link" href="project-bridgenet.html">View case →</a>
-        </article>
-      </div>
-      <div class="section-actions" data-reveal>
-        <a class="slide-btn ghost-btn" href="projects.html"><span>All cases</span></a>
-      </div>
-    </section>
-
-    <section class="ticker-section" data-reveal>
-      <div class="section-heading centered compact">
-        <span class="section-label">stack</span>
-        <h2>Technologies in use.</h2>
-      </div>
-      <div class="ticker-wrap" data-ticker>
-        <div class="ticker-track">
-          <span class="ticker-item">STM32</span>
-          <span class="ticker-item">C / C++</span>
-          <span class="ticker-item">BLDC</span>
-          <span class="ticker-item">FOC</span>
-          <span class="ticker-item">PID</span>
-          <span class="ticker-item">ROS</span>
-          <span class="ticker-item">Python</span>
-          <span class="ticker-item">React</span>
-          <span class="ticker-item">TypeScript</span>
-          <span class="ticker-item">Node.js</span>
-          <span class="ticker-item">PostgreSQL</span>
-          <span class="ticker-item">Azure</span>
-          <span class="ticker-item">Autodesk Inventor</span>
-          <span class="ticker-item">STM32</span>
-          <span class="ticker-item">C / C++</span>
-          <span class="ticker-item">BLDC</span>
-          <span class="ticker-item">FOC</span>
-          <span class="ticker-item">PID</span>
-          <span class="ticker-item">ROS</span>
-          <span class="ticker-item">Python</span>
-          <span class="ticker-item">React</span>
-          <span class="ticker-item">TypeScript</span>
-          <span class="ticker-item">Node.js</span>
-          <span class="ticker-item">PostgreSQL</span>
-          <span class="ticker-item">Azure</span>
-          <span class="ticker-item">Autodesk Inventor</span>
+    <section class="profile-band content-section">
+      <div class="site-shell profile-band__grid">
+        <div class="profile-band__portrait" data-reveal><img src="images/profile.jpg" alt="Portrait of Jiarong (Bill) Lu" width="2042" height="2407" loading="lazy"></div>
+        <div class="profile-band__copy" data-reveal>
+          <p class="eyebrow"><span></span> Waterloo / Ontario</p>
+          <h2>Engineering across<br>the boundary.</h2>
+          <p>I’m pursuing a BASc in Computer Engineering at the University of Waterloo, expected June 2029. My best work happens where firmware, hardware, software, and product judgment meet.</p>
+          <div class="capability-list">
+            <span>STM32 / C / C++</span><span>PCB / KiCad / Altium</span><span>Swift / SwiftUI</span><span>Python / TypeScript</span><span>CAD / CNC</span><span>AI automation</span>
+          </div>
+          <a class="text-action" href="about.html">More about my approach ↗</a>
         </div>
       </div>
     </section>
 
-    <section class="cta-band">
-      <div class="cta-band-inner site-shell">
-        <div class="cta-copy" data-reveal>
-          <span class="section-label">contact</span>
-          <h2>Open to internships and technical collaboration.</h2>
-          <p>If you are building in robotics, embedded systems, or applied AI, send a note — I typically reply within a day.</p>
+    <section class="closing-cta" id="contact">
+      <div class="site-shell closing-cta__inner" data-reveal>
+        <p class="mono-label">AVAILABLE FOR ENGINEERING OPPORTUNITIES</p>
+        <h2>Building something<br>that has to work?</h2>
+        <div class="closing-cta__actions">
+          <a class="primary-action" href="mailto:j94lu@uwaterloo.ca">Email Bill ↗</a>
+          <a class="text-action" href="contact.html">Open contact page</a>
         </div>
-        <form class="cta-form contact-form" action="https://formspree.io/f/mkgozayl" method="POST" data-formspree-form data-reveal data-reveal-delay="1">
-          <input type="text" name="name" placeholder="Your name" required>
-          <input type="email" name="email" placeholder="Your email" required>
-          <textarea name="message" rows="4" placeholder="What are you building?" required></textarea>
-          <button type="submit" class="slide-btn cta-btn"><span>Send message</span></button>
-          <p class="form-status" data-form-status aria-live="polite" hidden></p>
-        </form>
       </div>
     </section>
   </main>
-  <footer>
-    <div class="footer-inner site-shell">
-      <p>(c) 2026 Jiarong (Bill) Lu</p>
-      <ul class="footer-links">
-        <li><a href="about.html">About</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
+
+  <footer class="site-footer">
+    <div class="site-shell site-footer__grid">
+      <div><strong>BILL LU</strong><p>Embedded systems, PCB design, robotics, and practical AI.</p></div>
+      <nav aria-label="Footer navigation"><a href="projects.html">Work</a><a href="experience.html">Experience</a><a href="about.html">About</a><a href="contact.html">Contact</a></nav>
+      <div class="site-footer__social"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
+      <p class="site-footer__legal">© 2026 Jiarong (Bill) Lu</p>
     </div>
   </footer>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-  <script src="js/site.js"></script>
+
+  <noscript><style>.boot-loader{display:none!important}.is-loading{overflow:auto!important}</style></noscript>
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/cinematic.js"></script>
 </body>
 </html>

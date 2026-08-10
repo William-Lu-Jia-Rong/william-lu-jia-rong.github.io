@@ -1,0 +1,23 @@
+# Keep source-only files and private résumé artifacts out of branch-based
+# GitHub Pages builds. The Vite/Sites production build also excludes them.
+exclude:
+  - Resume_Hardware.pdf
+  - Resume_Software.pdf
+  - node_modules
+  - dist
+  - build
+  - worker
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - vite.config.ts
+  - README.md
+  - experience-bopoda.html
+  - experience-glory-media.html
+  - experience-hswebsite.html
+  - experience-mindmatrix.html
+  - project-glory-media.html
+  - project-hswebsite.html
+  - skills.html
+  - water-quality-portfolio.html
+  - flipcard.js

@@ -1,48 +1,133 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Experience | Jiarong (Bill) Lu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta name="description" content="Bill Lu's experience across aerial robotics, production STM32 firmware, BLDC motor control, full-stack software, and practical AI automation.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/experience.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="Experience | Jiarong (Bill) Lu">
+  <meta property="og:description" content="Aerial robotics, production firmware, compact motor-control hardware, full-stack software, and practical AI automation.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/experience.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Experience | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="Aerial robotics, production firmware, compact motor-control hardware, full-stack software, and practical AI automation.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/future.css">
 </head>
-<body>
-  <div class="progress-line"></div>
-  <header>
-    <nav class="navbar site-shell">
-      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-      <ul class="nav-links">
+<body class="archive-page experience-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
         <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
-        <li><a class="active" href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
+        <li><a class="active" aria-current="page" href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
-      <div class="nav-social"><a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></div>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
     </nav>
   </header>
-  <main class="site-shell">
-    <section class="page-hero">
+
+  <main id="main-content">
+    <section class="page-hero site-shell case-grid--profile" aria-labelledby="experience-title">
+      <p class="eyebrow" data-reveal>Experience</p>
+      <h1 id="experience-title" data-reveal>Engineering across the stack, all the way to the physical outcome.</h1>
+      <p data-reveal>My recent work spans embedded flight software, production STM32 products, motor-control electronics, full-stack applications, and AI-assisted operations.</p>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="current-title">
       <div class="section-heading" data-reveal>
-        <span class="eyebrow">Experience</span>
-        <h1>Recent roles across robotics, firmware, and applied AI.</h1>
-        <p>I work comfortably across low-level embedded development and high-level product thinking, especially when a team is trying to make a system both technically rigorous and practically usable.</p>
+        <p class="eyebrow">Current</p>
+        <h2 id="current-title">Active roles.</h2>
+      </div>
+      <div class="case-grid case-grid--featured">
+        <article class="panel timeline-card" data-reveal>
+          <div class="timeline-meta"><span class="status-chip">Current</span><time datetime="2024-10">Oct 2024&ndash;Present</time></div>
+          <h3>Waterloo Aerial Robotics Group</h3>
+          <p class="timeline-role">Embedded Flight Software Team Member</p>
+          <p>Building motor-driver functionality, working on PID-based attitude management, and modeling thrust from aircraft motors and propellers.</p>
+          <div class="chip-row"><span class="chip">Embedded flight software</span><span class="chip">PID</span><span class="chip">Thrust modeling</span></div>
+          <a class="mini-link" href="experience-warg.html">Read the WARG case study <span aria-hidden="true">&rarr;</span></a>
+        </article>
+        <article class="panel timeline-card" data-reveal>
+          <div class="timeline-meta"><span class="status-chip">Current</span><time datetime="2026-05">May 2026&ndash;Present</time></div>
+          <h3>Automate Agency</h3>
+          <p class="timeline-role">Web &amp; AI Automation Developer &middot; Part-time</p>
+          <p>Launched the agency website and built a daily social-content workflow linking generation, review, scheduling, publishing, and logs.</p>
+          <div class="chip-row"><span class="chip">Web development</span><span class="chip">AI automation</span><span class="chip">Content systems</span></div>
+          <a class="mini-link" href="experience-automate-agency.html">Read the automation case study <span aria-hidden="true">&rarr;</span></a>
+        </article>
       </div>
     </section>
-    <section>
+
+    <section class="case-section site-shell" aria-labelledby="embedded-history-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Embedded control</p>
+        <h2 id="embedded-history-title">Firmware, boards, mechanics, and test workflows.</h2>
+      </div>
       <div class="experience-timeline">
-        <article class="timeline-card" data-reveal data-tilt><span class="timeline-date">Oct 2024 - Present</span><h3>Waterloo Aerial Robotics Group</h3><div class="timeline-role">Embedded Flight Software Team Member</div><ul><li>Built motor-driver functionality for a new driver architecture within a student aerial robotics platform.</li><li>Worked on attitude management using PID control to improve stability and system behavior.</li><li>Modeled thrust generated by aircraft motors and propellers to support control and system understanding.</li></ul></article>
-        <article class="timeline-card" data-reveal data-tilt><span class="timeline-date">Jun 2025 - Sept 2025</span><h3>Shanghai Mindmatrix Technology Ltd</h3><div class="timeline-role">Embedded Software Developer</div><ul><li>Developed BLDC motor-control firmware on STM32 using real-time PWM, ADC, and communication flows in C and C++.</li><li>Designed and fabricated multi-layer BLDC driver PCBs and coordinated manufacturing with JLCPCB.</li><li>Built a torque-testing rig in Autodesk Inventor and worked toward FOC and finely tuned PID-based angular control.</li></ul><div class="button-row"><a class="ghost-btn" href="experience-mindmatrix.html">More detail</a></div></article>
-        <article class="timeline-card" data-reveal data-tilt><span class="timeline-date">Jun 2025 - Aug 2025</span><h3>Glory Media</h3><div class="timeline-role">AI Transformation and Product Development</div><ul><li>Built an iOS social product direction for media subscribers with sharing, interaction, and community features.</li><li>Developed data platforms that aggregated creator and marketing data from social and brand channels.</li><li>Prototyped AI-powered tools for recommendations, knowledge systems, summarization, and domain-specific agents.</li></ul><div class="button-row"><a class="ghost-btn" href="experience-glory-media.html">More detail</a></div></article>
-        <article class="timeline-card" data-reveal data-tilt><span class="timeline-date">Recent Technical Work</span><h3>Studica Limited</h3><div class="timeline-role">Embedded Software Development and AI Tooling</div><ul><li>Maintained firmware for multiple STM32-based hardware products spanning sensing, motor control, and robotics functions.</li><li>Used AI-assisted workflows to speed firmware development, repetitive testing, and visualization work.</li><li>Built an AI-assisted concept for CNC-based sensor calibration to reduce manual G-code-heavy processes.</li></ul></article>
+        <article class="panel timeline-card" data-reveal>
+          <div class="timeline-meta"><time datetime="2026-01">Jan&ndash;Apr 2026</time><span>Ontario, Canada</span></div>
+          <h3>Studica Limited</h3>
+          <p class="timeline-role">Embedded Software Developer</p>
+          <ul>
+            <li>Developed and maintained firmware for five major STM32 hardware products spanning motion, motor, distance, and color sensing.</li>
+            <li>Applied AI tools to accelerate firmware development and repetitive testing.</li>
+            <li>Built an AI-assisted visualization concept for CNC-based sensor calibration.</li>
+          </ul>
+          <a class="mini-link" href="experience-embedded-control.html#studica-title">Explore the Studica work <span aria-hidden="true">&rarr;</span></a>
+        </article>
+        <article class="panel timeline-card" data-reveal>
+          <div class="timeline-meta"><time datetime="2025-06">Jun&ndash;Sep 2025</time><span>Shanghai, China</span></div>
+          <h3>Shanghai Mindmatrix Technology</h3>
+          <p class="timeline-role">Embedded Software Developer</p>
+          <ul>
+            <li>Developed STM32 BLDC-control firmware with real-time PWM, ADC, and communication flows.</li>
+            <li>Designed multilayer driver PCBs and reduced one board to 1.8 &times; 3.0 cm.</li>
+            <li>Built a torque-testing rig and worked toward FOC and tuned PID control targeting less than 0.1&deg; error.</li>
+          </ul>
+          <a class="mini-link" href="experience-embedded-control.html#mindmatrix-title">Explore the Mindmatrix work <span aria-hidden="true">&rarr;</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="software-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Software experience</p>
+          <h2 id="software-title">Glory Media</h2>
+          <p><time datetime="2025-08">Aug&ndash;Dec 2025</time> &middot; Software Developer</p>
+        </div>
+        <div class="panel" data-reveal>
+          <p>Built full-stack TypeScript and cross-platform React Native product work for a social networking and marketplace platform. The system combined session-based authentication, REST APIs, PostgreSQL data modeling, responsive React interfaces, and role-based permissions.</p>
+          <div class="chip-row"><span class="chip">TypeScript</span><span class="chip">React</span><span class="chip">React Native</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-label="Contact call to action">
+      <div class="panel callout-panel" data-reveal>
+        <p class="eyebrow">Next challenge</p>
+        <h2>I&rsquo;m interested in embedded, robotics, and product engineering teams where the interfaces matter.</h2>
+        <a class="cta-btn" href="contact.html">Get in touch</a>
       </div>
     </section>
   </main>
-  <footer><div class="footer-inner site-shell"><p>? 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
-  <script src="js/site.js"></script>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="projects.html">Projects</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
 </body>
 </html>
-

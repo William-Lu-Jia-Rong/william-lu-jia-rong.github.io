@@ -1,85 +1,141 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Projects | Jiarong (Bill) Lu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta name="description" content="Selected products and engineering systems by Bill Lu, including the PocketPilot iOS app, an STM32 water-quality monitor, aerial robotics software, embedded control, and AI automation.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/projects.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="Projects | Jiarong (Bill) Lu">
+  <meta property="og:description" content="Products and systems spanning native iOS, embedded hardware, robotics, and practical AI.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/projects.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Projects | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="Products and systems spanning native iOS, embedded hardware, robotics, and practical AI.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/future.css">
 </head>
-<body>
-  <div class="progress-line"></div>
-  <header>
-    <nav class="navbar site-shell">
-      <h1 class="logo"><a href="index.html">Bill Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-      <ul class="nav-links">
+<body class="archive-page projects-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
         <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a class="active" href="projects.html">Projects</a></li>
+        <li><a class="active" aria-current="page" href="projects.html">Projects</a></li>
         <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
+        <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
-      <div class="nav-social"><a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></div>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
     </nav>
   </header>
-  <main>
-    <section class="page-hero site-shell">
-      <div class="section-heading centered compact" data-reveal>
-        <span class="eyebrow">Projects</span>
-        <h1>Selected work.</h1>
-        <p>Three projects that best represent my current direction across embedded systems, applied AI, and product thinking.</p>
+
+  <main id="main-content">
+    <section class="page-hero site-shell case-grid--profile" aria-labelledby="projects-title">
+      <p class="eyebrow" data-reveal>Selected projects</p>
+      <h1 id="projects-title" data-reveal>Products and systems built around real constraints.</h1>
+      <p data-reveal>My work moves between native software and physical systems, with the same goal in both places: turn complexity into something dependable, legible, and useful.</p>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="featured-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Flagship builds</p>
+        <h2 id="featured-title">Two complete product stories.</h2>
+      </div>
+      <div class="case-grid case-grid--featured">
+        <article class="panel project-feature" data-reveal>
+          <div class="project-feature-copy">
+            <span class="panel-kicker">Native iOS &middot; 2026</span>
+            <h3>PocketPilot</h3>
+            <p>A privacy-minded spending companion with on-device OCR, user-selected storage, Shortcuts-based automation, and clear monthly insights. Designed, developed, and released independently.</p>
+            <div class="chip-row"><span class="chip">Swift</span><span class="chip">SwiftUI</span><span class="chip">On-device OCR</span><span class="chip">App Store</span></div>
+            <div class="button-row"><a class="cta-btn" href="project-pocketpilot.html">Read the case study</a><a class="mini-link" href="https://apps.apple.com/ca/app/pocketpilot/id6783054106" target="_blank" rel="noreferrer">App Store <span aria-hidden="true">&nearr;</span></a></div>
+          </div>
+          <figure class="case-media">
+            <img class="app-icon" src="images/pocketpilot/app-icon.webp" width="1024" height="1024" alt="PocketPilot app icon">
+            <img class="phone-shot" src="images/pocketpilot/screenshot-insights.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot monthly spending insights screen">
+          </figure>
+        </article>
+
+        <article class="panel project-feature" data-reveal>
+          <div class="project-feature-copy">
+            <span class="panel-kicker">Embedded system &middot; ECE 198</span>
+            <h3>Automatic Water Quality Monitor</h3>
+            <p>A boat-based STM32 prototype integrating TDS sensing, propulsion, custom electronics, and a 3D-printed physical enclosure for mobile water-quality data collection.</p>
+            <div class="chip-row"><span class="chip">STM32F401RE</span><span class="chip">C / C++</span><span class="chip">TDS sensing</span><span class="chip">Motor control</span></div>
+            <div class="button-row"><a class="cta-btn" href="project-water-quality.html">Read the case study</a><a class="mini-link" href="https://github.com/1eoN-G/ECE-198-project" target="_blank" rel="noreferrer">Repository <span aria-hidden="true">&nearr;</span></a></div>
+          </div>
+          <figure class="case-media">
+            <img src="images/Automatic_Water_Quality_Monitoring_Device/boatv2%20-%20Copy.jpg" width="2237" height="1308" loading="lazy" alt="Automatic water-quality monitoring boat prototype">
+            <figcaption>Integrated sensing and propulsion prototype.</figcaption>
+          </figure>
+        </article>
       </div>
     </section>
 
-    <section class="apple-band">
-      <div class="spotlight-shell">
-        <div class="spotlight-grid">
-          <div class="spotlight-copy" data-reveal>
-            <span class="panel-kicker">Featured Project</span>
-            <h2>Automatic Water Quality Monitor.</h2>
-            <p>A compact STM32-based system for real-time sensing, motion, and physical integration.</p>
-            <div class="spotlight-metrics">
-              <div class="spotlight-stat"><strong>STM32</strong><span>Embedded sensing and control</span></div>
-              <div class="spotlight-stat"><strong>TDS</strong><span>Water analysis and data collection</span></div>
-              <div class="spotlight-stat"><strong>3D</strong><span>Custom physical build and enclosure</span></div>
-            </div>
-            <div class="button-row"><a class="mini-link" href="project-water-quality.html">Learn more</a></div>
-          </div>
-          <div class="spotlight-frame" data-reveal>
-            <div class="spotlight-label"><span>Embedded Device</span><span>Case Study</span></div>
-            <img class="spotlight-image" src="images/profile.jpg" alt="Project highlight image">
-          </div>
+    <section class="case-section site-shell" aria-labelledby="systems-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Engineering in practice</p>
+        <h2 id="systems-title">Three more systems, built in working teams.</h2>
+      </div>
+      <div class="case-grid case-grid--cards">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Aerial robotics</span>
+          <h3>WARG Flight Software</h3>
+          <p>Motor-driver architecture, PID attitude management, and ongoing propulsion modeling for University of Waterloo student-built aircraft.</p>
+          <a class="mini-link" href="experience-warg.html">Explore WARG <span aria-hidden="true">&rarr;</span></a>
+        </article>
+        <div class="panel" data-reveal>
+          <span class="panel-kicker">Embedded control</span>
+          <h3>Production Firmware &amp; BLDC Systems</h3>
+          <p>Five STM32 hardware products, compact multilayer motor-driver PCBs, physical torque testing, and calibration tooling.</p>
+          <a class="mini-link" href="experience-embedded-control.html">Explore embedded control <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Practical AI</span>
+          <h3>Automate Agency</h3>
+          <p>A customer-facing website and daily content system connecting generation, human review, scheduling, publishing, and logs.</p>
+          <a class="mini-link" href="experience-automate-agency.html">Explore the workflow <span aria-hidden="true">&rarr;</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="earlier-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Earlier software work</p>
+          <h2 id="earlier-title">BridgeNet</h2>
+        </div>
+        <div class="panel" data-reveal>
+          <span class="panel-kicker">Past project</span>
+          <p>An AI-assisted education and networking platform for high-school students, university students, and job seekers, built with React, TypeScript, Node.js, Express, and PostgreSQL. The project explored university search, tutoring, and job matching within one full-stack product.</p>
+          <div class="chip-row"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span></div>
+          <a class="mini-link" href="project-bridgenet.html">View the archived project page <span aria-hidden="true">&rarr;</span></a>
         </div>
       </div>
     </section>
 
-    <section class="site-shell">
-      <div class="projects-grid">
-        <article class="project-item" data-reveal data-tilt>
-          <span class="panel-kicker">AI Platform</span>
-          <h3>BridgeNet</h3>
-          <p>Education and networking platform with modern frontend and backend tooling plus AI-assisted support.</p>
-          <div class="button-row"><a class="ghost-btn" href="project-bridgenet.html">Learn more</a></div>
-        </article>
-        <article class="project-item" data-reveal data-tilt>
-          <span class="panel-kicker">Applied AI</span>
-          <h3>Glory Media</h3>
-          <p>Production-minded AI workflows for analytics, knowledge systems, and deployable media tooling.</p>
-          <div class="button-row"><a class="ghost-btn" href="project-glory-media.html">Learn more</a></div>
-        </article>
-        <article class="project-item" data-reveal data-tilt>
-          <span class="panel-kicker">Operations</span>
-          <h3>High School Activity Website</h3>
-          <p>Built and ran a WordPress platform supporting school organizations with clearer updates and operations.</p>
-          <div class="button-row"><a class="ghost-btn" href="project-hswebsite.html">Learn more</a></div>
-        </article>
+    <section class="case-section site-shell" aria-label="Contact call to action">
+      <div class="panel callout-panel" data-reveal>
+        <p class="eyebrow">Have a system to build?</p>
+        <h2>Let&rsquo;s connect the hardware, software, and product story.</h2>
+        <a class="cta-btn" href="contact.html">Start a conversation</a>
       </div>
     </section>
   </main>
-  <footer><div class="footer-inner site-shell"><p>(c) 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
-  <script src="js/site.js"></script>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="experience.html">Experience</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
 </body>
 </html>
-

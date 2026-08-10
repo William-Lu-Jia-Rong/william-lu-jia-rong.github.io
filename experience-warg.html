@@ -1,72 +1,123 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Experience - Waterloo Aerial Robotics Group (WARG)</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WARG Flight Software | Jiarong (Bill) Lu</title>
+  <meta name="description" content="Bill Lu's embedded flight software work with the Waterloo Aerial Robotics Group, including motor-driver architecture, PID attitude management, and ongoing aircraft thrust modeling.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/experience-warg.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="WARG Flight Software | Jiarong (Bill) Lu">
+  <meta property="og:description" content="Motor-driver architecture, PID attitude management, and ongoing aircraft thrust modeling with the Waterloo Aerial Robotics Group.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/experience-warg.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WARG Flight Software | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="Motor-driver architecture, PID attitude management, and ongoing aircraft thrust modeling with the Waterloo Aerial Robotics Group.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/future.css">
 </head>
-<body>
-  <header>
-    <nav class="navbar">
-      <h1 class="logo"><a href="index.html">Jiarong Lu</a></h1>
-      <button class="nav-toggle" aria-label="Toggle navigation" style="display:none;">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-      <ul class="nav-links">
+<body class="case-page warg-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
         <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
         <li><a href="projects.html">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="skills.html">Skills</a></li>
+        <li><a class="active" href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
     </nav>
   </header>
-  <main>
-    <section class="about-container">
-      <h1>Waterloo Aerial Robotics Group (WARG)</h1>
-      <p><strong>Position:</strong> Embedded Flight Software Team Member</p>
-      <p><strong>Timeline:</strong> Oct 2024 - Present</p>
-      <h2>Responsibilities & Achievements</h2>
-      <ul>
-        <li>Developed embedded flight software for drones and fixed-wing aerial robots as part of a student design team at the University of Waterloo.</li>
-        <li>Built and optimized motor driver modules for the new driver architecture, ensuring reliable and efficient motor control.</li>
-        <li>Worked on the Attitude Manager with PID control, a module that smooths the pilot flying experience and improves flight stability.</li>
-        <li>Collaborated with multidisciplinary team members to integrate hardware and software solutions for aerial robotics.</li>
-      </ul>
-      <a href="experience.html" class="cta-btn">Back to Experience</a>
+
+  <main id="main-content" class="case-shell">
+    <section class="case-hero site-shell" aria-labelledby="warg-title">
+      <div class="case-hero-copy" data-reveal>
+        <p class="eyebrow">Waterloo Aerial Robotics Group &middot; Oct 2024&ndash;Present</p>
+        <h1 id="warg-title">Flight software for aircraft that have to behave predictably.</h1>
+        <p class="lede">As an Embedded Flight Software team member, I contribute to the control software behind WARG&rsquo;s student-built drones and fixed-wing aircraft, connecting driver architecture, attitude control, and ongoing thrust-model work.</p>
+        <div class="chip-row" role="group" aria-label="WARG focus areas"><span class="chip">Embedded flight software</span><span class="chip">Motor drivers</span><span class="chip">PID control</span><span class="chip">Flight dynamics</span></div>
+      </div>
+      <figure class="case-media panel case-media--data" data-reveal>
+        <div class="telemetry-board" role="group" aria-label="Flight software workstreams">
+          <div><span>Driver layer</span><strong>Motor output</strong></div>
+          <div><span>Control layer</span><strong>Attitude PID</strong></div>
+          <div><span>Model layer</span><strong>Motor + propeller thrust</strong></div>
+        </div>
+        <figcaption>A systems view of the workstreams; this is a portfolio visualization, not live aircraft telemetry.</figcaption>
+      </figure>
     </section>
+
+    <section class="case-section site-shell" aria-labelledby="workstreams-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Three connected workstreams</p>
+        <h2 id="workstreams-title">Move from command to controlled motion.</h2>
+        <p>Each piece addresses a different layer of the same problem: expressing motor output reliably, managing aircraft attitude, and understanding the force produced by the propulsion system.</p>
+      </div>
+      <div class="case-grid case-grid--steps">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">01 &middot; Motor driver</span>
+          <h3>Build motor-driver functionality within the new architecture.</h3>
+          <p>Built motor-driver functionality for WARG&rsquo;s new driver architecture, creating the software path responsible for translating higher-level commands into motor behavior.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">02 &middot; Attitude manager</span>
+          <h3>Shape response with PID control.</h3>
+          <p>Worked on the Attitude Manager and its PID control function, a layer designed to make aircraft response stable and manageable for the pilot.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">03 &middot; Thrust model</span>
+          <h3>Connect software to propulsion physics.</h3>
+          <p>Work in progress models the thrust generated by the aircraft&rsquo;s motors and propellers so control behavior can be reasoned about against the physical system.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="systems-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Systems thinking</p>
+          <h2 id="systems-title">The interface between code and airframe matters.</h2>
+        </div>
+        <div class="panel" data-reveal>
+          <p>Flight-control work is not isolated firmware. Drivers, control loops, propulsion assumptions, and aircraft behavior have to agree. Working across these layers has strengthened how I reason about timing, feedback, interfaces, and the physical consequences of software decisions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="role-title">
+      <div class="case-grid">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Team context</span>
+          <h2 id="role-title">Engineering inside a multidisciplinary design team.</h2>
+          <p>WARG designs drones and fixed-wing aerial robots at the University of Waterloo. The embedded flight software work sits alongside electrical, mechanical, autonomy, and testing efforts, making clear communication across disciplines part of the technical job.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Current direction</span>
+          <h3>Keep the model grounded.</h3>
+          <p>The thrust-modeling work remains active. On this site, ongoing work is described as work in progress rather than presented as a completed flight-performance result.</p>
+        </article>
+      </div>
+    </section>
+
+    <nav class="case-nav site-shell" aria-label="Case study navigation">
+      <a class="ghost-btn" href="experience.html">All experience</a>
+      <a class="mini-link" href="experience-embedded-control.html">Next: Embedded Control Systems <span aria-hidden="true">&rarr;</span></a>
+    </nav>
   </main>
-  <footer>
-    <p>© 2025 Jiarong Lu | <a href="contact.html">Contact Me</a></p>
-  </footer>
-  <script>
-    // 手机端菜单折叠功能
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    function checkMobileMenu() {
-      if (window.innerWidth <= 900) {
-        navToggle.style.display = 'block';
-        navLinks.classList.add('collapsed');
-      } else {
-        navToggle.style.display = 'none';
-        navLinks.classList.remove('collapsed');
-        navLinks.style.display = '';
-      }
-    }
-    navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
-      if (navLinks.classList.contains('open')) {
-        navLinks.style.display = 'flex';
-      } else {
-        navLinks.style.display = 'none';
-      }
-    });
-    window.addEventListener('resize', checkMobileMenu);
-    window.addEventListener('DOMContentLoaded', checkMobileMenu);
-  </script>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
 </body>
-</html> 
+</html>

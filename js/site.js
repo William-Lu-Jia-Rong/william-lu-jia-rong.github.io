@@ -1,234 +1,178 @@
-const root = document.documentElement;
+(function () {
+  "use strict";
 
-function updateScrollProgress() {
-  const total = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = total > 0 ? `${(window.scrollY / total) * 100}%` : '0%';
-  root.style.setProperty('--scroll-progress', progress);
-}
+  var root = document.documentElement;
+  var body = document.body;
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-function setupReveal() {
-  const revealItems = document.querySelectorAll('[data-reveal]');
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.12 }
-  );
+  function updatePageChrome() {
+    var scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    var progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
+    root.style.setProperty("--scroll-progress", (progress * 100).toFixed(3) + "%");
 
-  revealItems.forEach((item) => observer.observe(item));
-}
+    var progressBar = document.querySelector("[data-scroll-progress]");
+    if (progressBar) {
+      progressBar.style.transform = "scaleX(" + progress.toFixed(4) + ")";
+    }
 
-function setupTilt() {
-  const cards = document.querySelectorAll('[data-tilt]');
-  cards.forEach((card) => {
-    card.addEventListener('mousemove', (event) => {
-      if (window.innerWidth < 900) return;
-      const rect = card.getBoundingClientRect();
-      const px = (event.clientX - rect.left) / rect.width;
-      const py = (event.clientY - rect.top) / rect.height;
-      const rotateY = (px - 0.5) * 10;
-      const rotateX = (0.5 - py) * 10;
-      card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-    });
-  });
-}
-
-function setupCursorGlow() {
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-  window.addEventListener('mousemove', (event) => {
-    root.style.setProperty('--cursor-x', `${event.clientX}px`);
-    root.style.setProperty('--cursor-y', `${event.clientY}px`);
-  });
-}
-
-function setupNav() {
-  const toggle = document.querySelector('.nav-toggle');
-  const header = document.querySelector('header');
-  if (!toggle) return;
-
-  toggle.addEventListener('click', () => {
-    document.body.classList.toggle('nav-open');
-  });
-
-  document.querySelectorAll('.nav-links a').forEach((link) => {
-    link.addEventListener('click', () => document.body.classList.remove('nav-open'));
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') document.body.classList.remove('nav-open');
-  });
-
-  if (header) {
-    const onScroll = () => {
-      header.classList.toggle('nav-scrolled', window.scrollY > 80);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
-}
-
-function setupSlideButtons() {
-  document.querySelectorAll('.slide-btn').forEach((btn) => {
-    const label = btn.querySelector('span');
-    if (!label) return;
-    btn.setAttribute('data-hover', label.textContent);
-  });
-}
-
-function setupCounters() {
-  const counters = document.querySelectorAll('[data-counter]');
-  if (!counters.length) return;
-
-  const animateCounter = (el) => {
-    const target = Number(el.dataset.counter);
-    const suffix = el.dataset.counterSuffix || '';
-    const duration = 1400;
-    const start = performance.now();
-
-    const tick = (now) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const value = Math.round(target * eased);
-      el.textContent = `${value}${suffix}`;
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-
-    requestAnimationFrame(tick);
-  };
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.4 }
-  );
-
-  counters.forEach((counter) => observer.observe(counter));
-}
-
-function setupTicker() {
-  document.querySelectorAll('[data-ticker]').forEach((wrap) => {
-    wrap.addEventListener('mouseenter', () => {
-      const track = wrap.querySelector('.ticker-track');
-      if (track) track.style.animationPlayState = 'paused';
-    });
-    wrap.addEventListener('mouseleave', () => {
-      const track = wrap.querySelector('.ticker-track');
-      if (track) track.style.animationPlayState = 'running';
-    });
-  });
-}
-
-function setupLenis() {
-  if (typeof Lenis === 'undefined') return null;
-  if (window.matchMedia('(pointer: coarse)').matches) return null;
-
-  const lenis = new Lenis({
-    duration: 1.1,
-    smoothWheel: true,
-    smoothTouch: false
-  });
-
-  lenis.on('scroll', updateScrollProgress);
-
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
+    var header = document.querySelector(".site-header");
+    if (header) {
+      header.classList.toggle("is-scrolled", window.scrollY > 18);
+    }
   }
 
-  requestAnimationFrame(raf);
-  return lenis;
-}
+  function setMenuState(isOpen) {
+    var toggle = document.querySelector("[data-menu-toggle]");
+    var panel = document.querySelector("[data-menu-panel]");
+    if (!toggle || !panel) return;
 
-function setupContactForms() {
-  const forms = document.querySelectorAll('[data-formspree-form]');
+    body.classList.toggle("menu-open", isOpen);
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.querySelector(".sr-only").textContent = isOpen ? "Close menu" : "Open menu";
+    panel.hidden = !isOpen;
+  }
 
-  forms.forEach((form) => {
-    const submitButton = form.querySelector('button[type="submit"]');
-    const status = form.querySelector('[data-form-status]');
-    if (!submitButton || !status) return;
+  function setupHomepageMenu() {
+    var toggle = document.querySelector("[data-menu-toggle]");
+    var panel = document.querySelector("[data-menu-panel]");
+    if (!toggle || !panel) return;
 
-    const defaultLabel = submitButton.querySelector('span')?.textContent || submitButton.textContent;
+    toggle.addEventListener("click", function () {
+      setMenuState(!body.classList.contains("menu-open"));
+    });
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    panel.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () { setMenuState(false); });
+    });
+  }
 
-      submitButton.disabled = true;
-      const span = submitButton.querySelector('span');
-      if (span) span.textContent = 'Sending...';
-      else submitButton.textContent = 'Sending...';
+  function setupInteriorNavigation() {
+    var toggle = document.querySelector(".nav-toggle");
+    var navigation = document.querySelector(".nav-links");
+    if (!toggle || !navigation) return;
 
-      status.hidden = false;
-      status.className = 'form-status';
-      status.textContent = 'Sending your message...';
+    function setOpen(isOpen) {
+      body.classList.toggle("nav-open", isOpen);
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+    }
 
-      try {
-        const response = await fetch(form.action, {
-          method: form.method || 'POST',
-          body: new FormData(form),
-          headers: {
-            Accept: 'application/json'
-          }
-        });
+    toggle.addEventListener("click", function () {
+      setOpen(!body.classList.contains("nav-open"));
+    });
 
-        if (!response.ok) {
-          let errorMessage = 'Something went wrong. Please try again in a moment.';
+    navigation.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () { setOpen(false); });
+    });
 
-          try {
-            const data = await response.json();
-            if (Array.isArray(data?.errors) && data.errors.length > 0) {
-              errorMessage = data.errors.map((item) => item.message).join(' ');
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 820) setOpen(false);
+    });
+  }
+
+  function setupReveal() {
+    var items = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!items.length) return;
+
+    if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+      items.forEach(function (item) { item.classList.add("revealed"); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("revealed");
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -8%", threshold: 0.08 });
+
+    items.forEach(function (item) {
+      item.classList.add("reveal-ready");
+      observer.observe(item);
+    });
+  }
+
+  function setupTilt() {
+    if (reducedMotion.matches || window.matchMedia("(pointer: coarse)").matches) return;
+
+    document.querySelectorAll("[data-tilt]").forEach(function (card) {
+      card.addEventListener("pointermove", function (event) {
+        var rect = card.getBoundingClientRect();
+        var x = (event.clientX - rect.left) / rect.width - 0.5;
+        var y = (event.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = "perspective(1000px) rotateX(" + (-y * 5).toFixed(2) + "deg) rotateY(" + (x * 6).toFixed(2) + "deg) translateY(-4px)";
+      });
+      card.addEventListener("pointerleave", function () { card.style.transform = ""; });
+    });
+  }
+
+  function setupContactForms() {
+    document.querySelectorAll("[data-formspree-form]").forEach(function (form) {
+      var submit = form.querySelector('button[type="submit"]');
+      var status = form.querySelector("[data-form-status]");
+      if (!submit || !status) return;
+
+      var originalLabel = submit.textContent;
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        submit.disabled = true;
+        submit.textContent = "Sending…";
+        status.hidden = false;
+        status.className = "form-status";
+        status.textContent = "Sending your message…";
+
+        try {
+          var response = await fetch(form.action, {
+            method: form.method || "POST",
+            body: new FormData(form),
+            headers: { Accept: "application/json" }
+          });
+
+          if (!response.ok) {
+            var message = "The message could not be sent. Please email me directly instead.";
+            try {
+              var payload = await response.json();
+              if (Array.isArray(payload.errors) && payload.errors.length) {
+                message = payload.errors.map(function (error) { return error.message; }).join(" ");
+              }
+            } catch (_) {
+              // Formspree sometimes returns an empty error body; the fallback is clearer.
             }
-          } catch (parseError) {
-            // Keep the fallback message when the API does not return JSON.
+            throw new Error(message);
           }
 
-          throw new Error(errorMessage);
+          form.reset();
+          status.className = "form-status is-success";
+          status.textContent = "Message sent. Thanks — I’ll get back to you soon.";
+        } catch (error) {
+          status.className = "form-status is-error";
+          status.textContent = error && error.message ? error.message : "Unable to send right now. Please email me directly instead.";
+        } finally {
+          submit.disabled = false;
+          submit.textContent = originalLabel;
         }
-
-        form.reset();
-        status.className = 'form-status is-success';
-        status.textContent = 'Message sent successfully. I will get back to you soon.';
-      } catch (error) {
-        status.className = 'form-status is-error';
-        status.textContent = error.message || 'Unable to send the message right now. Please email me directly instead.';
-      } finally {
-        submitButton.disabled = false;
-        if (span) span.textContent = defaultLabel;
-        else submitButton.textContent = defaultLabel;
-      }
+      });
     });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    setMenuState(false);
+    body.classList.remove("nav-open");
+    var navToggle = document.querySelector(".nav-toggle");
+    if (navToggle) navToggle.setAttribute("aria-expanded", "false");
   });
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  updateScrollProgress();
-  setupLenis();
-  setupReveal();
-  setupTilt();
-  setupCursorGlow();
-  setupNav();
-  setupSlideButtons();
-  setupCounters();
-  setupTicker();
-  setupContactForms();
-});
+  document.addEventListener("DOMContentLoaded", function () {
+    updatePageChrome();
+    setupHomepageMenu();
+    setupInteriorNavigation();
+    setupReveal();
+    setupTilt();
+    setupContactForms();
+  });
 
-if (typeof Lenis === 'undefined') {
-  window.addEventListener('scroll', updateScrollProgress, { passive: true });
-}
-window.addEventListener('resize', updateScrollProgress);
+  window.addEventListener("scroll", updatePageChrome, { passive: true });
+  window.addEventListener("resize", updatePageChrome);
+}());

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PocketPilot Case Study | Jiarong (Bill) Lu</title>
+  <meta name="description" content="PocketPilot is a privacy-minded iPhone spending companion built by Bill Lu with Swift and SwiftUI, featuring on-device receipt scanning, flexible storage, automations, and spending insights.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/project-pocketpilot.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="PocketPilot Case Study | Jiarong (Bill) Lu">
+  <meta property="og:description" content="A privacy-minded iPhone spending companion built from product concept through App Store release.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/project-pocketpilot.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PocketPilot Case Study | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="A privacy-minded iPhone spending companion built from product concept through App Store release.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/future.css">
+</head>
+<body class="case-page pocketpilot-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <ul class="nav-links" id="primary-navigation">
+        <li><a href="index.html">Home</a></li>
+        <li><a class="active" href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-social" role="group" aria-label="Social profiles">
+        <a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content" class="case-shell">
+    <section class="case-hero site-shell" aria-labelledby="pocketpilot-title">
+      <div class="case-hero-copy" data-reveal>
+        <p class="eyebrow">Independent iOS product &middot; Released July 7, 2026</p>
+        <h1 id="pocketpilot-title">Private spending context, without giving up control of the data.</h1>
+        <p class="lede">PocketPilot turns payment screenshots and receipts into organized transactions and useful spending insights. I took the product from idea to App Store release as a solo developer, building the experience in Swift and SwiftUI.</p>
+        <div class="button-row">
+          <a class="cta-btn" href="https://apps.apple.com/ca/app/pocketpilot/id6783054106" target="_blank" rel="noreferrer">View on the App Store</a>
+          <a class="ghost-btn" href="#product-flow">Explore the product</a>
+        </div>
+        <dl class="case-stats" aria-label="PocketPilot project summary">
+          <div><dt>Role</dt><dd>Solo product developer</dd></div>
+          <div><dt>Platform</dt><dd>iPhone</dd></div>
+          <div><dt>Stack</dt><dd>Swift &amp; SwiftUI</dd></div>
+        </dl>
+      </div>
+
+      <figure class="case-media case-media--phones" data-reveal>
+        <img class="app-icon" src="images/pocketpilot/app-icon.webp" width="1024" height="1024" alt="PocketPilot app icon" fetchpriority="high">
+        <img class="phone-shot phone-shot--primary" src="images/pocketpilot/screenshot-transactions.webp" width="1242" height="2688" alt="PocketPilot transaction list with daily and monthly totals" fetchpriority="high">
+        <img class="phone-shot phone-shot--secondary" src="images/pocketpilot/screenshot-insights.webp" width="1242" height="2688" alt="PocketPilot monthly spending insights organized by category">
+        <figcaption>A focused transaction ledger, monthly summaries, and category-level insights in one native iOS experience.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-section site-shell" id="product-flow" aria-labelledby="flow-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Product flow</p>
+        <h2 id="flow-title">Capture. Process. Store. Understand.</h2>
+        <p>Every step is designed to reduce bookkeeping friction while keeping the user in charge of where transaction data lives.</p>
+      </div>
+      <div class="case-grid case-grid--steps">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">01 &middot; Capture</span>
+          <h3>Start with the payment record you already have.</h3>
+          <p>Users can choose an image of a receipt or a payment screen from a bank app, Apple Pay, WeChat, or Alipay instead of retyping every field.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">02 &middot; Process</span>
+          <h3>Read transaction text on the device.</h3>
+          <p>On-device OCR extracts useful text for review. The workflow is built to assist entry, not hide it, so the resulting transaction remains visible to the user.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">03 &middot; Store</span>
+          <h3>Choose the storage model.</h3>
+          <p>PocketPilot supports local-only use, iCloud sync, or a self-hosted Raspberry Pi endpoint. There is no developer-operated transaction cloud.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">04 &middot; Understand</span>
+          <h3>Turn records into spending context.</h3>
+          <p>Search, monthly totals, currency conversion, category breakdowns, and duplicate controls make a growing transaction history easier to use.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="capture-title">
+      <div class="case-grid case-grid--media">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">On-device capture</p>
+          <h2 id="capture-title">A short path from screenshot to transaction.</h2>
+          <p>The scan experience communicates exactly what will happen before an image is selected: the user chooses the source and PocketPilot reads its text on the iPhone.</p>
+          <div class="chip-row" role="group" aria-label="Capture capabilities">
+            <span class="chip">Receipt images</span>
+            <span class="chip">Payment screens</span>
+            <span class="chip">On-device OCR</span>
+            <span class="chip">Transaction review</span>
+          </div>
+        </div>
+        <figure class="case-media case-media--phone" data-reveal>
+          <img class="phone-shot" src="images/pocketpilot/screenshot-scan.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot scan screen explaining on-device text recognition for receipts and payment screenshots">
+          <figcaption>The capture screen explains the source and processing model before the user selects an image.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="control-title">
+      <div class="case-grid case-grid--media case-grid--reverse">
+        <figure class="case-media case-media--phone" data-reveal>
+          <img class="phone-shot" src="images/pocketpilot/screenshot-storage-sync.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot storage settings with local-only, self-hosted Raspberry Pi, and iCloud sync choices">
+          <figcaption>Storage is a product choice, not a hidden infrastructure decision.</figcaption>
+        </figure>
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Data control</p>
+          <h2 id="control-title">Privacy expressed as an understandable setting.</h2>
+          <p>Rather than making one storage model fit every user, PocketPilot exposes three clear paths: keep data on the iPhone, sync through the user&rsquo;s Apple account, or connect a self-hosted server over Tailscale.</p>
+          <p>The developer does not operate a transaction-data cloud for the app. That boundary keeps the privacy story specific and verifiable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="system-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Complete utility</p>
+        <h2 id="system-title">More than a scanner.</h2>
+        <p>The product closes the loop with automation, organization, and views that help users make sense of recurring activity.</p>
+      </div>
+      <div class="case-grid case-grid--gallery">
+        <figure class="case-media case-media--phone" data-reveal>
+          <img class="phone-shot" src="images/pocketpilot/screenshot-automations.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot automation setup for Back Tap and payment notifications through Apple Shortcuts">
+          <figcaption>Shortcuts-based setup helps users log payments with Back Tap and payment-notification workflows.</figcaption>
+        </figure>
+        <figure class="case-media case-media--phone" data-reveal>
+          <img class="phone-shot" src="images/pocketpilot/screenshot-settings.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot settings for CSV import, categories, payment cards, duplicates, currency, and language">
+          <figcaption>Import, categorization, duplicate handling, currency, and language controls keep the ledger practical.</figcaption>
+        </figure>
+        <figure class="case-media case-media--phone" data-reveal>
+          <img class="phone-shot" src="images/pocketpilot/screenshot-insights.webp" width="1242" height="2688" loading="lazy" alt="PocketPilot insights showing a monthly total and spending by category">
+          <figcaption>Monthly totals and category breakdowns turn individual records into a readable overview.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <nav class="case-nav site-shell" aria-label="Case study navigation">
+      <a class="ghost-btn" href="projects.html">All projects</a>
+      <a class="mini-link" href="project-water-quality.html">Next case: Water Quality Monitor <span aria-hidden="true">&rarr;</span></a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner site-shell">
+      <p>&copy; 2026 Jiarong (Bill) Lu</p>
+      <ul class="footer-links">
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script type="module" src="js/site.js"></script>
+</body>
+</html>

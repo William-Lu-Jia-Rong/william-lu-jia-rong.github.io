@@ -1,37 +1,157 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Automatic Water Quality Monitor | Jiarong (Bill) Lu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta name="description" content="An STM32-based mobile water-quality monitoring prototype combining TDS sensing, motor control, custom electronics, and a 3D-printed physical platform.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/project-water-quality.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="Automatic Water Quality Monitor | Jiarong (Bill) Lu">
+  <meta property="og:description" content="A mobile STM32 platform combining water-quality sensing, propulsion, electronics, and a custom physical build.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/project-water-quality.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Automatic Water Quality Monitor | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="A mobile STM32 platform combining water-quality sensing, propulsion, electronics, and a custom physical build.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/future.css">
 </head>
-<body>
-  <div class="progress-line"></div>
-  <header><nav class="navbar site-shell"><h1 class="logo"><a href="index.html">Bill Lu</a></h1><button class="nav-toggle" aria-label="Toggle navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a class="active" href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="skills.html">Skills</a></li><li><a href="contact.html">Contact</a></li></ul><div class="nav-social"><a href="https://github.com/William-Lu-Jia-Rong?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></div></nav></header>
-  <main class="detail-shell">
-    <article class="project-container" data-reveal>
-      <span class="detail-kicker">Embedded Project</span>
-      <h1>Automatic Water Quality Monitoring Device</h1>
-      <div class="project-meta"><p><strong>Project:</strong> Low-cost embedded water-quality monitoring platform with mobility and modular sensing.</p><p><strong>Course Context:</strong> ECE 198</p><p><strong>Repository:</strong> <a href="https://github.com/1eoN-G/ECE-198-project" target="_blank" rel="noreferrer">GitHub project code</a></p></div>
-      <div class="tech-stack"><span class="tech-tag">STM32F401RE</span><span class="tech-tag">C / C++</span><span class="tech-tag">TDS Sensing</span><span class="tech-tag">Motor Control</span><span class="tech-tag">3D Printing</span><span class="tech-tag">System Integration</span></div>
-      <h2>Overview</h2>
-      <p>Our team developed a cost-effective boat-based monitoring device designed to collect real-time water-quality data. The system uses TDS sensing, STM32-based control, and a modular physical design that can be extended toward wireless communication and autonomy.</p>
-      <h2>What I built</h2>
-      <ul>
-        <li>Embedded control logic for sensor collection and system coordination.</li>
-        <li>Mechanical and structural design work with a custom 3D-printed enclosure.</li>
-        <li>Hardware integration across sensing, propulsion, and power subsystems.</li>
-        <li>A platform designed for future Bluetooth and autonomy upgrades.</li>
+<body class="case-page water-quality-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
+        <li><a href="index.html">Home</a></li>
+        <li><a class="active" href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
       </ul>
-      <h2>Why it mattered</h2>
-      <p>The project was aimed at making water-quality monitoring more affordable and easier to deploy, replacing slow or expensive manual sampling with a mobile, data-driven embedded system.</p>
-      <div class="button-row"><a class="ghost-btn" href="projects.html">Back to Projects</a></div>
-    </article>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
+    </nav>
+  </header>
+
+  <main id="main-content" class="case-shell">
+    <section class="case-hero site-shell" aria-labelledby="water-title">
+      <div class="case-hero-copy" data-reveal>
+        <p class="eyebrow">Embedded team project &middot; ECE 198</p>
+        <h1 id="water-title">A mobile platform for accessible water-quality sensing.</h1>
+        <p class="lede">Our team built a boat-based monitoring prototype that brings sensing, propulsion, and physical integration into one STM32-controlled platform designed for real-time TDS data collection.</p>
+        <div class="button-row">
+          <a class="cta-btn" href="https://github.com/1eoN-G/ECE-198-project" target="_blank" rel="noreferrer">View the repository</a>
+          <a class="ghost-btn" href="#architecture">See the architecture</a>
+        </div>
+        <dl class="case-stats" aria-label="Water quality project summary">
+          <div><dt>Controller</dt><dd>STM32F401RE</dd></div>
+          <div><dt>Measurement</dt><dd>TDS sensing</dd></div>
+          <div><dt>Format</dt><dd>Mobile prototype</dd></div>
+        </dl>
+      </div>
+      <figure class="case-media" data-reveal>
+        <img src="images/Automatic_Water_Quality_Monitoring_Device/boatv2%20-%20Copy.jpg" width="2237" height="1308" alt="Physical prototype of the automatic water-quality monitoring boat" fetchpriority="high">
+        <figcaption>The integrated prototype combines a custom hull, protected electronics, sensing, and propulsion.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="challenge-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Challenge</p>
+          <h2 id="challenge-title">Bring measurement to the water.</h2>
+        </div>
+        <div class="panel" data-reveal>
+          <p>Manual sampling can be slow and expensive to repeat across multiple locations. The project explored a lower-cost mobile system that could collect water-quality data while creating a foundation for future wireless communication and autonomous operation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" id="architecture" aria-labelledby="architecture-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">System architecture</p>
+        <h2 id="architecture-title">Sensing, actuation, and control in one loop.</h2>
+        <p>The prototype coordinates the TDS signal path, embedded control, H-bridge motor drive, power, and mechanical structure.</p>
+      </div>
+      <div class="case-grid case-grid--gallery">
+        <figure class="case-media" data-reveal>
+          <img src="images/Automatic_Water_Quality_Monitoring_Device/Overall_Connection_design.png" width="625" height="435" loading="lazy" alt="Overall connection diagram for the water-quality monitor, including STM32 control, sensing, power, and motors">
+          <figcaption>Overall system connections.</figcaption>
+        </figure>
+        <figure class="case-media" data-reveal>
+          <img src="images/Automatic_Water_Quality_Monitoring_Device/TDS_Sensor_Design.png" width="1191" height="803" loading="lazy" alt="Circuit design for the total dissolved solids sensor interface">
+          <figcaption>TDS sensor interface.</figcaption>
+        </figure>
+        <figure class="case-media" data-reveal>
+          <img src="images/Automatic_Water_Quality_Monitoring_Device/H_Bridge_design_with_TIP_120.png" width="516" height="335" loading="lazy" alt="TIP120 H-bridge circuit design used for motor direction control">
+          <figcaption>Motor-drive H-bridge design.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="contribution-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">My contribution</p>
+        <h2 id="contribution-title">Integrate the pieces into a working physical system.</h2>
+      </div>
+      <div class="case-grid case-grid--steps">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Embedded control</span>
+          <h3>Coordinate sensing and behavior.</h3>
+          <p>Contributed embedded control logic for sensor collection and coordination of the system&rsquo;s major subsystems.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Electrical integration</span>
+          <h3>Connect measurement, propulsion, and power.</h3>
+          <p>Worked across the hardware interfaces joining the TDS sensor, STM32 controller, motor drive, and supporting electronics.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Mechanical design</span>
+          <h3>Build for the physical environment.</h3>
+          <p>Contributed to the structural design and custom 3D-printed enclosure used to organize and protect the prototype hardware.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="wiring-title">
+      <div class="case-grid case-grid--media">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Integration detail</p>
+          <h2 id="wiring-title">Make every interface explicit.</h2>
+          <p>A wiring plan translated the block-level architecture into concrete connections around the STM32. Capturing those interfaces made assembly and debugging more repeatable for the team.</p>
+          <div class="chip-row" role="group" aria-label="Project technologies"><span class="chip">C / C++</span><span class="chip">STM32</span><span class="chip">TDS sensor</span><span class="chip">Motor control</span><span class="chip">3D printing</span></div>
+        </div>
+        <figure class="case-media" data-reveal>
+          <img src="images/Automatic_Water_Quality_Monitoring_Device/Wire_connection_Between_STM32.png" width="1233" height="582" loading="lazy" alt="Detailed wiring diagram between the STM32 board and the monitoring device subsystems">
+          <figcaption>Controller-level wiring plan for the prototype.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="outcome-title">
+      <article class="panel" data-reveal>
+        <span class="panel-kicker">Outcome</span>
+        <h2 id="outcome-title">A working foundation, with the next steps visible.</h2>
+        <p>The team completed an integrated mobile prototype and identified a practical path toward future Bluetooth communication and autonomous operation. Those capabilities remain future extensions rather than claims about the current build.</p>
+      </article>
+    </section>
+
+    <nav class="case-nav site-shell" aria-label="Case study navigation">
+      <a class="mini-link" href="project-pocketpilot.html"><span aria-hidden="true">&larr;</span> Previous: PocketPilot</a>
+      <a class="ghost-btn" href="projects.html">All projects</a>
+      <a class="mini-link" href="experience-warg.html">Explore WARG <span aria-hidden="true">&rarr;</span></a>
+    </nav>
   </main>
-  <footer><div class="footer-inner site-shell"><p>? 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
-  <script src="js/site.js"></script>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
 </body>
 </html>
-
