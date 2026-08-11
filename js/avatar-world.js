@@ -3,9 +3,9 @@ import * as THREE from "./vendor/three.module.min.js";
 const CHAPTER_STOPS = Object.freeze([0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.72, 0.84, 0.96]);
 const TAU = Math.PI * 2;
 const POCKETPILOT_TEXTURE_URLS = Object.freeze([
-  new URL("../images/PocketPilot/screenshot-insights.webp", import.meta.url).href,
-  new URL("../images/PocketPilot/screenshot-scan.webp", import.meta.url).href,
-  new URL("../images/PocketPilot/screenshot-transactions.webp", import.meta.url).href,
+  new URL("../images/pocketpilot/screenshot-insights.webp", import.meta.url).href,
+  new URL("../images/pocketpilot/screenshot-scan.webp", import.meta.url).href,
+  new URL("../images/pocketpilot/screenshot-transactions.webp", import.meta.url).href,
 ]);
 
 const COLORS = Object.freeze({
@@ -322,8 +322,10 @@ export function createAvatarWorld(options = {}) {
 
     function avatarStandard(color, settings = {}) {
       const opacity = settings.opacity ?? 1;
-      const material = new THREE.MeshToonMaterial({
+      const material = new THREE.MeshStandardMaterial({
         color,
+        roughness: settings.roughness ?? 0.42,
+        metalness: settings.metalness ?? 0.18,
         emissive: settings.emissive ?? 0x000000,
         emissiveIntensity: settings.emissiveIntensity ?? 0,
         transparent: true,
@@ -344,78 +346,67 @@ export function createAvatarWorld(options = {}) {
     }
 
     const boxGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const sphereGeometry = trackGeometry(new THREE.SphereGeometry(0.5, mobile ? 14 : 20, mobile ? 10 : 14));
-    const limbGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.56, 1, mobile ? 8 : 12));
-    const jointGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, mobile ? 10 : 14));
-    const shellGeometry = trackGeometry(new THREE.CapsuleGeometry(0.5, 0.34, mobile ? 4 : 6, mobile ? 10 : 14));
-    const smileGeometry = trackGeometry(new THREE.TorusGeometry(0.15, 0.022, 6, 18, Math.PI));
+    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, mobile ? 8 : 12));
+    const shellGeometry = trackGeometry(new THREE.CapsuleGeometry(0.5, 0.3, mobile ? 4 : 6, mobile ? 10 : 14));
 
     const whiteShellMaterial = avatarStandard(COLORS.robotWhite, {
-      emissive: COLORS.cyanSoft,
-      emissiveIntensity: 0.035,
+      roughness: 0.3,
+      metalness: 0.22,
     });
-    const jointMaterial = avatarStandard(COLORS.robotGray, {});
-    const copperAccentMaterial = avatarStandard(COLORS.copper, {
-      emissive: COLORS.copper,
-      emissiveIntensity: 0.18,
+    const graphiteMaterial = avatarStandard(0x18232c, {
+      roughness: 0.36,
+      metalness: 0.64,
+    });
+    const aluminumMaterial = avatarStandard(0x87959d, {
+      roughness: 0.28,
+      metalness: 0.78,
     });
     const cyanLedMaterial = avatarStandard(COLORS.cyan, {
       emissive: COLORS.cyan,
-      emissiveIntensity: 0.72,
+      emissiveIntensity: 0.48,
+      roughness: 0.3,
+      metalness: 0.08,
       depthWrite: false,
     });
     const screenMaterial = avatarBasic(COLORS.screen);
 
-    // Compact tool pod: deliberately mechanical, with no clothing or human silhouette.
-    const toolPod = mesh(shellGeometry, jointMaterial, [0, 1.46, -0.39], [0.58, 0.48, 0.4]);
+    // A compact service-machine silhouette: restrained panels, short linkages,
+    // and tool ends instead of toy-like hands or oversized shoes.
+    const toolPod = mesh(boxGeometry, graphiteMaterial, [0, 1.22, -0.32], [0.62, 0.54, 0.24]);
     root.add(toolPod);
 
     const pelvis = new THREE.Group();
-    pelvis.position.set(0, 0.99, 0);
-    const rotaryWaist = mesh(jointGeometry, jointMaterial, [0, 0, 0], [0.52, 0.25, 0.43]);
-    const waistLight = mesh(boxGeometry, cyanLedMaterial, [0, 0.02, 0.23], [0.34, 0.07, 0.035]);
+    pelvis.position.set(0, 0.66, 0);
+    const rotaryWaist = mesh(cylinderGeometry, graphiteMaterial, [0, 0, 0], [0.39, 0.16, 0.34]);
+    const waistLight = mesh(boxGeometry, cyanLedMaterial, [0, 0.01, 0.185], [0.22, 0.035, 0.018]);
     pelvis.add(rotaryWaist, waistLight);
 
     const torso = new THREE.Group();
-    torso.position.set(0, 1.43, 0);
-    const chassis = mesh(shellGeometry, whiteShellMaterial, [0, 0, 0], [0.92, 0.61, 0.72]);
-    const chestPanel = mesh(boxGeometry, jointMaterial, [0, -0.015, 0.37], [0.56, 0.38, 0.055]);
-    const chestCore = mesh(jointGeometry, copperAccentMaterial, [0, 0.01, 0.42], [0.13, 0.055, 0.13], [Math.PI / 2, 0, 0]);
-    torso.add(chassis, chestPanel, chestCore);
+    torso.position.set(0, 1.15, 0);
+    const chassis = mesh(boxGeometry, whiteShellMaterial, [0, 0, 0], [0.86, 0.58, 0.55]);
+    const chestPanel = mesh(boxGeometry, graphiteMaterial, [0, 0.005, 0.292], [0.48, 0.27, 0.032]);
+    const chestStatus = mesh(boxGeometry, cyanLedMaterial, [0, 0.005, 0.313], [0.2, 0.025, 0.012]);
+    torso.add(chassis, chestPanel, chestStatus);
     root.add(pelvis, torso);
 
     const head = new THREE.Group();
-    head.position.set(0, 2.09, 0.02);
-    const headShell = mesh(shellGeometry, whiteShellMaterial, [0, 0, 0], [0.78, 0.8, 0.72], [0, 0, Math.PI / 2]);
-    const faceScreen = mesh(sphereGeometry, screenMaterial, [0, -0.02, 0.38], [0.63, 0.4, 0.075]);
-    head.add(headShell, faceScreen);
-
-    const eyeLeds = new THREE.InstancedMesh(sphereGeometry, cyanLedMaterial, 2);
-    [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.18, 0.028, 0.448);
-      dummy.rotation.set(0, 0, side * -0.08);
-      dummy.scale.set(0.17, 0.082, 0.03);
-      dummy.updateMatrix();
-      eyeLeds.setMatrixAt(index, dummy.matrix);
-    });
-    eyeLeds.instanceMatrix.needsUpdate = true;
-    eyeLeds.computeBoundingSphere();
-
-    const smile = mesh(smileGeometry, cyanLedMaterial, [0, -0.105, 0.432], [0.88, 0.55, 1], [0, 0, Math.PI]);
-    const antenna = mesh(limbGeometry, copperAccentMaterial, [0, 0.48, 0], [0.06, 0.23, 0.06]);
-    const antennaTip = mesh(sphereGeometry, cyanLedMaterial, [0, 0.635, 0], [0.17, 0.17, 0.17]);
-    head.add(eyeLeds, smile, antenna, antennaTip);
+    head.position.set(0, 1.69, 0.015);
+    const headShell = mesh(shellGeometry, whiteShellMaterial, [0, 0, 0], [0.58, 0.36, 0.42], [0, 0, Math.PI / 2]);
+    const faceScreen = mesh(boxGeometry, screenMaterial, [0, -0.005, 0.245], [0.48, 0.19, 0.035]);
+    const opticBar = mesh(boxGeometry, cyanLedMaterial, [0, 0.005, 0.268], [0.21, 0.026, 0.012]);
+    const lidar = mesh(cylinderGeometry, graphiteMaterial, [0, 0.31, 0], [0.15, 0.055, 0.15]);
+    head.add(headShell, faceScreen, opticBar, lidar);
     root.add(head);
 
     function makeArm(side) {
       const shoulder = new THREE.Group();
-      shoulder.position.set(side * 0.58, 1.58, 0);
-      const upper = mesh(limbGeometry, whiteShellMaterial, [0, -0.19, 0], [0.22, 0.38, 0.22]);
+      shoulder.position.set(side * 0.52, 1.31, 0);
+      const upper = mesh(boxGeometry, whiteShellMaterial, [0, -0.15, 0], [0.16, 0.3, 0.18]);
       const elbow = new THREE.Group();
-      elbow.position.set(0, -0.37, 0);
-      const lower = mesh(limbGeometry, jointMaterial, [0, -0.16, 0], [0.18, 0.32, 0.18]);
-      const hand = mesh(sphereGeometry, whiteShellMaterial, [0, -0.36, 0.035], [0.31, 0.28, 0.3]);
-      elbow.add(lower, hand);
+      elbow.position.set(0, -0.3, 0);
+      const lower = mesh(boxGeometry, aluminumMaterial, [0, -0.13, 0], [0.13, 0.26, 0.14]);
+      const toolEnd = mesh(cylinderGeometry, graphiteMaterial, [0, -0.3, 0.015], [0.13, 0.1, 0.13]);
+      elbow.add(lower, toolEnd);
       shoulder.add(upper, elbow);
       root.add(shoulder);
       return { shoulder, elbow };
@@ -423,12 +414,12 @@ export function createAvatarWorld(options = {}) {
 
     function makeLeg(side) {
       const hip = new THREE.Group();
-      hip.position.set(side * 0.23, 0.98, 0);
-      const upper = mesh(limbGeometry, whiteShellMaterial, [0, -0.2, 0], [0.27, 0.4, 0.27]);
+      hip.position.set(side * 0.2, 0.65, 0);
+      const upper = mesh(boxGeometry, whiteShellMaterial, [0, -0.15, 0], [0.2, 0.3, 0.22]);
       const knee = new THREE.Group();
-      knee.position.set(0, -0.39, 0);
-      const lower = mesh(limbGeometry, jointMaterial, [0, -0.16, 0], [0.21, 0.32, 0.21]);
-      const foot = mesh(sphereGeometry, whiteShellMaterial, [0, -0.38, 0.1], [0.42, 0.26, 0.55], [0.04, 0, 0]);
+      knee.position.set(0, -0.3, 0);
+      const lower = mesh(boxGeometry, aluminumMaterial, [0, -0.13, 0], [0.15, 0.26, 0.17]);
+      const foot = mesh(boxGeometry, graphiteMaterial, [0, -0.305, 0.055], [0.25, 0.09, 0.34]);
       knee.add(lower, foot);
       hip.add(upper, knee);
       root.add(hip);
@@ -440,9 +431,9 @@ export function createAvatarWorld(options = {}) {
     const leftLeg = makeLeg(-1);
     const rightLeg = makeLeg(1);
 
-    root.scale.setScalar(mobile ? 0.6 : 0.5);
+    root.scale.setScalar(mobile ? 0.48 : 0.36);
     root.userData.fadeMaterials = fadeMaterials;
-    root.userData.baseScale = mobile ? 0.6 : 0.5;
+    root.userData.baseScale = mobile ? 0.48 : 0.36;
     avatarRig = {
       root,
       pelvis,
@@ -989,56 +980,56 @@ export function createAvatarWorld(options = {}) {
     const phase = progress * Math.PI * 38;
     const stride = Math.sin(phase);
     const counterStride = Math.sin(phase + Math.PI);
-    const bob = Math.abs(Math.sin(phase)) * 0.045 * walkAmount;
-    const idleBob = Math.sin(timestamp * 0.0022) * 0.012 * stillness;
+    const bob = Math.abs(Math.sin(phase)) * 0.018 * walkAmount;
+    const idleBob = Math.sin(timestamp * 0.0017) * 0.004 * stillness;
 
     path.getPointAt(progress, pathPoint);
     path.getTangentAt(clamp(progress, 0.001, 0.999), pathTangent).normalize();
     const platformLift = smoothstep(0.91, 0.96, progress) * 0.1;
-    avatar.position.set(pathPoint.x, 0.1 + platformLift + bob + idleBob, pathPoint.z);
+    avatar.position.set(pathPoint.x, 0.035 + platformLift + bob + idleBob, pathPoint.z);
     avatar.rotation.y = Math.atan2(pathTangent.x, pathTangent.z);
 
-    const legSwing = 0.54 * walkAmount;
+    const legSwing = 0.34 * walkAmount;
     avatarRig.leftLeg.hip.rotation.x = stride * legSwing;
     avatarRig.rightLeg.hip.rotation.x = counterStride * legSwing;
     avatarRig.leftLeg.knee.rotation.x = Math.max(0, -stride) * 0.58 * walkAmount;
     avatarRig.rightLeg.knee.rotation.x = Math.max(0, -counterStride) * 0.58 * walkAmount;
 
-    let leftArmX = counterStride * 0.42 * walkAmount;
-    let rightArmX = stride * 0.42 * walkAmount;
-    let leftArmZ = -0.04;
-    let rightArmZ = 0.04;
-    let leftElbowX = -0.08;
-    let rightElbowX = -0.08;
+    let leftArmX = counterStride * 0.22 * walkAmount;
+    let rightArmX = stride * 0.22 * walkAmount;
+    let leftArmZ = -0.025;
+    let rightArmZ = 0.025;
+    let leftElbowX = -0.04;
+    let rightElbowX = -0.04;
     let leftElbowZ = 0;
     let rightElbowZ = 0;
 
-    leftArmX = mix(leftArmX, -0.2, point);
-    leftArmZ = mix(leftArmZ, -1.48, point);
-    leftElbowX = mix(leftElbowX, -0.12, point);
-    leftElbowZ = mix(leftElbowZ, -0.08, point);
+    leftArmX = mix(leftArmX, -0.14, point);
+    leftArmZ = mix(leftArmZ, -1.18, point);
+    leftElbowX = mix(leftElbowX, -0.1, point);
+    leftElbowZ = mix(leftElbowZ, -0.05, point);
 
-    rightArmX = mix(rightArmX, -0.1, wave);
-    rightArmZ = mix(rightArmZ, 2.66, wave);
-    rightElbowX = mix(rightElbowX, -0.18, wave);
-    rightElbowZ = mix(rightElbowZ, Math.sin(timestamp * 0.0065) * 0.42, wave);
+    rightArmX = mix(rightArmX, -0.06, wave);
+    rightArmZ = mix(rightArmZ, 1.42, wave);
+    rightElbowX = mix(rightElbowX, -0.12, wave);
+    rightElbowZ = mix(rightElbowZ, Math.sin(timestamp * 0.005) * 0.16, wave);
 
-    leftArmX = mix(leftArmX, -0.88, inspect);
-    rightArmX = mix(rightArmX, -0.88, inspect);
-    leftArmZ = mix(leftArmZ, -0.26, inspect);
-    rightArmZ = mix(rightArmZ, 0.26, inspect);
-    leftElbowX = mix(leftElbowX, -0.7, inspect);
-    rightElbowX = mix(rightElbowX, -0.7, inspect);
+    leftArmX = mix(leftArmX, -0.64, inspect);
+    rightArmX = mix(rightArmX, -0.64, inspect);
+    leftArmZ = mix(leftArmZ, -0.18, inspect);
+    rightArmZ = mix(rightArmZ, 0.18, inspect);
+    leftElbowX = mix(leftElbowX, -0.46, inspect);
+    rightElbowX = mix(rightElbowX, -0.46, inspect);
 
     avatarRig.leftArm.shoulder.rotation.set(leftArmX, 0, leftArmZ);
     avatarRig.rightArm.shoulder.rotation.set(rightArmX, 0, rightArmZ);
     avatarRig.leftArm.elbow.rotation.set(leftElbowX, 0, leftElbowZ);
     avatarRig.rightArm.elbow.rotation.set(rightElbowX, 0, rightElbowZ);
-    avatarRig.pelvis.rotation.y = stride * 0.055 * walkAmount;
-    avatarRig.torso.rotation.y = counterStride * 0.045 * walkAmount;
-    avatarRig.torso.rotation.z = Math.sin(phase * 0.5) * 0.012 * walkAmount;
-    avatarRig.head.rotation.y = -0.38 * point - 0.28 * inspect + Math.sin(phase * 0.18) * 0.025;
-    avatarRig.head.rotation.z = 0.05 * wave;
+    avatarRig.pelvis.rotation.y = stride * 0.025 * walkAmount;
+    avatarRig.torso.rotation.y = counterStride * 0.02 * walkAmount;
+    avatarRig.torso.rotation.z = Math.sin(phase * 0.5) * 0.005 * walkAmount;
+    avatarRig.head.rotation.y = -0.26 * point - 0.18 * inspect + Math.sin(phase * 0.18) * 0.012;
+    avatarRig.head.rotation.z = 0.018 * wave;
 
     avatarRig.root.userData.fadeMaterials.forEach((material) => {
       material.opacity = material.userData.baseOpacity;
@@ -1121,7 +1112,7 @@ export function createAvatarWorld(options = {}) {
       ? mobileOverride
       : viewportWidth <= 760 || viewportHeight > viewportWidth * 1.22;
     if (avatarRig?.root) {
-      const avatarScale = mobile ? 0.6 : 0.5;
+      const avatarScale = mobile ? 0.48 : 0.36;
       avatarRig.root.scale.setScalar(avatarScale);
       avatarRig.root.userData.baseScale = avatarScale;
     }

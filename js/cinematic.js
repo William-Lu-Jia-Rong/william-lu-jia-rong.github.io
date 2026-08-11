@@ -143,13 +143,18 @@ if (body.classList.contains("home-page")) {
   }
 
   function updatePhoneSystem(scene, progress) {
+    const intro = map(progress, 0.02, 0.22);
+    const focus = Math.min(3, Math.floor(clamp(progress * 4, 0, 3.999)));
+
+    scene.querySelectorAll("[data-step]").forEach((step) => {
+      step.classList.toggle("is-active", Number(step.dataset.step) === focus);
+    });
+
     const front = scene.querySelector(".phone-card--front");
     const middle = scene.querySelector(".phone-card--mid");
     const rear = scene.querySelector(".phone-card--rear");
     if (!front || !middle || !rear) return;
 
-    const intro = map(progress, 0.02, 0.22);
-    const focus = Math.min(3, Math.floor(clamp(progress * 4, 0, 3.999)));
     const mobile = window.innerWidth <= 820;
     const spread = mobile ? 0.72 : 1;
     const lift = (1 - intro) * 80;
@@ -164,9 +169,6 @@ if (body.classList.contains("home-page")) {
     middle.style.opacity = focus === 3 ? "1" : "0.68";
     rear.style.opacity = focus === 2 ? "1" : "0.58";
 
-    scene.querySelectorAll("[data-step]").forEach((step) => {
-      step.classList.toggle("is-active", Number(step.dataset.step) === focus);
-    });
   }
 
   function updatePipeline(scene, progress) {
