@@ -27,8 +27,8 @@ const pageEntries = Object.fromEntries(
     .map((fileName) => [fileName.slice(0, -5), resolve(root, fileName)]),
 );
 
-// The pages load these as classic scripts, which Vite intentionally leaves
-// untouched. Named entries preserve their stable URLs in the static output.
+// Named module entries preserve stable source-compatible URLs for both the
+// branch-served GitHub Pages site and the compiled Sites package.
 const classicScripts = Object.fromEntries(
   ["site", "cinematic"]
     .map((name) => [name, resolve(root, "js", `${name}.js`)] as const)

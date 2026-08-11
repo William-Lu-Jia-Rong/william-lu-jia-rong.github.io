@@ -576,6 +576,44 @@ body.is-loaded .boot-loader {
   height: 100%;
   opacity: 0.5;
   pointer-events: none;
+  transition: opacity 500ms var(--ease);
+}
+
+.avatar-world {
+  --avatar-safe-x: 72%;
+  --avatar-safe-y: 56%;
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  contain: strict;
+  transition: opacity 700ms var(--ease), visibility 700ms;
+}
+
+.avatar-world__canvas {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  pointer-events: none;
+}
+
+.home-page.avatar-ready .avatar-world {
+  visibility: visible;
+  opacity: 1;
+}
+
+.home-page.avatar-ready .signal-canvas {
+  opacity: 0;
+}
+
+.home-page.avatar-fallback .avatar-world,
+.home-page.avatar-disabled .avatar-world {
+  display: none;
 }
 
 main {
@@ -1317,6 +1355,193 @@ main {
 
 .water-layout { grid-template-columns: minmax(0, 0.8fr) 1.2fr; }
 
+/* Continuous avatar composition
+   The ready state separates each chapter into three root-level planes:
+   static ambience, the fixed WebGL world, and sticky readable content. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-page.avatar-ready main {
+    z-index: auto;
+  }
+
+  .home-page.avatar-ready .cinematic-scene {
+    isolation: auto;
+    background: var(--black);
+  }
+
+  .home-page.avatar-ready .pocketpilot-scene {
+    background:
+      radial-gradient(circle at 72% 48%, rgba(46, 102, 210, 0.18), transparent 32rem),
+      linear-gradient(115deg, #04070b, #080d17 70%, #030506);
+  }
+
+  .home-page.avatar-ready .flight-scene {
+    background:
+      radial-gradient(circle at 72% 55%, rgba(23, 140, 165, 0.14), transparent 34rem),
+      #040809;
+  }
+
+  .home-page.avatar-ready .control-scene {
+    background: radial-gradient(circle at 76% 52%, rgba(255, 195, 104, 0.1), transparent 34rem), var(--black);
+  }
+
+  .home-page.avatar-ready .ai-scene {
+    background: radial-gradient(circle at 72% 52%, rgba(98, 152, 255, 0.12), transparent 36rem), var(--black);
+  }
+
+  .home-page.avatar-ready .water-scene {
+    background: radial-gradient(circle at 75% 62%, rgba(77, 229, 211, 0.1), transparent 36rem), var(--black);
+  }
+
+  .home-page.avatar-ready .scene-stage {
+    position: relative;
+    top: auto;
+    display: grid;
+    grid-template: 1fr / 1fr;
+    height: 100%;
+    min-height: 100%;
+    overflow: clip;
+    isolation: auto;
+    background: transparent;
+  }
+
+  .home-page.avatar-ready .scene-stage > * {
+    grid-area: 1 / 1;
+  }
+
+  .home-page.avatar-ready .scene-layout {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    align-self: start;
+    height: 100svh;
+    min-height: 600px;
+  }
+
+  .home-page.avatar-ready .hero-backdrop,
+  .home-page.avatar-ready .control-backdrop,
+  .home-page.avatar-ready .ai-backdrop,
+  .home-page.avatar-ready .water-photo,
+  .home-page.avatar-ready .flight-map,
+  .home-page.avatar-ready .scene-grid {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    align-self: start;
+    height: 100svh;
+    opacity: 0.34;
+  }
+
+  .home-page.avatar-ready .hero-backdrop,
+  .home-page.avatar-ready .control-backdrop,
+  .home-page.avatar-ready .ai-backdrop,
+  .home-page.avatar-ready .water-photo {
+    inset: auto;
+  }
+
+  .home-page.avatar-ready .scene-grid,
+  .home-page.avatar-ready .flight-map {
+    inset: auto;
+    width: 100%;
+  }
+
+  .home-page.avatar-ready .pocket-orbit {
+    position: sticky;
+    top: 14svh;
+    right: auto;
+    z-index: 1;
+    align-self: start;
+    justify-self: end;
+    margin-right: -8vw;
+    transform: rotate(var(--scene-rotate));
+    opacity: 0.22;
+  }
+
+  .home-page.avatar-ready .water-blueprint {
+    position: sticky;
+    top: 22svh;
+    right: auto;
+    z-index: 2;
+    align-self: start;
+    justify-self: end;
+    margin-right: 4%;
+    opacity: 0.2;
+  }
+
+  .home-page.avatar-ready .phone-system {
+    opacity: 0;
+    filter: saturate(0.65);
+  }
+
+  .home-page.avatar-ready .hero-hud,
+  .home-page.avatar-ready .telemetry-stack,
+  .home-page.avatar-ready .spec-lines,
+  .home-page.avatar-ready .pipeline,
+  .home-page.avatar-ready .chapter-steps {
+    opacity: 0.92;
+    transition: opacity 260ms ease;
+  }
+
+  .home-page.avatar-ready .chapter-steps {
+    right: 0;
+    left: 50%;
+    width: auto;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+  }
+
+  .home-page.avatar-ready .chapter-steps article {
+    background: rgba(6, 10, 15, 0.97);
+  }
+
+  .home-page.avatar-ready .chapter-steps article.is-active {
+    background: rgba(25, 48, 86, 0.98);
+  }
+
+  .home-page.avatar-ready .telemetry-stack {
+    background: rgba(4, 12, 14, 0.96);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  }
+
+  .home-page.avatar-ready .spec-lines article,
+  .home-page.avatar-ready .pipeline li,
+  .home-page.avatar-ready .hero-hud {
+    background-color: rgba(6, 10, 12, 0.95);
+  }
+
+  .home-page.avatar-ready .hero-hud:hover,
+  .home-page.avatar-ready .telemetry-stack:hover,
+  .home-page.avatar-ready .spec-lines:hover,
+  .home-page.avatar-ready .pipeline:hover,
+  .home-page.avatar-ready .chapter-steps:hover {
+    opacity: 1;
+  }
+
+  .home-page.avatar-ready .scroll-cue {
+    position: sticky;
+    top: calc(100svh - 56px);
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 9;
+    align-self: start;
+    justify-self: center;
+    transform: none;
+  }
+
+  .home-page.avatar-ready .content-section,
+  .home-page.avatar-ready .closing-cta,
+  .home-page.avatar-ready .site-footer {
+    z-index: auto;
+  }
+
+  .home-page.avatar-ready .content-section > .site-shell,
+  .home-page.avatar-ready .closing-cta__inner,
+  .home-page.avatar-ready .site-footer__grid {
+    position: relative;
+    z-index: 8;
+  }
+}
+
 /* Homepage content */
 
 .content-section {
@@ -1385,6 +1610,11 @@ main {
   transition: background 260ms ease;
 }
 
+.home-page.avatar-ready .work-card {
+  background: rgba(5, 8, 9, 0.94);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+}
+
 .work-card:nth-child(even) { border-right: 0; }
 .work-card--feature { grid-column: 1 / -1; min-height: 420px; }
 
@@ -1398,6 +1628,7 @@ main {
 }
 
 .work-card:hover { background: rgba(255, 255, 255, 0.03); }
+.home-page.avatar-ready .work-card:hover { background: rgba(10, 15, 17, 0.97); }
 .work-card:hover::before { opacity: 1; }
 
 .work-card__index,
@@ -2391,6 +2622,10 @@ footer {
 
 @media (max-width: 820px) {
   :root { --header-h: 70px; }
+  .avatar-world {
+    --avatar-safe-x: 68%;
+    --avatar-safe-y: 76%;
+  }
   .site-shell,
   .page-hero,
   .case-hero,
@@ -2497,6 +2732,13 @@ footer {
   .chapter-steps article { display: none; min-height: 65px; padding: 11px 13px; border: 1px solid rgba(98, 152, 255, 0.25); }
   .chapter-steps article.is-active { display: block; }
   .pocketpilot-scene .scene-index { display: none; }
+  .home-page.avatar-ready .phone-system { opacity: 0; }
+  .home-page.avatar-ready .hero-hud,
+  .home-page.avatar-ready .telemetry-stack,
+  .home-page.avatar-ready .spec-lines,
+  .home-page.avatar-ready .pipeline,
+  .home-page.avatar-ready .chapter-steps { opacity: 0.94; }
+  .home-page.avatar-ready .chapter-steps { right: 0; left: 0; width: auto; }
 
   .flight-scene .scene-copy,
   .control-scene .scene-copy,
@@ -2575,6 +2817,7 @@ footer {
   .timeline-card { grid-template-columns: 1fr; gap: 10px; }
   .site-footer__grid,
   .footer-inner { grid-template-columns: 1fr; gap: 26px; }
+  .home-page.avatar-ready .site-footer__grid > div:first-child p { max-width: 220px; }
   .site-footer__legal { text-align: left; }
 }
 
@@ -2655,6 +2898,7 @@ footer {
   }
   body.is-loading { overflow: auto; }
   .boot-loader,
+  .avatar-world,
   .signal-canvas,
   .noise-layer { display: none !important; }
   .cinematic-scene {

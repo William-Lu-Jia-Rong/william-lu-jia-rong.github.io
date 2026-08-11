@@ -63,8 +63,19 @@
       <p class="boot-loader__status" data-loader-status>Calibrating embedded portfolio...</p>
     </div>
   </div>
+  <script>
+    window.setTimeout(function () {
+      var loader = document.querySelector("[data-loader]");
+      document.body.classList.remove("is-loading");
+      document.body.classList.add("is-loaded");
+      if (loader) loader.setAttribute("aria-hidden", "true");
+    }, 3500);
+  </script>
 
   <canvas class="signal-canvas" data-signal-canvas aria-hidden="true"></canvas>
+  <div class="avatar-world" data-avatar-world aria-hidden="true">
+    <canvas class="avatar-world__canvas" data-avatar-canvas></canvas>
+  </div>
   <div class="noise-layer" aria-hidden="true"></div>
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -108,7 +119,7 @@
   </header>
 
   <main id="main-content">
-    <section class="cinematic-scene hero-scene" id="intro" data-scene="intro" data-theme="copper">
+    <section class="cinematic-scene hero-scene" id="intro" data-scene="intro" data-avatar-chapter="intro" data-theme="copper">
       <div class="scene-stage">
         <div class="hero-backdrop" aria-hidden="true">
           <img src="images/cinematic/pcb-hero.webp" alt="" width="1672" height="941" fetchpriority="high" data-parallax="0.13">
@@ -136,7 +147,7 @@
       </div>
     </section>
 
-    <section class="cinematic-scene pocketpilot-scene" id="pocketpilot" data-scene="pocketpilot" data-theme="blue">
+    <section class="cinematic-scene pocketpilot-scene" id="pocketpilot" data-scene="pocketpilot" data-avatar-chapter="pocketpilot" data-theme="blue">
       <div class="scene-stage pocketpilot-stage">
         <div class="scene-grid scene-grid--blue" aria-hidden="true"></div>
         <div class="pocket-orbit" aria-hidden="true"></div>
@@ -181,7 +192,7 @@
       </div>
     </section>
 
-    <section class="cinematic-scene flight-scene" id="warg" data-scene="warg" data-theme="cyan">
+    <section class="cinematic-scene flight-scene" id="warg" data-scene="warg" data-avatar-chapter="warg" data-theme="cyan">
       <div class="scene-stage flight-stage">
         <div class="flight-map" aria-hidden="true">
           <div class="flight-grid-plane"></div>
@@ -207,7 +218,7 @@
       </div>
     </section>
 
-    <section class="cinematic-scene control-scene" id="embedded" data-scene="embedded" data-theme="amber">
+    <section class="cinematic-scene control-scene" id="embedded" data-scene="embedded" data-avatar-chapter="embedded" data-theme="amber">
       <div class="scene-stage control-stage">
         <div class="control-backdrop" aria-hidden="true"><img src="images/cinematic/pcb-hero.webp" alt="" width="1672" height="941" loading="lazy"></div>
         <div class="site-shell scene-layout control-layout">
@@ -228,7 +239,7 @@
       </div>
     </section>
 
-    <section class="cinematic-scene ai-scene" id="ai" data-scene="ai" data-theme="blue">
+    <section class="cinematic-scene ai-scene" id="ai" data-scene="ai" data-avatar-chapter="ai" data-theme="blue">
       <div class="scene-stage ai-stage">
         <div class="ai-backdrop" aria-hidden="true"><img src="images/cinematic/ai-automation.webp" alt="" width="1672" height="941" loading="lazy"></div>
         <div class="site-shell scene-layout ai-layout">
@@ -252,7 +263,7 @@
       </div>
     </section>
 
-    <section class="cinematic-scene water-scene" id="water" data-scene="water" data-theme="aqua">
+    <section class="cinematic-scene water-scene" id="water" data-scene="water" data-avatar-chapter="water" data-theme="aqua">
       <div class="scene-stage water-stage">
         <div class="water-photo" aria-hidden="true"><img src="images/Automatic_Water_Quality_Monitoring_Device/boatv2 - Copy.jpg" alt="" width="2237" height="1308" loading="lazy"></div>
         <div class="water-blueprint" aria-hidden="true"><img src="images/Automatic_Water_Quality_Monitoring_Device/Overall_Connection_design.png" alt="" width="625" height="435" loading="lazy"></div>
@@ -268,7 +279,7 @@
       </div>
     </section>
 
-    <section class="work-index content-section" id="work">
+    <section class="work-index content-section" id="work" data-avatar-chapter="work">
       <div class="site-shell">
         <div class="section-intro" data-reveal>
           <p class="eyebrow"><span></span> Selected systems</p>
@@ -301,7 +312,7 @@
       </div>
     </section>
 
-    <section class="profile-band content-section">
+    <section class="profile-band content-section" data-avatar-chapter="profile">
       <div class="site-shell profile-band__grid">
         <div class="profile-band__portrait" data-reveal><img src="images/profile.jpg" alt="Portrait of Jiarong (Bill) Lu" width="2042" height="2407" loading="lazy"></div>
         <div class="profile-band__copy" data-reveal>
@@ -316,7 +327,7 @@
       </div>
     </section>
 
-    <section class="closing-cta" id="contact">
+    <section class="closing-cta" id="contact" data-avatar-chapter="contact">
       <div class="site-shell closing-cta__inner" data-reveal>
         <p class="mono-label">AVAILABLE FOR ENGINEERING OPPORTUNITIES</p>
         <h2>Building something<br>that has to work?</h2>

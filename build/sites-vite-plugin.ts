@@ -46,6 +46,8 @@ export function sites(): Plugin {
         "images",
         "og.png",
       );
+      const threeVendorSource = resolve(root, "js", "vendor");
+      const threeVendorOutput = resolve(clientOutputDirectory, "js", "vendor");
 
       await rm(metadataOutput, { recursive: true, force: true });
       await mkdir(metadataOutput, { recursive: true });
@@ -58,6 +60,12 @@ export function sites(): Plugin {
           recursive: true,
         });
         await copyFile(socialCardSource, socialCardOutput);
+      }
+
+      // Keep the pinned Three.js runtime and its MIT license available as
+      // first-party files in the packaged site as well as in the source tree.
+      if (await exists(threeVendorSource)) {
+        await cp(threeVendorSource, threeVendorOutput, { recursive: true });
       }
 
       if (await exists(hostingConfig)) {

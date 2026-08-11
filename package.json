@@ -9,11 +9,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node build/validate-site.mjs && node --check js/site.js && node --check js/cinematic.js && node --check worker/index.js && tsc --noEmit",
+    "check": "node build/validate-site.mjs && node --check js/site.js && node --check js/cinematic.js && node --check js/avatar-world.js && node --check worker/index.js && tsc --noEmit",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "22.19.19",
+    "three": "0.185.1",
     "typescript": "5.9.3",
     "vite": "8.2.1"
   }

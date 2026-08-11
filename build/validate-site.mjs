@@ -67,6 +67,38 @@ for (const [route, html] of documents) {
 
 await access(resolve(root, "images", "og.png"));
 
+const homepage = documents.get("index.html") ?? "";
+const avatarChapters = [...homepage.matchAll(/data-avatar-chapter=["']([^"']+)["']/gi)]
+  .map((match) => match[1]);
+const requiredAvatarChapters = [
+  "intro",
+  "pocketpilot",
+  "warg",
+  "embedded",
+  "ai",
+  "water",
+  "work",
+  "profile",
+  "contact",
+];
+
+if (!/data-avatar-world(?:\s|>)/i.test(homepage)) {
+  failures.push("index.html: missing continuous avatar world mount");
+}
+if (!/data-avatar-canvas(?:\s|>)/i.test(homepage)) {
+  failures.push("index.html: missing decorative avatar canvas");
+}
+for (const chapter of requiredAvatarChapters) {
+  if (!avatarChapters.includes(chapter)) {
+    failures.push(`index.html: missing avatar chapter ${chapter}`);
+  }
+}
+
+await access(resolve(root, "js", "avatar-world.js"));
+await access(resolve(root, "js", "vendor", "three.module.min.js"));
+await access(resolve(root, "js", "vendor", "three.core.min.js"));
+await access(resolve(root, "js", "vendor", "THREE-LICENSE.txt"));
+
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
