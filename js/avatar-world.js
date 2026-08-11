@@ -431,9 +431,9 @@ export function createAvatarWorld(options = {}) {
     const leftLeg = makeLeg(-1);
     const rightLeg = makeLeg(1);
 
-    root.scale.setScalar(mobile ? 0.48 : 0.36);
+    root.scale.setScalar(mobile ? 0.58 : 0.48);
     root.userData.fadeMaterials = fadeMaterials;
-    root.userData.baseScale = mobile ? 0.48 : 0.36;
+    root.userData.baseScale = mobile ? 0.58 : 0.48;
     avatarRig = {
       root,
       pelvis,
@@ -488,19 +488,22 @@ export function createAvatarWorld(options = {}) {
     });
     const phones = [];
     const layouts = [
-      [-2.2, 1.86, 0.28, -0.08, -0.1],
-      [-3.02, 1.54, 0.7, 0.13, 0.08],
-      [-1.37, 1.48, 0.61, -0.12, -0.07],
+      [-0.86, 1.5, 0.34, -0.08, -0.1],
+      [0, 1.72, 0.68, 0.08, 0.04],
+      [0.86, 1.46, 0.5, -0.1, 0.08],
     ];
     layouts.forEach((layout, index) => {
       const phone = new THREE.Group();
       phone.position.set(layout[0], layout[1], layout[2]);
       phone.rotation.set(layout[3], layout[4], index === 1 ? -0.08 : index === 2 ? 0.08 : 0);
-      const body = mesh(bodyGeometry, bodyMaterial, [0, 0, 0], [0.68, 1.28, 0.1]);
-      const screen = mesh(screenGeometry, screenMaterials[index], [0, 0, 0.075], [0.58, 1.08, 0.035]);
+      const body = mesh(bodyGeometry, bodyMaterial, [0, 0, 0], [0.38, 0.76, 0.075]);
+      const screen = mesh(screenGeometry, screenMaterials[index], [0, 0, 0.052], [0.32, 0.64, 0.025]);
       phone.add(body, screen);
       phone.userData.baseY = phone.position.y;
       phone.userData.baseRotationY = phone.rotation.y;
+      // The real app screenshots occupy the mobile proof dock; a second set
+      // of textured phones would compete with the robot in that narrow lane.
+      phone.visible = !mobile;
       phones.push(phone);
       group.add(phone);
     });
@@ -510,7 +513,8 @@ export function createAvatarWorld(options = {}) {
   function buildWargProps() {
     const group = makeChapterGroup(2);
     const drone = new THREE.Group();
-    drone.position.set(-2.15, 2.12, 0.32);
+    drone.position.set(-0.46, 1.72, 0.32);
+    drone.scale.setScalar(0.78);
     drone.userData.baseY = drone.position.y;
 
     const bodyGeometry = trackGeometry(new THREE.OctahedronGeometry(0.42, 0));
@@ -589,11 +593,11 @@ export function createAvatarWorld(options = {}) {
       roughness: 0.42,
     });
 
-    const board = mesh(boxGeometry, boardMaterial, [-2.15, 0.66, 0.12], [2.2, 0.1, 1.46], [0, 0.06, 0]);
+    const board = mesh(boxGeometry, boardMaterial, [0, 0.52, 0.12], [2.05, 0.1, 1.28], [0, 0.06, 0]);
     group.add(board);
     const components = new THREE.InstancedMesh(boxGeometry, componentMaterial, 9);
     for (let index = 0; index < 9; index += 1) {
-      dummy.position.set(-2.95 + (index % 3) * 0.72, 0.82, -0.34 + Math.floor(index / 3) * 0.42);
+      dummy.position.set(-0.72 + (index % 3) * 0.72, 0.68, -0.3 + Math.floor(index / 3) * 0.36);
       dummy.rotation.set(0, (index % 2) * 0.3, 0);
       dummy.scale.set(0.18 + (index % 2) * 0.08, 0.16 + (index % 3) * 0.035, 0.15);
       dummy.updateMatrix();
@@ -603,8 +607,8 @@ export function createAvatarWorld(options = {}) {
     components.computeBoundingSphere();
     group.add(components);
 
-    const motor = mesh(cylinderGeometry, motorMaterial, [-1.35, 1.19, 0.22], [0.7, 0.62, 0.7], [0, 0, Math.PI / 2]);
-    const motorRing = mesh(torusGeometry, ringMaterial, [-1.35, 1.19, 0.22], [1, 1, 1], [0, Math.PI / 2, 0]);
+    const motor = mesh(cylinderGeometry, motorMaterial, [0.94, 1.02, 0.22], [0.62, 0.54, 0.62], [0, 0, Math.PI / 2]);
+    const motorRing = mesh(torusGeometry, ringMaterial, [0.94, 1.02, 0.22], [0.88, 0.88, 0.88], [0, Math.PI / 2, 0]);
     group.add(motor, motorRing);
     animation.motor = motor;
     animation.motorRing = motorRing;
@@ -624,8 +628,8 @@ export function createAvatarWorld(options = {}) {
       depthWrite: false,
     });
     const positions = [
-      [-3.0, 1.12, -0.42], [-2.45, 2.02, 0.05], [-1.72, 1.24, 0.54],
-      [-2.85, 2.75, 0.72], [-1.55, 2.7, -0.28], [-0.95, 1.86, 0.35],
+      [-1.02, 1.04, -0.42], [-0.5, 1.88, 0.05], [0.16, 1.18, 0.54],
+      [-0.88, 2.5, 0.72], [0.34, 2.42, -0.28], [0.96, 1.7, 0.35],
     ];
     const nodes = new THREE.InstancedMesh(nodeGeometry, nodeMaterial, positions.length);
     positions.forEach((position, index) => {
@@ -657,7 +661,7 @@ export function createAvatarWorld(options = {}) {
     const group = makeChapterGroup(5);
     const rippleSegments = [];
     [0.62, 1.14, 1.72].forEach((radius) => {
-      rippleSegments.push(...makeCircleSegments(radius, mobile ? 22 : 34, "xz", [-1.85, 0.04, 0.08]));
+      rippleSegments.push(...makeCircleSegments(radius, mobile ? 22 : 34, "xz", [0, 0.04, 0.08]));
     });
     const rippleMaterial = chapterMaterial(group, "line", COLORS.water, { opacity: 0.62 });
     const ripples = new THREE.LineSegments(trackGeometry(makeLineGeometry(rippleSegments)), rippleMaterial);
@@ -671,8 +675,8 @@ export function createAvatarWorld(options = {}) {
       emissiveIntensity: 0.48,
       roughness: 0.55,
     });
-    const boat = mesh(hullGeometry, hullMaterial, [-1.85, 0.28, 0.08], [0.68, 1, 0.34], [0, 0, Math.PI / 2]);
-    const marker = mesh(markerGeometry, markerMaterial, [-1.85, 0.84, 0.08], [1, 1, 1]);
+    const boat = mesh(hullGeometry, hullMaterial, [-0.82, 0.28, 0.08], [0.6, 0.9, 0.3], [0, 0, Math.PI / 2]);
+    const marker = mesh(markerGeometry, markerMaterial, [-0.82, 0.78, 0.08], [0.9, 0.9, 0.9]);
     group.add(boat, marker);
     animation.ripples = ripples;
     animation.boat = boat;
@@ -688,15 +692,15 @@ export function createAvatarWorld(options = {}) {
     const screenMaterial = chapterMaterial(group, "basic", COLORS.cyanSoft, { opacity: 0.76 });
     const panels = new THREE.InstancedMesh(panelGeometry, panelMaterial, 3);
     const screens = new THREE.InstancedMesh(panelGeometry, screenMaterial, 3);
-    const layouts = [[-3.2, 1.64, 0.8, -0.12], [-2.05, 1.88, 0.18, 0.04], [-0.95, 1.46, 0.72, 0.12]];
+    const layouts = [[-1.02, 1.48, 0.72, -0.1], [0, 1.76, 0.18, 0.04], [1.02, 1.4, 0.66, 0.1]];
     layouts.forEach((layout, index) => {
       dummy.position.set(layout[0], layout[1], layout[2]);
       dummy.rotation.set(0, layout[3], 0);
-      dummy.scale.set(0.9, 1.18, 0.08);
+      dummy.scale.set(0.58, 0.88, 0.07);
       dummy.updateMatrix();
       panels.setMatrixAt(index, dummy.matrix);
       dummy.position.z += 0.07;
-      dummy.scale.set(0.74, 0.92, 0.025);
+      dummy.scale.set(0.48, 0.68, 0.022);
       dummy.updateMatrix();
       screens.setMatrixAt(index, dummy.matrix);
     });
@@ -729,15 +733,15 @@ export function createAvatarWorld(options = {}) {
       emissiveIntensity: 0.62,
       roughness: 0.46,
     });
-    const frame = mesh(ringGeometry, frameMaterial, [-2.05, 1.83, 0.18], [1, 1, 1]);
-    const badge = mesh(badgeGeometry, badgeMaterial, [-2.05, 1.83, 0.13], [1.14, 0.78, 0.13]);
+    const frame = mesh(ringGeometry, frameMaterial, [-0.78, 1.58, 0.18], [0.72, 0.72, 0.72]);
+    const badge = mesh(badgeGeometry, badgeMaterial, [-0.78, 1.58, 0.13], [0.82, 0.56, 0.1]);
 
     const badgeLeds = new THREE.InstancedMesh(ledGeometry, ledMaterial, 4);
     const ledLayouts = [
-      [-2.28, 1.95, 0.23, 0.13, 0.08, 0.03],
-      [-1.82, 1.95, 0.23, 0.13, 0.08, 0.03],
-      [-2.55, 1.53, 0.2, 0.09, 0.09, 0.04],
-      [-1.55, 2.17, 0.2, 0.09, 0.09, 0.04],
+      [-0.95, 1.68, 0.23, 0.1, 0.065, 0.025],
+      [-0.61, 1.68, 0.23, 0.1, 0.065, 0.025],
+      [-1.14, 1.36, 0.2, 0.07, 0.07, 0.032],
+      [-0.42, 1.83, 0.2, 0.07, 0.07, 0.032],
     ];
     ledLayouts.forEach((layout, index) => {
       dummy.position.set(layout[0], layout[1], layout[2]);
@@ -750,13 +754,13 @@ export function createAvatarWorld(options = {}) {
     badgeLeds.computeBoundingSphere();
 
     const circuitSegments = [
-      [[-2.55, 1.53, 0.19], [-2.45, 1.64, 0.19]],
-      [[-2.45, 1.64, 0.19], [-2.45, 1.83, 0.19]],
-      [[-1.55, 2.17, 0.19], [-1.68, 2.06, 0.19]],
-      [[-1.68, 2.06, 0.19], [-1.68, 1.86, 0.19]],
-      [[-2.36, 1.67, 0.23], [-2.22, 1.67, 0.23]],
-      [[-2.12, 1.67, 0.23], [-1.98, 1.67, 0.23]],
-      [[-1.88, 1.67, 0.23], [-1.74, 1.67, 0.23]],
+      [[-1.14, 1.36, 0.19], [-1.06, 1.45, 0.19]],
+      [[-1.06, 1.45, 0.19], [-1.06, 1.58, 0.19]],
+      [[-0.42, 1.83, 0.19], [-0.52, 1.75, 0.19]],
+      [[-0.52, 1.75, 0.19], [-0.52, 1.6, 0.19]],
+      [[-1.01, 1.47, 0.23], [-0.91, 1.47, 0.23]],
+      [[-0.84, 1.47, 0.23], [-0.74, 1.47, 0.23]],
+      [[-0.67, 1.47, 0.23], [-0.57, 1.47, 0.23]],
     ];
     const circuits = new THREE.LineSegments(trackGeometry(makeLineGeometry(circuitSegments)), circuitMaterial);
     group.add(frame, badge, badgeLeds, circuits);
@@ -1039,18 +1043,18 @@ export function createAvatarWorld(options = {}) {
 
   function updateCamera(progress) {
     const desktopFrames = [
-      [-0.15, 4.55, 8.0, -1.7, 1.82], [0.1, 4.8, 8.3, -1.72, 1.9],
-      [-0.1, 4.75, 8.6, -1.85, 1.95], [0.05, 4.7, 8.25, -1.7, 1.82],
-      [-0.15, 4.9, 8.55, -1.82, 1.98], [0.1, 4.65, 8.15, -1.72, 1.74],
-      [-0.05, 4.85, 8.45, -1.78, 1.9], [0.08, 4.55, 7.95, -1.62, 1.83],
-      [0, 4.7, 8.2, -1.66, 1.85],
+      [0, 4.22, 7.35, 0, 0.72], [0.04, 4.3, 7.5, 0, 0.74],
+      [-0.04, 4.28, 7.55, 0, 0.72], [0.03, 4.2, 7.38, 0, 0.7],
+      [-0.03, 4.34, 7.55, 0, 0.76], [0.04, 4.18, 7.32, 0, 0.7],
+      [-0.03, 4.3, 7.48, 0, 0.74], [0.03, 4.18, 7.3, 0, 0.72],
+      [0, 4.24, 7.38, 0, 0.72],
     ];
     const mobileFrames = [
-      [0, 5.3, 9.6, -1.05, 3.68], [0, 5.5, 10.0, -1.05, 3.78],
-      [0, 5.55, 10.15, -1.05, 3.82], [0, 5.4, 9.9, -1.05, 3.72],
-      [0, 5.65, 10.25, -1.05, 3.88], [0, 5.35, 9.8, -1.05, 3.68],
-      [0, 5.6, 10.1, -1.05, 3.8], [0, 5.28, 9.65, -1.05, 3.66],
-      [0, 5.4, 9.85, -1.05, 3.72],
+      [0, 4.72, 8.45, 0, 1.48], [0.03, 4.82, 8.65, 0, 1.52],
+      [-0.03, 4.86, 8.72, 0, 1.52], [0.02, 4.76, 8.55, 0, 1.46],
+      [-0.02, 4.9, 8.75, 0, 1.55], [0.03, 4.74, 8.5, 0, 1.46],
+      [-0.02, 4.86, 8.68, 0, 1.52], [0.02, 4.7, 8.42, 0, 1.48],
+      [0, 4.78, 8.55, 0, 1.5],
     ];
     const frames = mobile ? mobileFrames : desktopFrames;
     const scaled = progress * (frames.length - 1);
@@ -1112,9 +1116,14 @@ export function createAvatarWorld(options = {}) {
       ? mobileOverride
       : viewportWidth <= 760 || viewportHeight > viewportWidth * 1.22;
     if (avatarRig?.root) {
-      const avatarScale = mobile ? 0.48 : 0.36;
+      const avatarScale = mobile ? 0.58 : 0.48;
       avatarRig.root.scale.setScalar(avatarScale);
       avatarRig.root.userData.baseScale = avatarScale;
+    }
+    if (animation.phones) {
+      animation.phones.forEach((phone) => {
+        phone.visible = !mobile;
+      });
     }
     const deviceRatio = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
     renderer.setPixelRatio(Math.min(deviceRatio, mobile ? 1 : 1.5));
