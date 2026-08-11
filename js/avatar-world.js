@@ -1,7 +1,15 @@
 import * as THREE from "./vendor/three.module.min.js";
+import { GLTFLoader } from "./vendor/addons/loaders/GLTFLoader.js";
+import { HDRLoader } from "./vendor/addons/loaders/HDRLoader.js";
 
 const CHAPTER_STOPS = Object.freeze([0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.72, 0.84, 0.96]);
 const TAU = Math.PI * 2;
+const CANONICAL_ROBOT_HEIGHT = 2.2;
+const MAX_MODEL_DRAWS = 20;
+const MAX_MODEL_TRIANGLES = 25000;
+const ROBOT_MODEL_URL = new URL("../assets/3d/robot-expressive.glb", import.meta.url).href;
+const WORKSHOP_HDR_URL = new URL("../assets/3d/aerodynamics-workshop-1k.hdr", import.meta.url).href;
+const REQUIRED_ROBOT_CLIPS = Object.freeze(["Idle", "Walking", "Wave", "ThumbsUp", "Yes"]);
 const POCKETPILOT_TEXTURE_URLS = Object.freeze([
   new URL("../images/pocketpilot/screenshot-insights.webp", import.meta.url).href,
   new URL("../images/pocketpilot/screenshot-scan.webp", import.meta.url).href,
@@ -100,14 +108,15 @@ function makeCircleSegments(radius, count, plane = "xz", center = [0, 0, 0]) {
  * @param {(event: Event) => void} [options.onContextLost]
  * @param {(event: Event) => void} [options.onContextRestored]
  * @param {(error: unknown) => void} [options.onError]
- * The factory initializes synchronously and throws if WebGL is unavailable, so
- * callers can enter their static fallback path with a single try/catch.
+ * The factory resolves only after the imported robot and lighting assets have
+ * loaded, validated, and compiled. It rejects on any startup failure so callers
+ * can enter their static fallback path without exposing an incomplete world.
  *
- * @returns {{initialize: function(): boolean, update: function(number|object, number=): void,
+ * @returns {Promise<{initialize: function(): Promise<boolean>, update: function(number|object, number=): void,
  *   resize: function(number=, number=, boolean=): void, setActive: function(boolean): void, dispose: function(): void,
- *   readonly ready: boolean, readonly error: unknown}}
+ *   readonly ready: boolean, readonly error: unknown}>}
  */
-export function createAvatarWorld(options = {}) {
+export async function createAvatarWorld(options = {}) {
   const canvas = options.canvas;
   const geometries = new Set();
   const materials = new Set();
@@ -125,7 +134,14 @@ export function createAvatarWorld(options = {}) {
   let camera = null;
   let world = null;
   let avatar = null;
-  let avatarRig = null;
+  let avatarMixer = null;
+  let avatarActions = null;
+  let avatarClips = null;
+  let environmentRenderTarget = null;
+  let environmentContext = null;
+  let environmentSourceTexture = null;
+  let assetAbortController = null;
+  let externalAbortListener = null;
   let routeMaterial = null;
   let initialized = false;
   let disposed = false;
@@ -139,6 +155,8 @@ export function createAvatarWorld(options = {}) {
   let peakDrawCalls = 0;
   let peakTriangles = 0;
   let compactViewport = false;
+  let tabletViewport = false;
+  let shortViewport = false;
   let gaitPhase = 0;
   let gaitEnergy = 0;
   let lastAvatarProgress = 0;
@@ -323,206 +341,242 @@ export function createAvatarWorld(options = {}) {
     world.add(routeGroup);
   }
 
-  function buildAvatar() {
-    const root = new THREE.Group();
-    root.name = "retro-industrial-inspection-robot";
-    const fadeMaterials = [];
+  function throwIfAssetLoadAborted() {
+    if (disposed || assetAbortController?.signal.aborted || options.signal?.aborted) {
+      throw new DOMException("Avatar asset loading was aborted.", "AbortError");
+    }
+  }
 
-    function avatarStandard(color, settings = {}) {
-      const opacity = settings.opacity ?? 1;
-      const material = new THREE.MeshStandardMaterial({
-        color,
-        roughness: settings.roughness ?? 0.42,
-        metalness: settings.metalness ?? 0.18,
-        emissive: settings.emissive ?? 0x000000,
-        emissiveIntensity: settings.emissiveIntensity ?? 0,
-        transparent: settings.transparent ?? opacity < 1,
-        opacity,
-        depthWrite: settings.depthWrite ?? true,
-        side: settings.side ?? THREE.FrontSide,
+  async function fetchArrayBuffer(url) {
+    throwIfAssetLoadAborted();
+    const response = await fetch(url, {
+      cache: "force-cache",
+      credentials: "same-origin",
+      signal: assetAbortController.signal,
+    });
+    if (!response.ok) throw new Error(`Unable to load avatar asset (${response.status}): ${url}`);
+    const buffer = await response.arrayBuffer();
+    throwIfAssetLoadAborted();
+    return buffer;
+  }
+
+  function createHdrTexture(buffer) {
+    const data = new HDRLoader().parse(buffer);
+    if (!data?.data || !data.width || !data.height) {
+      throw new Error("The workshop HDR did not contain usable image data.");
+    }
+    const texture = new THREE.DataTexture(
+      data.data,
+      data.width,
+      data.height,
+      THREE.RGBAFormat,
+      data.type,
+    );
+    texture.colorSpace = data.colorSpace;
+    texture.minFilter = data.minFilter;
+    texture.magFilter = data.magFilter;
+    texture.generateMipmaps = data.generateMipmaps;
+    texture.flipY = data.flipY;
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  function collectImportedResources(root) {
+    root.traverse((object) => {
+      if (!object.isMesh) return;
+      if (object.geometry) geometries.add(object.geometry);
+      const objectMaterials = Array.isArray(object.material) ? object.material : [object.material];
+      objectMaterials.filter(Boolean).forEach((material) => {
+        materials.add(material);
+        Object.values(material).forEach((value) => {
+          if (value?.isTexture) textures.add(value);
+        });
+        const materialName = material.name.toLowerCase();
+        if (materialName === "main") {
+          material.color?.setHex(COLORS.robotWhite);
+          material.roughness = 0.38;
+          material.metalness = 0.24;
+          material.envMapIntensity = 1.08;
+        } else if (materialName === "grey") {
+          material.color?.setHex(COLORS.robotGray);
+          material.roughness = 0.52;
+          material.metalness = 0.34;
+          material.envMapIntensity = 0.96;
+        } else if (materialName === "black") {
+          material.color?.setHex(COLORS.screen);
+          material.emissive?.setHex(0x03171d);
+          material.emissiveIntensity = 0.32;
+          material.roughness = 0.28;
+          material.metalness = 0.38;
+          material.envMapIntensity = 0.82;
+        } else {
+          material.envMapIntensity = 0.92;
+        }
+        material.needsUpdate = true;
       });
-      material.userData.baseOpacity = opacity;
-      trackMaterial(material);
-      fadeMaterials.push(material);
-      return material;
+      object.castShadow = false;
+      object.receiveShadow = false;
+    });
+  }
+
+  function validateRobot(gltf) {
+    if (!gltf?.scene) throw new Error("RobotExpressive is missing its scene root.");
+    const clipsByName = new Map((gltf.animations || []).map((clip) => [clip.name, clip]));
+    const missingClips = REQUIRED_ROBOT_CLIPS.filter((name) => !clipsByName.has(name));
+    if (missingClips.length) {
+      throw new Error(`RobotExpressive is missing required clips: ${missingClips.join(", ")}.`);
     }
 
-    function avatarBasic(color, settings = {}) {
-      const opacity = settings.opacity ?? 1;
-      const material = basicMaterial(color, {
-        ...settings,
-        transparent: settings.transparent ?? opacity < 1,
-      });
-      fadeMaterials.push(material);
-      return material;
+    let drawCount = 0;
+    let triangleCount = 0;
+    let skinnedMeshCount = 0;
+    gltf.scene.traverse((object) => {
+      if (!object.isMesh) return;
+      drawCount += Array.isArray(object.material) ? object.material.length : 1;
+      if (object.isSkinnedMesh) skinnedMeshCount += 1;
+      const geometry = object.geometry;
+      const elementCount = geometry?.index?.count ?? geometry?.attributes?.position?.count ?? 0;
+      triangleCount += elementCount / 3;
+    });
+    if (!skinnedMeshCount) throw new Error("RobotExpressive does not contain an animated skinned mesh.");
+    if (drawCount > MAX_MODEL_DRAWS || triangleCount > MAX_MODEL_TRIANGLES) {
+      throw new Error(`RobotExpressive exceeds its render budget (${drawCount} draws, ${Math.ceil(triangleCount)} triangles).`);
+    }
+    return clipsByName;
+  }
+
+  function prepareRobot(gltf, clipsByName) {
+    const importedScene = gltf.scene;
+    importedScene.name = "robot-expressive-model";
+    importedScene.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(importedScene);
+    const size = bounds.getSize(new THREE.Vector3());
+    if (!Number.isFinite(size.y) || size.y <= 0.0001) {
+      throw new Error("RobotExpressive has invalid model bounds.");
     }
 
-    const detail = mobile ? 8 : 12;
-    const boxGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, detail));
-    const shellGeometry = trackGeometry(new THREE.CapsuleGeometry(0.5, 0.34, mobile ? 4 : 6, mobile ? 8 : 12));
-    const sphereGeometry = trackGeometry(new THREE.SphereGeometry(0.5, mobile ? 8 : 12, mobile ? 6 : 9));
-    const coneGeometry = trackGeometry(new THREE.ConeGeometry(0.5, 1, detail));
-    const warmShellMaterial = avatarStandard(0xded9ca, {
-      roughness: 0.55,
-      metalness: 0.05,
-    });
-    const graphiteMaterial = avatarStandard(0x172027, {
-      roughness: 0.6,
-      metalness: 0.38,
-    });
-    const aluminumMaterial = avatarStandard(0x78848a, {
-      roughness: 0.32,
-      metalness: 0.72,
-    });
-    const rubberMaterial = avatarStandard(0x0d1216, {
-      roughness: 0.8,
-      metalness: 0.08,
-    });
-    const brassMaterial = avatarStandard(0xb9854b, {
-      roughness: 0.43,
-      metalness: 0.55,
-    });
-    const cyanOpticMaterial = avatarStandard(0x7fe8f0, {
-      emissive: 0x52cbd8,
-      emissiveIntensity: 0.66,
-      roughness: 0.24,
-      metalness: 0.08,
+    const center = bounds.getCenter(new THREE.Vector3());
+    importedScene.position.x -= center.x;
+    importedScene.position.y -= bounds.min.y;
+    importedScene.position.z -= center.z;
+
+    const normalizedVisual = new THREE.Group();
+    normalizedVisual.name = "normalized-robot-expressive";
+    normalizedVisual.scale.setScalar(CANONICAL_ROBOT_HEIGHT / size.y);
+    normalizedVisual.add(importedScene);
+
+    avatar = new THREE.Group();
+    avatar.name = "imported-robot-expressive-avatar";
+    avatar.userData.baseScale = mobile ? 0.72 : 0.66;
+    avatar.scale.setScalar(avatar.userData.baseScale);
+    avatar.add(normalizedVisual);
+    world.add(avatar);
+
+    avatarMixer = new THREE.AnimationMixer(importedScene);
+    avatarClips = Object.fromEntries(REQUIRED_ROBOT_CLIPS.map((name) => [name, clipsByName.get(name)]));
+    avatarActions = Object.fromEntries(REQUIRED_ROBOT_CLIPS.map((name) => {
+      const action = avatarMixer.clipAction(avatarClips[name]);
+      action.enabled = true;
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.setEffectiveWeight(name === "Idle" ? 1 : 0);
+      action.play();
+      return [name, action];
+    }));
+    avatarMixer.update(0);
+    collectImportedResources(importedScene);
+    canvas.dataset.avatarModel = "robot-expressive";
+  }
+
+  function rebuildEnvironmentLighting(hdrTexture) {
+    environmentRenderTarget?.dispose();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    try {
+      pmrem.compileEquirectangularShader();
+      environmentRenderTarget = pmrem.fromEquirectangular(hdrTexture);
+      scene.environment = environmentRenderTarget.texture;
+    } finally {
+      pmrem.dispose();
+    }
+  }
+
+  function prepareEnvironment(hdrTexture) {
+    environmentSourceTexture = hdrTexture;
+    textures.add(hdrTexture);
+    rebuildEnvironmentLighting(hdrTexture);
+
+    const contextGeometry = trackGeometry(new THREE.SphereGeometry(32, 20, 12));
+    const contextMaterial = trackMaterial(new THREE.MeshBasicMaterial({
+      map: hdrTexture,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0.035,
       depthWrite: false,
-    });
-    const visorMaterial = avatarBasic(0x02090e);
+      toneMapped: true,
+    }));
+    contextMaterial.userData.baseOpacity = 0.035;
+    environmentContext = new THREE.Mesh(contextGeometry, contextMaterial);
+    environmentContext.name = "subtle-workshop-context";
+    environmentContext.position.set(0, 10, 16.4);
+    environmentContext.renderOrder = -10;
+    environmentContext.visible = !mobile;
+    scene.add(environmentContext);
+  }
 
-    // The visible shell floats over a graphite frame, so the silhouette reads
-    // as a manufactured inspection machine rather than a toy figurine.
-    const batteryPack = mesh(boxGeometry, graphiteMaterial, [0, 1.29, -0.34], [0.58, 0.46, 0.16]);
-    root.add(batteryPack);
+  function finishAssetLoading(controller) {
+    if (assetAbortController !== controller) return;
+    if (externalAbortListener) options.signal?.removeEventListener("abort", externalAbortListener);
+    externalAbortListener = null;
+    assetAbortController = null;
+  }
 
-    const pelvis = new THREE.Group();
-    pelvis.position.set(0, 0.77, 0);
-    const rotaryWaist = mesh(cylinderGeometry, graphiteMaterial, [0, 0, 0], [0.4, 0.15, 0.36]);
-    pelvis.add(rotaryWaist);
+  async function loadOptionalEnvironment(environmentResult, controller) {
+    try {
+      const { buffer, error } = await environmentResult;
+      if (disposed || controller.signal.aborted) return;
+      if (error) {
+        dispatch("avatarworldassetwarning", { asset: "environment", error });
+        return;
+      }
 
-    const torso = new THREE.Group();
-    torso.position.set(0, 1.31, 0);
-    const innerFrame = mesh(boxGeometry, graphiteMaterial, [0, -0.01, -0.005], [0.72, 0.5, 0.48]);
-    const chassis = mesh(shellGeometry, warmShellMaterial, [0, 0.015, 0.015], [0.88, 0.54, 0.55]);
-    const chestPanel = mesh(boxGeometry, visorMaterial, [0, 0.07, 0.315], [0.46, 0.18, 0.035]);
-    const chestStatus = mesh(boxGeometry, cyanOpticMaterial, [0, 0.07, 0.342], [0.12, 0.018, 0.012]);
-    torso.add(innerFrame, chassis, chestPanel, chestStatus);
-
-    const vents = new THREE.InstancedMesh(boxGeometry, graphiteMaterial, 4);
-    for (let index = 0; index < 4; index += 1) {
-      dummy.position.set(-0.21 + index * 0.14, -0.15, 0.32);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(0.045, 0.105, 0.012);
-      dummy.updateMatrix();
-      vents.setMatrixAt(index, dummy.matrix);
+      let hdrTexture = null;
+      try {
+        hdrTexture = createHdrTexture(buffer);
+        prepareEnvironment(hdrTexture);
+      } catch (error) {
+        if (scene) scene.environment = null;
+        environmentRenderTarget?.dispose();
+        environmentRenderTarget = null;
+        if (hdrTexture) {
+          textures.delete(hdrTexture);
+          hdrTexture.dispose();
+        }
+        environmentSourceTexture = null;
+        dispatch("avatarworldassetwarning", { asset: "environment", error });
+      }
+    } finally {
+      finishAssetLoading(controller);
     }
-    vents.instanceMatrix.needsUpdate = true;
-    vents.computeBoundingSphere();
-    torso.add(vents);
+  }
 
-    const fasteners = new THREE.InstancedMesh(sphereGeometry, brassMaterial, 4);
-    [[-0.37, 0.2], [0.37, 0.2], [-0.37, -0.2], [0.37, -0.2]].forEach((position, index) => {
-      dummy.position.set(position[0], position[1], 0.345);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.setScalar(0.026);
-      dummy.updateMatrix();
-      fasteners.setMatrixAt(index, dummy.matrix);
-    });
-    fasteners.instanceMatrix.needsUpdate = true;
-    fasteners.computeBoundingSphere();
-    torso.add(fasteners);
-    root.add(pelvis, torso);
+  async function loadImportedWorldAssets() {
+    const controller = new AbortController();
+    assetAbortController = controller;
+    externalAbortListener = () => controller.abort(options.signal?.reason);
+    if (options.signal?.aborted) externalAbortListener();
+    else options.signal?.addEventListener("abort", externalAbortListener, { once: true });
 
-    const neck = mesh(cylinderGeometry, aluminumMaterial, [0, 1.72, 0], [0.15, 0.2, 0.15]);
-    root.add(neck);
+    const optionalEnvironment = fetchArrayBuffer(WORKSHOP_HDR_URL)
+      .then((buffer) => ({ buffer, error: null }))
+      .catch((error) => ({ buffer: null, error }));
+    const modelBuffer = await fetchArrayBuffer(ROBOT_MODEL_URL);
+    throwIfAssetLoadAborted();
 
-    const head = new THREE.Group();
-    head.position.set(0, 1.98, 0.02);
-    const headShell = mesh(sphereGeometry, warmShellMaterial, [0, 0, 0], [0.62, 0.3, 0.38]);
-    const wraparoundVisor = mesh(sphereGeometry, visorMaterial, [0, -0.005, 0.27], [0.52, 0.18, 0.13]);
-    head.add(headShell, wraparoundVisor);
-
-    const opticOffsets = [-0.2, 0, 0.2];
-    const eyeOptics = new THREE.InstancedMesh(sphereGeometry, cyanOpticMaterial, opticOffsets.length);
-    opticOffsets.forEach((x, index) => {
-      const opticScale = index === 1 ? 0.09 : 0.065;
-      dummy.position.set(x, 0.005, 0.392);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(opticScale, opticScale * 0.68, 0.026);
-      dummy.updateMatrix();
-      eyeOptics.setMatrixAt(index, dummy.matrix);
-    });
-    eyeOptics.instanceMatrix.needsUpdate = true;
-    eyeOptics.computeBoundingSphere();
-    head.add(eyeOptics);
-
-    const headSideHubs = new THREE.InstancedMesh(cylinderGeometry, aluminumMaterial, 2);
-    [-0.34, 0.34].forEach((x, index) => {
-      dummy.position.set(x, 0, 0);
-      dummy.rotation.set(0, 0, Math.PI / 2);
-      dummy.scale.set(0.1, 0.065, 0.1);
-      dummy.updateMatrix();
-      headSideHubs.setMatrixAt(index, dummy.matrix);
-    });
-    headSideHubs.instanceMatrix.needsUpdate = true;
-    headSideHubs.computeBoundingSphere();
-    head.add(headSideHubs);
-    root.add(head);
-
-    function makeArm(side) {
-      const shoulder = new THREE.Group();
-      shoulder.position.set(side * 0.54, 1.43, 0);
-      const upper = mesh(shellGeometry, warmShellMaterial, [0, -0.16, 0], [0.16, 0.32, 0.18]);
-      const elbow = new THREE.Group();
-      elbow.position.set(0, -0.33, 0);
-      const lower = mesh(cylinderGeometry, aluminumMaterial, [0, -0.15, 0], [0.115, 0.3, 0.115]);
-      const toolEnd = side < 0
-        ? mesh(coneGeometry, brassMaterial, [0, -0.38, 0.015], [0.12, 0.22, 0.12])
-        : mesh(boxGeometry, rubberMaterial, [0, -0.36, 0.02], [0.2, 0.12, 0.17]);
-      elbow.add(lower, toolEnd);
-      shoulder.add(upper, elbow);
-      root.add(shoulder);
-      return { shoulder, elbow };
-    }
-
-    function makeLeg(side) {
-      const hip = new THREE.Group();
-      hip.position.set(side * 0.22, 0.76, 0);
-      const upper = mesh(shellGeometry, warmShellMaterial, [0, -0.16, 0], [0.2, 0.32, 0.22]);
-      const knee = new THREE.Group();
-      knee.position.set(0, -0.33, 0);
-      const lower = mesh(cylinderGeometry, aluminumMaterial, [0, -0.15, 0], [0.15, 0.3, 0.15]);
-      const foot = mesh(boxGeometry, rubberMaterial, [0, -0.38, 0.075], [0.3, 0.14, 0.42]);
-      knee.add(lower, foot);
-      hip.add(upper, knee);
-      root.add(hip);
-      return { hip, knee };
-    }
-
-    const leftArm = makeArm(-1);
-    const rightArm = makeArm(1);
-    const leftLeg = makeLeg(-1);
-    const rightLeg = makeLeg(1);
-
-    root.scale.setScalar(mobile ? 0.72 : 0.66);
-    root.userData.fadeMaterials = fadeMaterials;
-    root.userData.baseScale = mobile ? 0.72 : 0.66;
-    avatarRig = {
-      root,
-      pelvis,
-      torso,
-      head,
-      leftArm,
-      rightArm,
-      leftLeg,
-      rightLeg,
-      eyeOptics,
-      opticOffsets,
-    };
-    world.add(root);
-    return root;
+    const gltf = await new GLTFLoader().parseAsync(modelBuffer, new URL(".", ROBOT_MODEL_URL).href);
+    throwIfAssetLoadAborted();
+    const clipsByName = validateRobot(gltf);
+    prepareRobot(gltf, clipsByName);
+    void loadOptionalEnvironment(optionalEnvironment, controller);
   }
 
   function buildIntroProps() {
@@ -777,91 +831,6 @@ export function createAvatarWorld(options = {}) {
     animation.boat = boat;
   }
 
-  function buildWorkProps() {
-    const group = makeChapterGroup(6);
-    const panelGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const panelMaterial = chapterMaterial(group, "standard", COLORS.navyLight, {
-      roughness: 0.55,
-      metalness: 0.12,
-    });
-    const screenMaterial = chapterMaterial(group, "basic", COLORS.cyanSoft, { opacity: 0.76 });
-    const panels = new THREE.InstancedMesh(panelGeometry, panelMaterial, 3);
-    const screens = new THREE.InstancedMesh(panelGeometry, screenMaterial, 3);
-    const layouts = [[-1.02, 1.48, 0.72, -0.1], [0, 1.76, 0.18, 0.04], [1.02, 1.4, 0.66, 0.1]];
-    layouts.forEach((layout, index) => {
-      dummy.position.set(layout[0], layout[1], layout[2]);
-      dummy.rotation.set(0, layout[3], 0);
-      dummy.scale.set(0.58, 0.88, 0.07);
-      dummy.updateMatrix();
-      panels.setMatrixAt(index, dummy.matrix);
-      dummy.position.z += 0.07;
-      dummy.scale.set(0.48, 0.68, 0.022);
-      dummy.updateMatrix();
-      screens.setMatrixAt(index, dummy.matrix);
-    });
-    panels.instanceMatrix.needsUpdate = true;
-    screens.instanceMatrix.needsUpdate = true;
-    panels.computeBoundingSphere();
-    screens.computeBoundingSphere();
-    group.add(panels, screens);
-    animation.workPanels = group;
-  }
-
-  function buildProfileProps() {
-    const group = makeChapterGroup(7);
-    const ringGeometry = trackGeometry(new THREE.TorusGeometry(0.94, 0.055, 6, 28));
-    const badgeGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const ledGeometry = trackGeometry(new THREE.SphereGeometry(0.5, 8, 6));
-    const frameMaterial = chapterMaterial(group, "standard", COLORS.copper, {
-      emissive: COLORS.copper,
-      emissiveIntensity: 0.31,
-      roughness: 0.48,
-    });
-    const badgeMaterial = chapterMaterial(group, "standard", COLORS.navyLight, {
-      emissive: COLORS.navy,
-      emissiveIntensity: 0.12,
-      roughness: 0.56,
-    });
-    const circuitMaterial = chapterMaterial(group, "line", COLORS.cyanSoft, { opacity: 0.72 });
-    const ledMaterial = chapterMaterial(group, "standard", COLORS.cyan, {
-      emissive: COLORS.cyan,
-      emissiveIntensity: 0.62,
-      roughness: 0.46,
-    });
-    const frame = mesh(ringGeometry, frameMaterial, [-0.78, 1.58, 0.18], [0.72, 0.72, 0.72]);
-    const badge = mesh(badgeGeometry, badgeMaterial, [-0.78, 1.58, 0.13], [0.82, 0.56, 0.1]);
-
-    const badgeLeds = new THREE.InstancedMesh(ledGeometry, ledMaterial, 4);
-    const ledLayouts = [
-      [-0.95, 1.68, 0.23, 0.1, 0.065, 0.025],
-      [-0.61, 1.68, 0.23, 0.1, 0.065, 0.025],
-      [-1.14, 1.36, 0.2, 0.07, 0.07, 0.032],
-      [-0.42, 1.83, 0.2, 0.07, 0.07, 0.032],
-    ];
-    ledLayouts.forEach((layout, index) => {
-      dummy.position.set(layout[0], layout[1], layout[2]);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(layout[3], layout[4], layout[5]);
-      dummy.updateMatrix();
-      badgeLeds.setMatrixAt(index, dummy.matrix);
-    });
-    badgeLeds.instanceMatrix.needsUpdate = true;
-    badgeLeds.computeBoundingSphere();
-
-    const circuitSegments = [
-      [[-1.14, 1.36, 0.19], [-1.06, 1.45, 0.19]],
-      [[-1.06, 1.45, 0.19], [-1.06, 1.58, 0.19]],
-      [[-0.42, 1.83, 0.19], [-0.52, 1.75, 0.19]],
-      [[-0.52, 1.75, 0.19], [-0.52, 1.6, 0.19]],
-      [[-1.01, 1.47, 0.23], [-0.91, 1.47, 0.23]],
-      [[-0.84, 1.47, 0.23], [-0.74, 1.47, 0.23]],
-      [[-0.67, 1.47, 0.23], [-0.57, 1.47, 0.23]],
-    ];
-    const circuits = new THREE.LineSegments(trackGeometry(makeLineGeometry(circuitSegments)), circuitMaterial);
-    group.add(frame, badge, badgeLeds, circuits);
-    animation.profileFrame = frame;
-  }
-
   function buildContactProps() {
     const group = makeChapterGroup(8);
     const platformGeometry = trackGeometry(new THREE.CylinderGeometry(1.2, 1.42, 0.22, 24));
@@ -908,15 +877,12 @@ export function createAvatarWorld(options = {}) {
     scene.add(hemisphere, key, rim);
 
     buildRoute();
-    avatar = buildAvatar();
     buildIntroProps();
     buildPocketPilotProps();
     buildWargProps();
     buildEmbeddedProps();
     buildAiProps();
     buildWaterProps();
-    buildWorkProps();
-    buildProfileProps();
     buildContactProps();
   }
 
@@ -938,6 +904,7 @@ export function createAvatarWorld(options = {}) {
     if (disposed || !renderer || !scene || !camera) return;
     try {
       contextLost = false;
+      if (environmentSourceTexture) rebuildEnvironmentLighting(environmentSourceTexture);
       resize(viewportWidth, viewportHeight, mobile);
       renderer.compile(scene, camera);
       renderer.render(scene, camera);
@@ -952,7 +919,7 @@ export function createAvatarWorld(options = {}) {
     }
   }
 
-  function initialize() {
+  async function initialize() {
     if (initialized && !contextLost) return true;
     if (disposed || !canvas || typeof canvas.getContext !== "function") {
       initializationError = new TypeError("A usable canvas is required for the avatar world.");
@@ -978,6 +945,9 @@ export function createAvatarWorld(options = {}) {
       buildScene();
       canvas.addEventListener("webglcontextlost", handleContextLost, false);
       canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
+      await loadImportedWorldAssets();
+      throwIfAssetLoadAborted();
+      if (contextLost) throw new Error("WebGL context was lost during avatar startup.");
       resize();
       update(0, 0);
       renderer.compile(scene, camera);
@@ -1073,20 +1043,41 @@ export function createAvatarWorld(options = {}) {
       animation.boat.rotation.z = Math.PI / 2 + Math.sin(timestamp * 0.0017) * 0.035;
       animation.boat.position.y = 0.28 + Math.sin(timestamp * 0.0019) * 0.025;
     }
-    if (animation.profileFrame) animation.profileFrame.rotation.z = Math.sin(timestamp * 0.0007) * 0.06;
     if (animation.contactLights?.material) {
       const base = animation.contactLights.material.userData.baseOpacity;
       animation.contactLights.material.opacity = base * (0.84 + Math.sin(timestamp * 0.004) * 0.16);
     }
   }
 
+  function gesturePhase(progress, center, radius) {
+    return clamp((progress - (center - radius)) / Math.max(radius * 2, 0.00001), 0, 0.9999);
+  }
+
+  function setAvatarAction(name, weight, normalizedTime) {
+    const action = avatarActions?.[name];
+    const clip = avatarClips?.[name];
+    if (!action || !clip) return;
+    action.enabled = true;
+    action.setEffectiveWeight(clamp(weight));
+    action.time = clip.duration * clamp(normalizedTime, 0, 0.9999);
+  }
+
   function updateAvatar(progress, timestamp) {
-    const wave = clamp(pulse(progress, 0.035, 0.052) + pulse(progress, 0.962, 0.045));
-    const point = pulse(progress, 0.145, 0.052);
-    const inspect = pulse(progress, 0.365, 0.056);
+    if (!avatar || !avatarMixer || !avatarActions) return;
+
+    const introWave = pulse(progress, 0.035, 0.052);
+    const contactWave = pulse(progress, 0.962, 0.045);
+    const wave = clamp(introWave + contactWave);
+    const thumbsUp = pulse(progress, 0.145, 0.052);
+    const yes = pulse(progress, 0.365, 0.056);
     const profilePause = pulse(progress, 0.842, 0.062);
     const contactPause = smoothstep(0.93, 0.965, progress);
-    const stillness = clamp(Math.max(profilePause * 0.82, contactPause * 0.94, point * 0.42, inspect * 0.5));
+    const stillness = clamp(Math.max(
+      profilePause * 0.82,
+      contactPause * 0.94,
+      thumbsUp * 0.42,
+      yes * 0.5,
+    ));
     const elapsed = lastAvatarTimestamp > 0
       ? clamp((timestamp - lastAvatarTimestamp) / 1000, 0, 0.08)
       : 0;
@@ -1097,80 +1088,37 @@ export function createAvatarWorld(options = {}) {
     const response = 1 - Math.exp(-elapsed * (targetGaitEnergy > gaitEnergy ? 12 : 7));
     gaitEnergy = mix(gaitEnergy, targetGaitEnergy, response);
     gaitPhase += movementDirection * elapsed * (4.6 + gaitEnergy * 3.8) * gaitEnergy;
+    if (Math.abs(gaitPhase) > TAU * 1000) gaitPhase %= TAU;
     lastAvatarProgress = progress;
     lastAvatarTimestamp = timestamp;
 
-    const walkAmount = (1 - stillness) * gaitEnergy;
-    const stride = Math.sin(gaitPhase);
-    const counterStride = Math.sin(gaitPhase + Math.PI);
-    const bob = Math.abs(Math.sin(gaitPhase)) * 0.022 * walkAmount;
-    const idleBob = Math.sin(timestamp * 0.0014) * 0.0035 * (1 - walkAmount);
+    const gestureTotal = wave + thumbsUp + yes;
+    const gestureScale = gestureTotal > 1 ? 1 / gestureTotal : 1;
+    const waveWeight = wave * gestureScale;
+    const thumbsUpWeight = thumbsUp * gestureScale;
+    const yesWeight = yes * gestureScale;
+    const expressiveWeight = waveWeight + thumbsUpWeight + yesWeight;
+    const walkingWeight = clamp((1 - stillness) * gaitEnergy * (1 - expressiveWeight));
+    const idleWeight = clamp(1 - expressiveWeight - walkingWeight);
+    const walkingPhase = ((gaitPhase / TAU) % 1 + 1) % 1;
+    const idlePhase = (timestamp * 0.00012) % 1;
+    const wavePhase = introWave >= contactWave
+      ? gesturePhase(progress, 0.035, 0.052)
+      : gesturePhase(progress, 0.962, 0.045);
+
+    setAvatarAction("Idle", idleWeight, idlePhase);
+    setAvatarAction("Walking", walkingWeight, walkingPhase);
+    setAvatarAction("Wave", waveWeight, wavePhase);
+    setAvatarAction("ThumbsUp", thumbsUpWeight, gesturePhase(progress, 0.145, 0.052));
+    setAvatarAction("Yes", yesWeight, gesturePhase(progress, 0.365, 0.056));
+    avatarMixer.update(0);
 
     path.getPointAt(progress, pathPoint);
     path.getTangentAt(clamp(progress, 0.001, 0.999), pathTangent).normalize();
     const platformLift = smoothstep(0.91, 0.96, progress) * 0.1;
-    avatar.position.set(pathPoint.x, 0.035 + platformLift + bob + idleBob, pathPoint.z);
+    avatar.position.set(pathPoint.x, 0.035 + platformLift, pathPoint.z);
     avatar.rotation.y = Math.atan2(pathTangent.x, pathTangent.z);
-
-    const legSwing = 0.3 * walkAmount;
-    avatarRig.leftLeg.hip.rotation.x = stride * legSwing;
-    avatarRig.rightLeg.hip.rotation.x = counterStride * legSwing;
-    avatarRig.leftLeg.knee.rotation.x = Math.max(0, -stride) * 0.58 * walkAmount;
-    avatarRig.rightLeg.knee.rotation.x = Math.max(0, -counterStride) * 0.58 * walkAmount;
-
-    let leftArmX = counterStride * 0.22 * walkAmount;
-    let rightArmX = stride * 0.22 * walkAmount;
-    let leftArmZ = -0.025;
-    let rightArmZ = 0.025;
-    let leftElbowX = -0.04;
-    let rightElbowX = -0.04;
-    let leftElbowZ = 0;
-    let rightElbowZ = 0;
-
-    leftArmX = mix(leftArmX, -0.14, point);
-    leftArmZ = mix(leftArmZ, -1.18, point);
-    leftElbowX = mix(leftElbowX, -0.1, point);
-    leftElbowZ = mix(leftElbowZ, -0.05, point);
-
-    rightArmX = mix(rightArmX, -0.06, wave);
-    rightArmZ = mix(rightArmZ, 1.42, wave);
-    rightElbowX = mix(rightElbowX, -0.12, wave);
-    rightElbowZ = mix(rightElbowZ, Math.sin(timestamp * 0.005) * 0.16, wave);
-
-    leftArmX = mix(leftArmX, -0.64, inspect);
-    rightArmX = mix(rightArmX, -0.64, inspect);
-    leftArmZ = mix(leftArmZ, -0.18, inspect);
-    rightArmZ = mix(rightArmZ, 0.18, inspect);
-    leftElbowX = mix(leftElbowX, -0.46, inspect);
-    rightElbowX = mix(rightElbowX, -0.46, inspect);
-
-    avatarRig.leftArm.shoulder.rotation.set(leftArmX, 0, leftArmZ);
-    avatarRig.rightArm.shoulder.rotation.set(rightArmX, 0, rightArmZ);
-    avatarRig.leftArm.elbow.rotation.set(leftElbowX, 0, leftElbowZ);
-    avatarRig.rightArm.elbow.rotation.set(rightElbowX, 0, rightElbowZ);
-    avatarRig.pelvis.rotation.y = stride * 0.025 * walkAmount;
-    avatarRig.torso.rotation.y = counterStride * 0.02 * walkAmount;
-    avatarRig.torso.rotation.z = Math.sin(gaitPhase * 0.5) * 0.007 * walkAmount;
-    avatarRig.head.rotation.y = -0.26 * point - 0.18 * inspect + Math.sin(timestamp * 0.0007) * 0.025;
-    avatarRig.head.rotation.z = 0.018 * wave;
-
-    if (avatarRig.eyeOptics) {
-      const blink = 1 - pulse((timestamp * 0.00012) % 1, 0.93, 0.022) * 0.84;
-      avatarRig.opticOffsets.forEach((x, index) => {
-        const opticScale = index === 1 ? 0.09 : 0.065;
-        dummy.position.set(x, 0.005, 0.392);
-        dummy.rotation.set(0, 0, 0);
-        dummy.scale.set(opticScale, opticScale * 0.68 * blink, 0.026);
-        dummy.updateMatrix();
-        avatarRig.eyeOptics.setMatrixAt(index, dummy.matrix);
-      });
-      avatarRig.eyeOptics.instanceMatrix.needsUpdate = true;
-    }
-
-    avatarRig.root.userData.fadeMaterials.forEach((material) => {
-      material.opacity = material.userData.baseOpacity;
-    });
-    avatarRig.root.visible = progress < 0.9998;
+    avatar.visible = progress < 0.9998;
   }
 
   function updateCamera(progress) {
@@ -1200,7 +1148,7 @@ export function createAvatarWorld(options = {}) {
       mix(first[1], second[1], amount),
       pathPoint.z + mix(first[2], second[2], amount),
     );
-    const compactTargetOffset = compactViewport ? -0.62 : 0;
+    const compactTargetOffset = compactViewport ? -0.2 : 0;
     cameraTarget.set(
       pathPoint.x + mix(first[3], second[3], amount) + compactTargetOffset,
       mix(first[4], second[4], amount),
@@ -1249,11 +1197,20 @@ export function createAvatarWorld(options = {}) {
       ? mobileOverride
       : viewportWidth <= 760 || viewportHeight > viewportWidth * 1.22;
     compactViewport = viewportWidth <= 820 && viewportHeight < 620;
-    if (avatarRig?.root) {
-      const avatarScale = compactViewport ? 0.7 : mobile ? 0.72 : 0.66;
-      avatarRig.root.scale.setScalar(avatarScale);
-      avatarRig.root.userData.baseScale = avatarScale;
+    tabletViewport = !mobile && viewportWidth < 1180;
+    shortViewport = !mobile && viewportHeight < 700;
+    if (avatar) {
+      const avatarScale = compactViewport
+        ? 0.58
+        : mobile
+          ? 0.68
+          : tabletViewport || shortViewport
+            ? 0.58
+            : 0.64;
+      avatar.scale.setScalar(avatarScale);
+      avatar.userData.baseScale = avatarScale;
     }
+    if (environmentContext) environmentContext.visible = !mobile;
     if (animation.phones) {
       animation.phones.forEach((phone) => {
         phone.visible = !mobile;
@@ -1263,7 +1220,7 @@ export function createAvatarWorld(options = {}) {
     renderer.setPixelRatio(Math.min(deviceRatio, mobile ? 1 : 1.5));
     renderer.setSize(viewportWidth, viewportHeight, false);
     camera.aspect = viewportWidth / viewportHeight;
-    camera.fov = mobile ? 44 : 36;
+    camera.fov = compactViewport ? 46 : mobile ? 43 : tabletViewport || shortViewport ? 38 : 35;
     camera.updateProjectionMatrix();
     update(currentProgress, typeof performance !== "undefined" ? performance.now() : 0);
   }
@@ -1279,12 +1236,21 @@ export function createAvatarWorld(options = {}) {
     if (disposed) return;
     disposed = true;
     initialized = false;
+    assetAbortController?.abort();
+    if (externalAbortListener) options.signal?.removeEventListener("abort", externalAbortListener);
+    externalAbortListener = null;
+    avatarMixer?.stopAllAction();
+    if (avatarMixer) avatarMixer.uncacheRoot(avatarMixer.getRoot());
     if (canvas) {
       canvas.removeEventListener("webglcontextlost", handleContextLost, false);
       canvas.removeEventListener("webglcontextrestored", handleContextRestored, false);
       delete canvas.dataset.avatarDrawCalls;
       delete canvas.dataset.avatarTriangles;
+      delete canvas.dataset.avatarModel;
     }
+    if (scene) scene.environment = null;
+    environmentRenderTarget?.dispose();
+    environmentRenderTarget = null;
     geometries.forEach((geometry) => geometry.dispose());
     materials.forEach((material) => material.dispose());
     textures.forEach((texture) => texture.dispose());
@@ -1301,7 +1267,12 @@ export function createAvatarWorld(options = {}) {
     camera = null;
     world = null;
     avatar = null;
-    avatarRig = null;
+    avatarMixer = null;
+    avatarActions = null;
+    avatarClips = null;
+    environmentContext = null;
+    environmentSourceTexture = null;
+    assetAbortController = null;
   }
 
   const lifecycle = {
@@ -1318,7 +1289,7 @@ export function createAvatarWorld(options = {}) {
     },
   };
 
-  if (!initialize()) {
+  if (!(await initialize())) {
     const error = initializationError || new Error("Unable to initialize the avatar world.");
     dispose();
     throw error;

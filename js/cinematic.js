@@ -13,6 +13,7 @@ if (body.classList.contains("home-page")) {
 
   let avatarWorld = null;
   let avatarBootToken = 0;
+  let avatarBootAbortController = null;
   let signalCleanup = null;
   let animationFrame = 0;
   let scrollDirty = true;
@@ -21,6 +22,7 @@ if (body.classList.contains("home-page")) {
   let targetProgress = 0;
   let visualProgress = 0;
   let lastFrameTime = 0;
+  let nextMobileIdleFrameTime = 0;
   let lastScrollTime = performance.now();
   let pageActive = !document.hidden;
   let lastNarrativePosition = null;
@@ -381,9 +383,14 @@ if (body.classList.contains("home-page")) {
     const mobile = window.innerWidth <= 820;
     const recentlyScrolled = timestamp - lastScrollTime < 180;
 
-    if (mobile && settled && !recentlyScrolled && lastFrameTime && elapsed < 32) {
-      scheduleAnimationFrame();
-      return;
+    if (mobile && settled && !recentlyScrolled) {
+      if (timestamp < nextMobileIdleFrameTime) {
+        scheduleAnimationFrame();
+        return;
+      }
+      nextMobileIdleFrameTime = timestamp + 1000 / 30;
+    } else {
+      nextMobileIdleFrameTime = 0;
     }
 
     lastFrameTime = timestamp;
@@ -544,46 +551,72 @@ if (body.classList.contains("home-page")) {
 
   function disposeAvatarWorld() {
     avatarBootToken += 1;
+    avatarBootAbortController?.abort();
+    avatarBootAbortController = null;
     if (animationFrame) window.cancelAnimationFrame(animationFrame);
     animationFrame = 0;
     lastFrameTime = 0;
+    nextMobileIdleFrameTime = 0;
     if (avatarWorld) avatarWorld.dispose();
     avatarWorld = null;
   }
 
   async function bootAvatarWorld() {
     const token = ++avatarBootToken;
+    avatarBootAbortController?.abort();
+    const bootController = new AbortController();
+    avatarBootAbortController = bootController;
     stopSignalCanvas();
 
     if (reducedMotion.matches || hasDataSaver() || !avatarCanvas) {
-      disposeAvatarWorld();
+      bootController.abort();
+      if (avatarBootAbortController === bootController) avatarBootAbortController = null;
+      if (avatarWorld) avatarWorld.dispose();
+      avatarWorld = null;
       setAvatarState("disabled");
       updateMeasurements();
       scheduleInitialHashAlignment();
       return;
     }
 
+    let timeoutId = 0;
     const timeout = new Promise((_, reject) => {
-      window.setTimeout(() => reject(new Error("Avatar world startup timed out.")), 3000);
+      timeoutId = window.setTimeout(() => {
+        bootController.abort();
+        reject(new Error("Avatar world startup timed out."));
+      }, 8000);
     });
 
     try {
-      const module = await Promise.race([import("./avatar-world.js"), timeout]);
-      if (token !== avatarBootToken) return;
-
-      const world = module.createAvatarWorld({
-        canvas: avatarCanvas,
-        mobile: window.innerWidth <= 820,
-        onContextLost,
-        onContextRestored,
-        onError: enterFallback,
-      });
-      if (token !== avatarBootToken) {
+      const startup = import("./avatar-world.js").then((module) => module.createAvatarWorld({
+          canvas: avatarCanvas,
+          mobile: window.innerWidth <= 820,
+          signal: bootController.signal,
+          onContextLost,
+          onContextRestored,
+          onError: () => {
+            if (token !== avatarBootToken || bootController.signal.aborted) return;
+            if (avatarWorld) {
+              avatarWorld.dispose();
+              avatarWorld = null;
+            }
+            enterFallback();
+          },
+        })).then((world) => {
+          if (token !== avatarBootToken || bootController.signal.aborted) {
+            world.dispose();
+            throw new DOMException("Avatar world startup was superseded.", "AbortError");
+          }
+          return world;
+        });
+      const world = await Promise.race([startup, timeout]);
+      if (token !== avatarBootToken || bootController.signal.aborted) {
         world.dispose();
         return;
       }
 
       avatarWorld = world;
+      if (avatarBootAbortController === bootController) avatarBootAbortController = null;
       stopSignalCanvas();
       setAvatarState("ready");
       scheduleInitialHashAlignment();
@@ -593,7 +626,12 @@ if (body.classList.contains("home-page")) {
       updateMeasurements();
       scheduleAnimationFrame();
     } catch (_) {
-      if (token === avatarBootToken) enterFallback();
+      if (token === avatarBootToken) {
+        if (avatarBootAbortController === bootController) avatarBootAbortController = null;
+        enterFallback();
+      }
+    } finally {
+      if (timeoutId) window.clearTimeout(timeoutId);
     }
   }
 
