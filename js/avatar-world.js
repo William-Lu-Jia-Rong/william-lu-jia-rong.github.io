@@ -17,12 +17,9 @@ const COLORS = Object.freeze({
   copper: 0xd7834d,
   cyan: 0x57d9ec,
   cyanSoft: 0x9aebf4,
-  skin: 0xe7b18d,
-  skinShadow: 0xc98667,
-  hair: 0x101319,
-  jeans: 0x294d75,
-  jeansLight: 0x3d6893,
-  shoe: 0xe9edf1,
+  robotWhite: 0xe9f1f3,
+  robotGray: 0xaabac4,
+  screen: 0x020a12,
   water: 0x56bad1,
   white: 0xf5f7f7,
 });
@@ -320,7 +317,7 @@ export function createAvatarWorld(options = {}) {
 
   function buildAvatar() {
     const root = new THREE.Group();
-    root.name = "procedural-bill-avatar";
+    root.name = "procedural-engineering-robot";
     const fadeMaterials = [];
 
     function avatarStandard(color, settings = {}) {
@@ -348,133 +345,76 @@ export function createAvatarWorld(options = {}) {
 
     const boxGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
     const sphereGeometry = trackGeometry(new THREE.SphereGeometry(0.5, mobile ? 14 : 20, mobile ? 10 : 14));
-    const limbGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.58, 1, mobile ? 10 : 14));
-    const torsoGeometry = trackGeometry(new THREE.CapsuleGeometry(0.5, 0.56, mobile ? 4 : 6, mobile ? 10 : 14));
-    const smileGeometry = trackGeometry(new THREE.TorusGeometry(0.16, 0.018, 7, 20, Math.PI));
+    const limbGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.56, 1, mobile ? 8 : 12));
+    const jointGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, mobile ? 10 : 14));
+    const shellGeometry = trackGeometry(new THREE.CapsuleGeometry(0.5, 0.34, mobile ? 4 : 6, mobile ? 10 : 14));
+    const smileGeometry = trackGeometry(new THREE.TorusGeometry(0.15, 0.022, 6, 18, Math.PI));
 
-    const hoodieMaterial = avatarStandard(COLORS.charcoal, { roughness: 0.86 });
-    const hoodieLightMaterial = avatarStandard(COLORS.charcoalLight, { roughness: 0.82 });
-    const goldMaterial = avatarStandard(COLORS.gold, {
-      emissive: COLORS.gold,
-      emissiveIntensity: 0.11,
-      roughness: 0.56,
+    const whiteShellMaterial = avatarStandard(COLORS.robotWhite, {
+      emissive: COLORS.cyanSoft,
+      emissiveIntensity: 0.035,
     });
-    const faceMaterial = avatarStandard(COLORS.skin, { roughness: 0.9 });
-    const hairMaterial = avatarStandard(COLORS.hair, { roughness: 0.93 });
-    const jeansMaterial = avatarStandard(COLORS.jeans, { roughness: 0.8 });
-    const jeansLightMaterial = avatarStandard(COLORS.jeansLight, { roughness: 0.78 });
-    const shoeMaterial = avatarStandard(COLORS.shoe, { roughness: 0.72 });
-    const backpackMaterial = avatarStandard(COLORS.navyLight, { roughness: 0.9 });
-    const eyeMaterial = avatarBasic(COLORS.hair);
-    const eyeWhiteMaterial = avatarBasic(COLORS.white);
-    const noseMaterial = avatarBasic(COLORS.skinShadow);
-    const backpack = mesh(boxGeometry, backpackMaterial, [0, 2.12, -0.48], [0.88, 1.02, 0.34], [0.05, 0, 0]);
-    root.add(backpack);
+    const jointMaterial = avatarStandard(COLORS.robotGray, {});
+    const copperAccentMaterial = avatarStandard(COLORS.copper, {
+      emissive: COLORS.copper,
+      emissiveIntensity: 0.18,
+    });
+    const cyanLedMaterial = avatarStandard(COLORS.cyan, {
+      emissive: COLORS.cyan,
+      emissiveIntensity: 0.72,
+      depthWrite: false,
+    });
+    const screenMaterial = avatarBasic(COLORS.screen);
 
-    const pelvis = mesh(boxGeometry, jeansLightMaterial, [0, 1.16, 0], [0.78, 0.32, 0.47]);
-    const torso = mesh(torsoGeometry, hoodieMaterial, [0, 1.92, 0], [0.98, 0.9, 0.94]);
-    const hoodieHem = mesh(boxGeometry, hoodieLightMaterial, [0, 1.5, 0], [0.92, 0.2, 0.56]);
-    const goldDetails = new THREE.InstancedMesh(boxGeometry, goldMaterial, 4);
-    const goldLayouts = [
-      [0, 2.42, -0.68, 0.72, 0.15, 0.05, 0.05, 0, 0],
-      [0, 1.72, 0.5, 0.48, 0.045, 0.028, 0, 0, 0],
-      [-0.13, 2.18, 0.5, 0.028, 0.24, 0.028, 0, 0, -0.05],
-      [0.13, 2.18, 0.5, 0.028, 0.24, 0.028, 0, 0, 0.05],
-    ];
-    goldLayouts.forEach((layout, index) => {
-      dummy.position.set(layout[0], layout[1], layout[2]);
-      dummy.scale.set(layout[3], layout[4], layout[5]);
-      dummy.rotation.set(layout[6], layout[7], layout[8]);
-      dummy.updateMatrix();
-      goldDetails.setMatrixAt(index, dummy.matrix);
-    });
-    goldDetails.instanceMatrix.needsUpdate = true;
-    goldDetails.computeBoundingSphere();
-    root.add(pelvis, torso, hoodieHem, goldDetails);
+    // Compact tool pod: deliberately mechanical, with no clothing or human silhouette.
+    const toolPod = mesh(shellGeometry, jointMaterial, [0, 1.46, -0.39], [0.58, 0.48, 0.4]);
+    root.add(toolPod);
+
+    const pelvis = new THREE.Group();
+    pelvis.position.set(0, 0.99, 0);
+    const rotaryWaist = mesh(jointGeometry, jointMaterial, [0, 0, 0], [0.52, 0.25, 0.43]);
+    const waistLight = mesh(boxGeometry, cyanLedMaterial, [0, 0.02, 0.23], [0.34, 0.07, 0.035]);
+    pelvis.add(rotaryWaist, waistLight);
+
+    const torso = new THREE.Group();
+    torso.position.set(0, 1.43, 0);
+    const chassis = mesh(shellGeometry, whiteShellMaterial, [0, 0, 0], [0.92, 0.61, 0.72]);
+    const chestPanel = mesh(boxGeometry, jointMaterial, [0, -0.015, 0.37], [0.56, 0.38, 0.055]);
+    const chestCore = mesh(jointGeometry, copperAccentMaterial, [0, 0.01, 0.42], [0.13, 0.055, 0.13], [Math.PI / 2, 0, 0]);
+    torso.add(chassis, chestPanel, chestCore);
+    root.add(pelvis, torso);
 
     const head = new THREE.Group();
-    head.position.set(0, 2.82, 0.02);
-    const skinPieces = new THREE.InstancedMesh(sphereGeometry, faceMaterial, 3);
-    dummy.position.set(0, 0, 0);
-    dummy.rotation.set(0, 0, 0);
-    dummy.scale.set(1.24, 1.32, 1.13);
-    dummy.updateMatrix();
-    skinPieces.setMatrixAt(0, dummy.matrix);
-    [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.62, -0.025, 0.015);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(0.2, 0.3, 0.16);
-      dummy.updateMatrix();
-      skinPieces.setMatrixAt(index + 1, dummy.matrix);
-    });
-    skinPieces.instanceMatrix.needsUpdate = true;
-    skinPieces.computeBoundingSphere();
-    head.add(skinPieces);
+    head.position.set(0, 2.09, 0.02);
+    const headShell = mesh(shellGeometry, whiteShellMaterial, [0, 0, 0], [0.78, 0.8, 0.72], [0, 0, Math.PI / 2]);
+    const faceScreen = mesh(sphereGeometry, screenMaterial, [0, -0.02, 0.38], [0.63, 0.4, 0.075]);
+    head.add(headShell, faceScreen);
 
-    const hairPieces = new THREE.InstancedMesh(sphereGeometry, hairMaterial, 3);
-    dummy.position.set(0, 0.42, -0.08);
-    dummy.rotation.set(0, 0, 0);
-    dummy.scale.set(1.3, 0.58, 1.08);
-    dummy.updateMatrix();
-    hairPieces.setMatrixAt(0, dummy.matrix);
+    const eyeLeds = new THREE.InstancedMesh(sphereGeometry, cyanLedMaterial, 2);
     [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.21, 0.285, 0.49);
-      dummy.rotation.set(0.02, side * -0.08, side * 0.34);
-      dummy.scale.set(0.38, 0.22, 0.16);
+      dummy.position.set(side * 0.18, 0.028, 0.448);
+      dummy.rotation.set(0, 0, side * -0.08);
+      dummy.scale.set(0.17, 0.082, 0.03);
       dummy.updateMatrix();
-      hairPieces.setMatrixAt(index + 1, dummy.matrix);
+      eyeLeds.setMatrixAt(index, dummy.matrix);
     });
-    hairPieces.instanceMatrix.needsUpdate = true;
-    hairPieces.computeBoundingSphere();
-    head.add(hairPieces);
+    eyeLeds.instanceMatrix.needsUpdate = true;
+    eyeLeds.computeBoundingSphere();
 
-    const eyeWhites = new THREE.InstancedMesh(sphereGeometry, eyeWhiteMaterial, 2);
-    [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.215, 0.005, 0.555);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(0.145, 0.18, 0.06);
-      dummy.updateMatrix();
-      eyeWhites.setMatrixAt(index, dummy.matrix);
-    });
-    eyeWhites.instanceMatrix.needsUpdate = true;
-    eyeWhites.computeBoundingSphere();
-    head.add(eyeWhites);
-
-    const pupils = new THREE.InstancedMesh(sphereGeometry, eyeMaterial, 2);
-    [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.215, 0.002, 0.592);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(0.063, 0.088, 0.036);
-      dummy.updateMatrix();
-      pupils.setMatrixAt(index, dummy.matrix);
-    });
-    pupils.instanceMatrix.needsUpdate = true;
-    pupils.computeBoundingSphere();
-    head.add(pupils);
-
-    const brows = new THREE.InstancedMesh(boxGeometry, eyeMaterial, 2);
-    [-1, 1].forEach((side, index) => {
-      dummy.position.set(side * 0.205, 0.18, 0.557);
-      dummy.rotation.set(0, 0, side * -0.13);
-      dummy.scale.set(0.2, 0.035, 0.035);
-      dummy.updateMatrix();
-      brows.setMatrixAt(index, dummy.matrix);
-    });
-    brows.instanceMatrix.needsUpdate = true;
-    brows.computeBoundingSphere();
-    const nose = mesh(sphereGeometry, noseMaterial, [0, -0.08, 0.588], [0.06, 0.068, 0.045]);
-    const smile = mesh(smileGeometry, eyeMaterial, [0, -0.22, 0.55], [1.08, 0.62, 1], [0, 0, Math.PI]);
-    head.add(brows, nose, smile);
+    const smile = mesh(smileGeometry, cyanLedMaterial, [0, -0.105, 0.432], [0.88, 0.55, 1], [0, 0, Math.PI]);
+    const antenna = mesh(limbGeometry, copperAccentMaterial, [0, 0.48, 0], [0.06, 0.23, 0.06]);
+    const antennaTip = mesh(sphereGeometry, cyanLedMaterial, [0, 0.635, 0], [0.17, 0.17, 0.17]);
+    head.add(eyeLeds, smile, antenna, antennaTip);
     root.add(head);
 
     function makeArm(side) {
       const shoulder = new THREE.Group();
-      shoulder.position.set(side * 0.61, 2.29, 0);
-      const upper = mesh(limbGeometry, hoodieLightMaterial, [0, -0.27, 0], [0.32, 0.54, 0.32]);
+      shoulder.position.set(side * 0.58, 1.58, 0);
+      const upper = mesh(limbGeometry, whiteShellMaterial, [0, -0.19, 0], [0.22, 0.38, 0.22]);
       const elbow = new THREE.Group();
-      elbow.position.set(0, -0.53, 0);
-      const lower = mesh(limbGeometry, hoodieMaterial, [0, -0.24, 0], [0.28, 0.48, 0.28]);
-      const hand = mesh(sphereGeometry, faceMaterial, [0, -0.51, 0], [0.42, 0.44, 0.4]);
+      elbow.position.set(0, -0.37, 0);
+      const lower = mesh(limbGeometry, jointMaterial, [0, -0.16, 0], [0.18, 0.32, 0.18]);
+      const hand = mesh(sphereGeometry, whiteShellMaterial, [0, -0.36, 0.035], [0.31, 0.28, 0.3]);
       elbow.add(lower, hand);
       shoulder.add(upper, elbow);
       root.add(shoulder);
@@ -483,13 +423,13 @@ export function createAvatarWorld(options = {}) {
 
     function makeLeg(side) {
       const hip = new THREE.Group();
-      hip.position.set(side * 0.25, 1.2, 0);
-      const upper = mesh(limbGeometry, jeansLightMaterial, [0, -0.29, 0], [0.37, 0.58, 0.37]);
+      hip.position.set(side * 0.23, 0.98, 0);
+      const upper = mesh(limbGeometry, whiteShellMaterial, [0, -0.2, 0], [0.27, 0.4, 0.27]);
       const knee = new THREE.Group();
-      knee.position.set(0, -0.57, 0);
-      const lower = mesh(limbGeometry, jeansMaterial, [0, -0.26, 0], [0.32, 0.52, 0.32]);
-      const shoe = mesh(sphereGeometry, shoeMaterial, [0, -0.57, 0.13], [0.5, 0.26, 0.74], [0.04, 0, 0]);
-      knee.add(lower, shoe);
+      knee.position.set(0, -0.39, 0);
+      const lower = mesh(limbGeometry, jointMaterial, [0, -0.16, 0], [0.21, 0.32, 0.21]);
+      const foot = mesh(sphereGeometry, whiteShellMaterial, [0, -0.38, 0.1], [0.42, 0.26, 0.55], [0.04, 0, 0]);
+      knee.add(lower, foot);
       hip.add(upper, knee);
       root.add(hip);
       return { hip, knee };
@@ -500,9 +440,9 @@ export function createAvatarWorld(options = {}) {
     const leftLeg = makeLeg(-1);
     const rightLeg = makeLeg(1);
 
-    root.scale.setScalar(mobile ? 0.82 : 0.9);
+    root.scale.setScalar(mobile ? 0.6 : 0.5);
     root.userData.fadeMaterials = fadeMaterials;
-    root.userData.baseScale = mobile ? 0.82 : 0.9;
+    root.userData.baseScale = mobile ? 0.6 : 0.5;
     avatarRig = {
       root,
       pelvis,
@@ -780,22 +720,55 @@ export function createAvatarWorld(options = {}) {
   function buildProfileProps() {
     const group = makeChapterGroup(7);
     const ringGeometry = trackGeometry(new THREE.TorusGeometry(0.94, 0.055, 6, 28));
-    const bustGeometry = trackGeometry(new THREE.CapsuleGeometry(0.42, 0.52, 4, 8));
-    const headGeometry = trackGeometry(new THREE.SphereGeometry(0.36, 10, 7));
-    const frameMaterial = chapterMaterial(group, "standard", COLORS.gold, {
-      emissive: COLORS.gold,
+    const badgeGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
+    const ledGeometry = trackGeometry(new THREE.SphereGeometry(0.5, 8, 6));
+    const frameMaterial = chapterMaterial(group, "standard", COLORS.copper, {
+      emissive: COLORS.copper,
       emissiveIntensity: 0.31,
       roughness: 0.48,
     });
-    const portraitMaterial = chapterMaterial(group, "standard", COLORS.cyan, {
+    const badgeMaterial = chapterMaterial(group, "standard", COLORS.navyLight, {
+      emissive: COLORS.navy,
+      emissiveIntensity: 0.12,
+      roughness: 0.56,
+    });
+    const circuitMaterial = chapterMaterial(group, "line", COLORS.cyanSoft, { opacity: 0.72 });
+    const ledMaterial = chapterMaterial(group, "standard", COLORS.cyan, {
       emissive: COLORS.cyan,
-      emissiveIntensity: 0.18,
-      roughness: 0.62,
+      emissiveIntensity: 0.62,
+      roughness: 0.46,
     });
     const frame = mesh(ringGeometry, frameMaterial, [-2.05, 1.83, 0.18], [1, 1, 1]);
-    const bust = mesh(bustGeometry, portraitMaterial, [-2.05, 1.43, 0.13], [1.02, 0.92, 0.54]);
-    const portraitHead = mesh(headGeometry, portraitMaterial, [-2.05, 2.28, 0.14], [1, 1.1, 0.82]);
-    group.add(frame, bust, portraitHead);
+    const badge = mesh(badgeGeometry, badgeMaterial, [-2.05, 1.83, 0.13], [1.14, 0.78, 0.13]);
+
+    const badgeLeds = new THREE.InstancedMesh(ledGeometry, ledMaterial, 4);
+    const ledLayouts = [
+      [-2.28, 1.95, 0.23, 0.13, 0.08, 0.03],
+      [-1.82, 1.95, 0.23, 0.13, 0.08, 0.03],
+      [-2.55, 1.53, 0.2, 0.09, 0.09, 0.04],
+      [-1.55, 2.17, 0.2, 0.09, 0.09, 0.04],
+    ];
+    ledLayouts.forEach((layout, index) => {
+      dummy.position.set(layout[0], layout[1], layout[2]);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(layout[3], layout[4], layout[5]);
+      dummy.updateMatrix();
+      badgeLeds.setMatrixAt(index, dummy.matrix);
+    });
+    badgeLeds.instanceMatrix.needsUpdate = true;
+    badgeLeds.computeBoundingSphere();
+
+    const circuitSegments = [
+      [[-2.55, 1.53, 0.19], [-2.45, 1.64, 0.19]],
+      [[-2.45, 1.64, 0.19], [-2.45, 1.83, 0.19]],
+      [[-1.55, 2.17, 0.19], [-1.68, 2.06, 0.19]],
+      [[-1.68, 2.06, 0.19], [-1.68, 1.86, 0.19]],
+      [[-2.36, 1.67, 0.23], [-2.22, 1.67, 0.23]],
+      [[-2.12, 1.67, 0.23], [-1.98, 1.67, 0.23]],
+      [[-1.88, 1.67, 0.23], [-1.74, 1.67, 0.23]],
+    ];
+    const circuits = new THREE.LineSegments(trackGeometry(makeLineGeometry(circuitSegments)), circuitMaterial);
+    group.add(frame, badge, badgeLeds, circuits);
     animation.profileFrame = frame;
   }
 
@@ -1148,7 +1121,7 @@ export function createAvatarWorld(options = {}) {
       ? mobileOverride
       : viewportWidth <= 760 || viewportHeight > viewportWidth * 1.22;
     if (avatarRig?.root) {
-      const avatarScale = mobile ? 0.82 : 0.9;
+      const avatarScale = mobile ? 0.6 : 0.5;
       avatarRig.root.scale.setScalar(avatarScale);
       avatarRig.root.userData.baseScale = avatarScale;
     }
