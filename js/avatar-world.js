@@ -140,6 +140,8 @@ export async function createAvatarWorld(options = {}) {
   const targetOffset = new THREE.Vector3();
   const toolStart = new THREE.Vector3();
   const toolTarget = new THREE.Vector3();
+  const armDirection = new THREE.Vector3();
+  const armWorldQuaternion = new THREE.Quaternion();
   const additiveQuaternion = new THREE.Quaternion();
   const additiveEuler = new THREE.Euler();
   const dummy = new THREE.Object3D();
@@ -663,55 +665,135 @@ export async function createAvatarWorld(options = {}) {
 
   function createScrewdriver() {
     const tool = new THREE.Group();
-    tool.name = "poddy-screwdriver";
+    tool.name = "poddy-electric-driver";
     tool.visible = false;
 
-    const gripMaterial = standardMaterial(0x173243, {
-      roughness: 0.28,
-      metalness: 0.52,
-    });
-    const accentMaterial = standardMaterial(COLORS.cyan, {
-      emissive: 0x1c7788,
-      emissiveIntensity: 0.72,
-      roughness: 0.24,
-      metalness: 0.48,
-    });
-    const steelMaterial = standardMaterial(0xcbd8df, {
+    const casingMaterial = trackMaterial(new THREE.MeshPhysicalMaterial({
+      color: 0xf2f6f5,
       roughness: 0.2,
-      metalness: 0.9,
-    });
+      metalness: 0.12,
+      clearcoat: 0.95,
+      clearcoatRoughness: 0.08,
+    }));
+    const gripMaterial = trackMaterial(new THREE.MeshPhysicalMaterial({
+      color: 0x102735,
+      roughness: 0.25,
+      metalness: 0.46,
+      clearcoat: 0.6,
+      clearcoatRoughness: 0.14,
+    }));
+    const accentMaterial = trackMaterial(new THREE.MeshPhysicalMaterial({
+      color: COLORS.cyanSoft,
+      emissive: COLORS.cyan,
+      emissiveIntensity: 1.8,
+      roughness: 0.18,
+      metalness: 0.3,
+      clearcoat: 1,
+      clearcoatRoughness: 0.06,
+    }));
+    const steelMaterial = trackMaterial(new THREE.MeshPhysicalMaterial({
+      color: 0xdce6e9,
+      roughness: 0.16,
+      metalness: 0.94,
+      clearcoat: 0.72,
+      clearcoatRoughness: 0.08,
+    }));
+    const beamMaterial = trackMaterial(new THREE.MeshBasicMaterial({
+      color: COLORS.cyanSoft,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+    }));
+    beamMaterial.userData.baseOpacity = 0.78;
 
+    // The group's origin is the hand socket. The casing sits above the grip and
+    // the entire chuck/bit assembly spins independently around the Z axis.
     const grip = mesh(
-      trackGeometry(new THREE.CapsuleGeometry(0.105, 0.24, 10, 24)),
+      trackGeometry(new THREE.CapsuleGeometry(0.105, 0.25, 6, 14)),
       gripMaterial,
       [0, 0, 0],
       [1, 1, 1],
+      [0, 0, -0.12],
+    );
+    const battery = mesh(
+      trackGeometry(new THREE.CapsuleGeometry(0.095, 0.16, 4, 12)),
+      gripMaterial,
+      [-0.025, -0.235, -0.025],
+      [1.18, 0.88, 1.05],
+      [0, 0, Math.PI / 2],
+    );
+    const casing = mesh(
+      trackGeometry(new THREE.CapsuleGeometry(0.155, 0.28, 6, 16)),
+      casingMaterial,
+      [0, 0.205, 0.175],
+      [1, 1, 1],
       [Math.PI / 2, 0, 0],
     );
-    const accent = mesh(
-      trackGeometry(new THREE.BoxGeometry(0.035, 0.15, 0.045)),
+    const trigger = mesh(
+      trackGeometry(new THREE.BoxGeometry(0.055, 0.09, 0.055)),
       accentMaterial,
-      [0.087, 0, 0.035],
+      [0, 0.105, 0.155],
       [1, 1, 1],
-      [0, 0, 0],
+      [0.18, 0, 0],
+    );
+
+    const spinner = new THREE.Group();
+    spinner.name = "electric-driver-spinner";
+    // Keep the rotating assembly's origin on the bit axis. Rotating a group
+    // whose children carried the vertical offset made the shaft orbit away
+    // from the casing when users reversed the scroll direction.
+    spinner.position.set(0, 0.205, 0);
+    const chuck = mesh(
+      trackGeometry(new THREE.CylinderGeometry(0.105, 0.078, 0.2, 20)),
+      gripMaterial,
+      [0, 0, 0.445],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    const collar = mesh(
+      trackGeometry(new THREE.TorusGeometry(0.104, 0.018, 4, 16)),
+      accentMaterial,
+      [0, 0, 0.53],
     );
     const shaft = mesh(
-      trackGeometry(new THREE.CylinderGeometry(0.027, 0.027, 0.38, 20)),
+      trackGeometry(new THREE.CylinderGeometry(0.029, 0.029, 0.34, 16)),
       steelMaterial,
-      [0, 0, 0.3],
+      [0, 0, 0.68],
       [1, 1, 1],
       [Math.PI / 2, 0, 0],
     );
-    const tip = mesh(
-      trackGeometry(new THREE.ConeGeometry(0.052, 0.11, 20)),
+    const bit = mesh(
+      trackGeometry(new THREE.ConeGeometry(0.052, 0.12, 16)),
       steelMaterial,
-      [0, 0, 0.535],
+      [0, 0, 0.91],
       [1, 1, 1],
       [Math.PI / 2, 0, 0],
     );
-    tool.add(grip, accent, shaft, tip);
+    const spinMarker = mesh(
+      trackGeometry(new THREE.BoxGeometry(0.035, 0.12, 0.035)),
+      accentMaterial,
+      [0.085, 0, 0.47],
+    );
+    spinner.add(chuck, collar, shaft, bit, spinMarker);
+
+    const contactBeam = mesh(
+      trackGeometry(new THREE.CylinderGeometry(0.038, 0.018, 0.17, 16, 1, true)),
+      beamMaterial,
+      [0, 0.205, 0.995],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    contactBeam.visible = false;
+
+    tool.add(grip, battery, casing, trigger, spinner, contactBeam);
     world.add(tool);
     animation.screwdriver = tool;
+    animation.screwdriverSpinner = spinner;
+    animation.screwdriverContact = contactBeam;
+    animation.screwdriverContactMaterial = beamMaterial;
+    animation.screwdriverTipOffset = new THREE.Vector3(0, 0.205, 1.08);
   }
 
   function rebuildEnvironmentLighting(hdrTexture) {
@@ -947,8 +1029,8 @@ export async function createAvatarWorld(options = {}) {
   function buildEmbeddedProps() {
     const group = makeChapterGroup(3);
     const boxGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 28));
-    const torusGeometry = trackGeometry(new THREE.TorusGeometry(0.52, 0.045, 10, 28));
+    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 24));
+    const torusGeometry = trackGeometry(new THREE.TorusGeometry(0.52, 0.045, 6, 18));
     const boardMaterial = chapterMaterial(group, "standard", 0x174f4b, {
       roughness: 0.68,
       metalness: 0.08,
@@ -975,45 +1057,159 @@ export async function createAvatarWorld(options = {}) {
       roughness: 0.34,
       metalness: 0.72,
     });
+    const traceMaterial = chapterMaterial(group, "line", COLORS.cyan, { opacity: 0.72 });
+    const contactMaterial = chapterMaterial(group, "standard", COLORS.cyanSoft, {
+      emissive: COLORS.cyan,
+      emissiveIntensity: 1.35,
+      opacity: 0.92,
+      roughness: 0.2,
+      metalness: 0.35,
+    });
 
-    const board = mesh(boxGeometry, boardMaterial, [0, 0.52, 0.12], [2.05, 0.1, 1.28], [0, 0.06, 0]);
+    const boardShape = new THREE.Shape();
+    const boardWidth = 2.38;
+    const boardDepth = 1.56;
+    const corner = 0.14;
+    const left = -boardWidth / 2;
+    const right = boardWidth / 2;
+    const bottom = -boardDepth / 2;
+    const top = boardDepth / 2;
+    boardShape.moveTo(left + corner, bottom);
+    boardShape.lineTo(right - corner, bottom);
+    boardShape.quadraticCurveTo(right, bottom, right, bottom + corner);
+    boardShape.lineTo(right, top - corner);
+    boardShape.quadraticCurveTo(right, top, right - corner, top);
+    boardShape.lineTo(left + corner, top);
+    boardShape.quadraticCurveTo(left, top, left, top - corner);
+    boardShape.lineTo(left, bottom + corner);
+    boardShape.quadraticCurveTo(left, bottom, left + corner, bottom);
+    const boardGeometry = trackGeometry(new THREE.ExtrudeGeometry(boardShape, {
+      depth: 0.075,
+      bevelEnabled: true,
+      bevelSegments: 1,
+      bevelSize: 0.035,
+      bevelThickness: 0.025,
+      curveSegments: 4,
+    }));
+    const board = mesh(boardGeometry, boardMaterial, [0, 0.5, 0.1], [1, 1, 1], [-Math.PI / 2, 0, 0]);
     group.add(board);
-    const components = new THREE.InstancedMesh(boxGeometry, componentMaterial, 9);
-    for (let index = 0; index < 9; index += 1) {
-      dummy.position.set(-0.72 + (index % 3) * 0.72, 0.68, -0.3 + Math.floor(index / 3) * 0.36);
-      dummy.rotation.set(0, (index % 2) * 0.3, 0);
-      dummy.scale.set(0.18 + (index % 2) * 0.08, 0.16 + (index % 3) * 0.035, 0.15);
+
+    const traces = [
+      [[-1.02, 0.604, -0.5], [-0.58, 0.604, -0.5]], [[-0.58, 0.604, -0.5], [-0.58, 0.604, 0.02]],
+      [[-1.02, 0.604, 0.46], [-0.72, 0.604, 0.46]], [[-0.72, 0.604, 0.46], [-0.72, 0.604, 0.04]],
+      [[0.55, 0.604, -0.5], [1.04, 0.604, -0.5]], [[0.55, 0.604, -0.5], [0.55, 0.604, -0.12]],
+      [[0.52, 0.604, 0.47], [1.02, 0.604, 0.47]], [[0.52, 0.604, 0.08], [0.52, 0.604, 0.47]],
+      [[-0.42, 0.604, -0.12], [0.4, 0.604, -0.12]], [[-0.42, 0.604, 0.1], [0.4, 0.604, 0.1]],
+    ];
+    group.add(new THREE.LineSegments(trackGeometry(makeLineGeometry(traces)), traceMaterial));
+
+    const componentPositions = [
+      [-0.9, -0.43], [-0.72, 0.27], [-0.42, 0.5],
+      [0.5, -0.42], [0.72, 0.38], [1.0, -0.05],
+    ];
+    const components = new THREE.InstancedMesh(boxGeometry, componentMaterial, componentPositions.length);
+    componentPositions.forEach((position, index) => {
+      dummy.position.set(position[0], 0.68, position[1]);
+      dummy.rotation.set(0, index % 2 ? 0.12 : -0.08, 0);
+      dummy.scale.set(index % 3 === 0 ? 0.28 : 0.18, 0.16 + (index % 2) * 0.05, 0.14);
       dummy.updateMatrix();
       components.setMatrixAt(index, dummy.matrix);
-    }
+    });
     components.instanceMatrix.needsUpdate = true;
     components.computeBoundingSphere();
     group.add(components);
 
+    const pinGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 6));
+    const pins = new THREE.InstancedMesh(pinGeometry, screwMaterial, 16);
+    for (let index = 0; index < 16; index += 1) {
+      const column = index < 8 ? -0.42 : 0.42;
+      const row = index % 8;
+      dummy.position.set(column, 0.635, -0.49 + row * 0.14);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(0.035, 0.08, 0.035);
+      dummy.updateMatrix();
+      pins.setMatrixAt(index, dummy.matrix);
+    }
+    pins.instanceMatrix.needsUpdate = true;
+    pins.computeBoundingSphere();
+    group.add(pins);
+
+    const capacitorGeometry = trackGeometry(new THREE.CylinderGeometry(0.09, 0.09, 0.22, 10));
+    const capacitors = new THREE.InstancedMesh(capacitorGeometry, motorMaterial, 5);
+    [[-1.02, -0.12], [-0.92, 0.18], [0.92, -0.42], [0.7, 0.1], [1.02, 0.46]].forEach((position, index) => {
+      dummy.position.set(position[0], 0.7, position[1]);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.setScalar(index % 2 ? 0.86 : 1);
+      dummy.updateMatrix();
+      capacitors.setMatrixAt(index, dummy.matrix);
+    });
+    capacitors.instanceMatrix.needsUpdate = true;
+    capacitors.computeBoundingSphere();
+    group.add(capacitors);
+
     const motorAssembly = new THREE.Group();
-    motorAssembly.position.set(0.86, 1.04, 0.2);
-    const motor = mesh(cylinderGeometry, motorMaterial, [0, 0, 0], [0.62, 0.54, 0.62], [Math.PI / 2, 0, 0]);
-    const motorRing = mesh(torusGeometry, ringMaterial, [0, 0, 0.34], [0.88, 0.88, 0.88]);
+    motorAssembly.position.set(0.9, 1.02, 0.14);
+    const motor = mesh(cylinderGeometry, motorMaterial, [0, 0, 0], [0.62, 0.54, 0.72], [Math.PI / 2, 0, 0]);
+    const motorRing = mesh(torusGeometry, ringMaterial, [0, 0, 0.39], [0.78, 0.78, 0.78]);
+    const finGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
+    const motorFins = new THREE.InstancedMesh(finGeometry, motorMaterial, 8);
+    for (let index = 0; index < 8; index += 1) {
+      const angle = index / 8 * TAU;
+      dummy.position.set(Math.cos(angle) * 0.32, Math.sin(angle) * 0.28, -0.04);
+      dummy.rotation.set(0, 0, angle);
+      dummy.scale.set(0.06, 0.15, 0.48);
+      dummy.updateMatrix();
+      motorFins.setMatrixAt(index, dummy.matrix);
+    }
+    motorFins.instanceMatrix.needsUpdate = true;
+    motorFins.computeBoundingSphere();
+
+    const ventGeometry = trackGeometry(new THREE.TorusGeometry(0.285, 0.018, 4, 12));
+    const motorVents = new THREE.InstancedMesh(ventGeometry, screwMaterial, 3);
+    [-0.28, -0.12, 0.05].forEach((z, index) => {
+      dummy.position.set(0, 0, z);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      motorVents.setMatrixAt(index, dummy.matrix);
+    });
+    motorVents.instanceMatrix.needsUpdate = true;
+    motorVents.computeBoundingSphere();
+
     const fastener = mesh(
-      trackGeometry(new THREE.CylinderGeometry(0.14, 0.14, 0.075, 28)),
+      trackGeometry(new THREE.CylinderGeometry(0.14, 0.14, 0.075, 20)),
       screwMaterial,
-      [0, 0, 0.39],
+      [0, 0, 0.445],
       [1, 1, 1],
       [Math.PI / 2, 0, 0],
     );
-    const slotHorizontal = mesh(boxGeometry, slotMaterial, [0, 0, 0.432], [0.17, 0.038, 0.018]);
-    const slotVertical = mesh(boxGeometry, slotMaterial, [0, 0, 0.433], [0.038, 0.17, 0.018]);
-    const fastenerSlots = new THREE.Group();
-    fastenerSlots.add(slotHorizontal, slotVertical);
-    motorAssembly.add(motor, motorRing, fastener, fastenerSlots);
+    const fastenerSlots = new THREE.InstancedMesh(boxGeometry, slotMaterial, 2);
+    [[0.18, 0.038], [0.038, 0.18]].forEach((scale, index) => {
+      dummy.position.set(0, 0, 0.487 + index * 0.001);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(scale[0], scale[1], 0.018);
+      dummy.updateMatrix();
+      fastenerSlots.setMatrixAt(index, dummy.matrix);
+    });
+    fastenerSlots.instanceMatrix.needsUpdate = true;
+    fastenerSlots.computeBoundingSphere();
+    const contactHalo = mesh(
+      trackGeometry(new THREE.TorusGeometry(0.19, 0.022, 6, 18)),
+      contactMaterial,
+      [0, 0, 0.505],
+    );
+    contactHalo.visible = false;
+    motorAssembly.add(motor, motorFins, motorVents, motorRing, fastener, fastenerSlots, contactHalo);
     group.add(motorAssembly);
     animation.motorAssembly = motorAssembly;
     animation.motorBasePosition = motorAssembly.position.clone();
     animation.motor = motor;
+    animation.motorVents = motorVents;
     animation.motorRing = motorRing;
     animation.motorFastener = fastener;
     animation.motorFastenerSlots = fastenerSlots;
-    animation.motorContact = new THREE.Vector3(0.86, 1.04, 0.64);
+    animation.motorContactHalo = contactHalo;
+    animation.motorContact = new THREE.Vector3(0.9, 1.02, 0.63);
   }
 
   function buildAiProps() {
@@ -1440,34 +1636,75 @@ export async function createAvatarWorld(options = {}) {
     if (!tool || !animation.motorAssembly) return;
 
     const local = state.chapterIndex === 3 ? state.chapterProgress : chapterLocalProgress(state.progress, 3);
-    const engaged = state.chapterIndex === 3
-      ? smoothstep(0.3, 0.43, local) * (1 - smoothstep(0.76, 0.9, local))
+    const approach = state.chapterIndex === 3
+      ? smoothstep(0.06, 0.34, local) * (1 - smoothstep(0.84, 0.98, local))
       : 0;
-    const spin = local * TAU * 7.5;
-    tool.visible = reach > 0.015;
+    const engaged = state.chapterIndex === 3
+      ? smoothstep(0.3, 0.44, local) * (1 - smoothstep(0.76, 0.9, local))
+      : 0;
+    const spin = local * TAU * 9;
+    tool.visible = approach > 0.015;
 
     if (tool.visible) {
-      toolStart.set(avatar.position.x + 0.42, avatar.position.y + 0.9, avatar.position.z + 0.04);
+      // Aim the expressive head and presentation arm at the driver. These are
+      // additive to the rig pose, so the motion remains reversible with scroll.
+      if (avatarRig?.head) {
+        additiveEuler.set(0.07 * approach, -0.14 * approach, -0.11 * approach, "XYZ");
+        avatarRig.head.quaternion.multiply(additiveQuaternion.setFromEuler(additiveEuler));
+      }
+      if (avatarRig?.leftArm) {
+        additiveEuler.set(-0.08 * approach, 0.12 * approach, -0.18 * approach, "XYZ");
+        avatarRig.leftArm.quaternion.multiply(additiveQuaternion.setFromEuler(additiveEuler));
+      }
+      avatar.updateMatrixWorld(true);
+
+      if (avatarRig?.leftArm) {
+        avatarRig.leftArm.getWorldPosition(toolStart);
+        avatarRig.leftArm.getWorldQuaternion(armWorldQuaternion);
+        armDirection.set(1, 0, 0).applyQuaternion(armWorldQuaternion).normalize();
+        toolStart.addScaledVector(armDirection, 0.34);
+      } else {
+        toolStart.set(avatar.position.x + 0.42, avatar.position.y + 0.82, avatar.position.z + 0.04);
+      }
       toolTarget.copy(animation.motorContact);
       chapterGroups[3].localToWorld(toolTarget);
-      toolTarget.z -= 0.535;
-      tool.position.lerpVectors(toolStart, toolTarget, smoothstep(0.08, 0.72, reach));
-      tool.rotation.set(0, 0, spin * engaged);
-      const breathe = 1 + engaged * Math.sin(spin * 2) * 0.018;
-      tool.scale.setScalar(breathe);
+      const driverScale = 0.92;
+      toolTarget.y -= animation.screwdriverTipOffset.y * driverScale;
+      // Present the driver broadside to the camera: its local +Z bit now runs
+      // horizontally into the fastener instead of disappearing end-on.
+      toolTarget.x -= animation.screwdriverTipOffset.z * driverScale;
+      tool.position.lerpVectors(toolStart, toolTarget, smoothstep(0.08, 0.88, approach));
+      tool.rotation.set(0, Math.PI / 2, 0);
+      tool.scale.setScalar(driverScale + engaged * Math.sin(spin * 2) * 0.014);
+      if (animation.screwdriverSpinner) animation.screwdriverSpinner.rotation.z = spin;
+      if (animation.screwdriverContact && animation.screwdriverContactMaterial) {
+        animation.screwdriverContact.visible = engaged > 0.025;
+        animation.screwdriverContactMaterial.opacity = animation.screwdriverContactMaterial.userData.baseOpacity
+          * engaged * (0.72 + Math.sin(spin * 2.4) * 0.28);
+      }
+    } else if (animation.screwdriverContact) {
+      animation.screwdriverContact.visible = false;
     }
 
     const base = animation.motorBasePosition;
     animation.motorAssembly.position.set(
-      base.x + Math.sin(spin * 2.2) * engaged * 0.012,
-      base.y + Math.cos(spin * 1.8) * engaged * 0.014,
+      base.x + Math.sin(spin * 2.2) * engaged * 0.018,
+      base.y + Math.cos(spin * 1.8) * engaged * 0.02,
       base.z,
     );
-    animation.motorAssembly.rotation.z = Math.sin(spin * 2) * engaged * 0.02;
+    animation.motorAssembly.rotation.z = Math.sin(spin * 2) * engaged * 0.034;
     if (animation.motorFastenerSlots) animation.motorFastenerSlots.rotation.z = spin * engaged;
+    if (animation.motorFastener) animation.motorFastener.rotation.z = spin * engaged;
+    if (animation.motorVents) animation.motorVents.rotation.z = spin * engaged * -0.08;
     if (animation.motorRing) {
-      const ringScale = 0.88 * (1 + engaged * (0.08 + Math.sin(spin * 2) * 0.025));
+      const ringScale = 0.78 * (1 + engaged * (0.1 + Math.sin(spin * 2) * 0.03));
       animation.motorRing.scale.setScalar(ringScale);
+    }
+    if (animation.motorContactHalo) {
+      animation.motorContactHalo.visible = engaged > 0.02;
+      animation.motorContactHalo.rotation.z = -spin * 0.7;
+      const haloScale = 1 + engaged * (0.16 + Math.sin(spin * 2) * 0.05);
+      animation.motorContactHalo.scale.setScalar(haloScale);
     }
   }
 
