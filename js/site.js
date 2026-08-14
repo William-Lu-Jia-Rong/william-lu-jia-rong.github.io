@@ -6,6 +6,7 @@
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function updatePageChrome() {
+    if (body.dataset.scrollClock === "cinematic") return;
     var scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
     var progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
     root.style.setProperty("--scroll-progress", (progress * 100).toFixed(3) + "%");

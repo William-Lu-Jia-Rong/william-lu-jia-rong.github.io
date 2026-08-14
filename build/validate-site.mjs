@@ -99,43 +99,49 @@ await access(resolve(root, "js", "vendor", "three.module.min.js"));
 await access(resolve(root, "js", "vendor", "three.core.min.js"));
 await access(resolve(root, "js", "vendor", "THREE-LICENSE.txt"));
 
-const robotModelPath = resolve(root, "assets", "3d", "robot-expressive.glb");
+const robotModelPath = resolve(root, "assets", "3d", "poddy-m1.glb");
 const workshopEnvironmentPath = resolve(root, "assets", "3d", "aerodynamics-workshop-1k.hdr");
 const robotModel = await readFile(robotModelPath);
 const workshopEnvironment = await readFile(workshopEnvironmentPath);
-const requiredRobotClips = ["Idle", "Walking", "Wave", "ThumbsUp", "Yes"];
+const requiredRobotRigNodes = [
+  "head_ctrl01",
+  "eye_l_ctrl01",
+  "eye_r_ctrl01",
+  "arm_l_ctrl01",
+  "arm_r_ctrl01",
+];
 
-if (robotModel.length > 1_000_000) {
-  failures.push(`robot-expressive.glb: model exceeds the 1 MB web budget (${robotModel.length} bytes)`);
+if (robotModel.length > 1_500_000) {
+  failures.push(`poddy-m1.glb: model exceeds the 1.5 MB web budget (${robotModel.length} bytes)`);
 }
 if (robotModel.length < 20 || robotModel.readUInt32LE(0) !== 0x46546c67) {
-  failures.push("robot-expressive.glb: invalid GLB magic header");
+  failures.push("poddy-m1.glb: invalid GLB magic header");
 } else if (robotModel.readUInt32LE(4) !== 2) {
-  failures.push(`robot-expressive.glb: expected GLB version 2, found ${robotModel.readUInt32LE(4)}`);
+  failures.push(`poddy-m1.glb: expected GLB version 2, found ${robotModel.readUInt32LE(4)}`);
 } else if (robotModel.readUInt32LE(8) !== robotModel.length) {
-  failures.push("robot-expressive.glb: declared byte length does not match the file");
+  failures.push("poddy-m1.glb: declared byte length does not match the file");
 } else {
   const jsonLength = robotModel.readUInt32LE(12);
   const jsonType = robotModel.readUInt32LE(16);
   if (jsonType !== 0x4e4f534a || 20 + jsonLength > robotModel.length) {
-    failures.push("robot-expressive.glb: missing or invalid JSON chunk");
+    failures.push("poddy-m1.glb: missing or invalid JSON chunk");
   } else {
     try {
       const jsonText = robotModel.subarray(20, 20 + jsonLength).toString("utf8").trimEnd();
       const gltf = JSON.parse(jsonText);
-      const clipNames = (gltf.animations ?? []).map((clip) => clip.name);
+      const nodeNames = new Set((gltf.nodes ?? []).map((node) => node.name).filter(Boolean));
       const externalUris = [
         ...(gltf.buffers ?? []).map((buffer) => buffer.uri),
         ...(gltf.images ?? []).map((image) => image.uri),
       ].filter(Boolean);
 
-      if (!(gltf.skins?.length > 0)) failures.push("robot-expressive.glb: missing skinned rig");
-      for (const clipName of requiredRobotClips) {
-        if (!clipNames.includes(clipName)) failures.push(`robot-expressive.glb: missing ${clipName} clip`);
+      if (!(gltf.skins?.length > 0)) failures.push("poddy-m1.glb: missing skinned rig");
+      for (const nodeName of requiredRobotRigNodes) {
+        if (!nodeNames.has(nodeName)) failures.push(`poddy-m1.glb: missing ${nodeName} rig node`);
       }
-      if (externalUris.length) failures.push("robot-expressive.glb: external asset URIs are not allowed");
+      if (externalUris.length) failures.push("poddy-m1.glb: external asset URIs are not allowed");
     } catch (error) {
-      failures.push(`robot-expressive.glb: invalid JSON (${error.message})`);
+      failures.push(`poddy-m1.glb: invalid JSON (${error.message})`);
     }
   }
 }

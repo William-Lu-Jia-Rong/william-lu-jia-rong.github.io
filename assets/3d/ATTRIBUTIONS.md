@@ -1,11 +1,11 @@
 # 3D asset attributions
 
-## RobotExpressive
+## Poddy M1 — Stylized Floating Robot
 
-- Model by Tomás Laulhé (Quaternius)
-- Modifications by Don McCurdy
-- License: CC0 1.0 Universal
-- Source: https://github.com/mrdoob/three.js/tree/r185/examples/models/gltf/RobotExpressive
+- Model by Exmoor beast
+- License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+- Source: https://sketchfab.com/3d-models/poddy-m1-stylized-floating-robot-posed-6b5b90dc52ae4933a103d0a71777ecbd
+- Changes: geometry simplified and quantized; textures resized and converted to WebP; materials and rig animation adapted for this portfolio.
 
 ## Aerodynamics Workshop HDRI
 

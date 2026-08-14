@@ -1,15 +1,24 @@
 import * as THREE from "./vendor/three.module.min.js";
 import { GLTFLoader } from "./vendor/addons/loaders/GLTFLoader.js";
 import { HDRLoader } from "./vendor/addons/loaders/HDRLoader.js";
+import { AVATAR_TIMELINE_RANGES } from "./avatar-timeline.js";
 
-const CHAPTER_STOPS = Object.freeze([0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.72, 0.84, 0.96]);
+const CHAPTER_STOPS = Object.freeze(AVATAR_TIMELINE_RANGES.slice(0, -1));
 const TAU = Math.PI * 2;
 const CANONICAL_ROBOT_HEIGHT = 2.2;
-const MAX_MODEL_DRAWS = 20;
-const MAX_MODEL_TRIANGLES = 25000;
-const ROBOT_MODEL_URL = new URL("../assets/3d/robot-expressive.glb", import.meta.url).href;
+const MAX_MODEL_DRAWS = 12;
+const MAX_MODEL_TRIANGLES = 50000;
+const ROBOT_MODEL_URL = new URL("../assets/3d/poddy-m1.glb?v=2", import.meta.url).href;
 const WORKSHOP_HDR_URL = new URL("../assets/3d/aerodynamics-workshop-1k.hdr", import.meta.url).href;
-const REQUIRED_ROBOT_CLIPS = Object.freeze(["Idle", "Walking", "Wave", "ThumbsUp", "Yes"]);
+const ROBOT_CLIPS = Object.freeze({
+  present: "pose 1 - presentation",
+  surprise: "pose 2 - omfg",
+  wave: "pose 3 - hello",
+  welcome: "pose 4 - warm welcome",
+  sad: "pose 5 - sit sad",
+  presentFlipped: "pose 6 - presentation flipped",
+});
+const REQUIRED_ROBOT_CLIPS = Object.freeze(Object.values(ROBOT_CLIPS));
 const POCKETPILOT_TEXTURE_URLS = Object.freeze([
   new URL("../images/pocketpilot/screenshot-insights.webp", import.meta.url).href,
   new URL("../images/pocketpilot/screenshot-scan.webp", import.meta.url).href,
@@ -127,6 +136,12 @@ export async function createAvatarWorld(options = {}) {
   const cameraTarget = new THREE.Vector3();
   const pathPoint = new THREE.Vector3();
   const pathTangent = new THREE.Vector3();
+  const cameraOffset = new THREE.Vector3();
+  const targetOffset = new THREE.Vector3();
+  const toolStart = new THREE.Vector3();
+  const toolTarget = new THREE.Vector3();
+  const additiveQuaternion = new THREE.Quaternion();
+  const additiveEuler = new THREE.Euler();
   const dummy = new THREE.Object3D();
 
   let renderer = null;
@@ -137,6 +152,7 @@ export async function createAvatarWorld(options = {}) {
   let avatarMixer = null;
   let avatarActions = null;
   let avatarClips = null;
+  let avatarRig = null;
   let environmentRenderTarget = null;
   let environmentContext = null;
   let environmentSourceTexture = null;
@@ -157,8 +173,7 @@ export async function createAvatarWorld(options = {}) {
   let compactViewport = false;
   let tabletViewport = false;
   let shortViewport = false;
-  let gaitPhase = 0;
-  let gaitEnergy = 0;
+  let travelEnergy = 0;
   let lastAvatarProgress = 0;
   let lastAvatarTimestamp = 0;
   let movementDirection = 1;
@@ -179,6 +194,45 @@ export async function createAvatarWorld(options = {}) {
     "catmullrom",
     0.45,
   );
+
+  const desktopCameraOffsets = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.08, 4.34, 7.46),
+    new THREE.Vector3(-0.06, 4.42, 7.62),
+    new THREE.Vector3(0.1, 4.34, 7.5),
+    new THREE.Vector3(-0.08, 4.46, 7.65),
+    new THREE.Vector3(0.1, 4.3, 7.44),
+    new THREE.Vector3(-0.08, 4.42, 7.58),
+    new THREE.Vector3(0.07, 4.32, 7.42),
+    new THREE.Vector3(0, 4.38, 7.5),
+  ], false, "catmullrom", 0.45);
+  const mobileCameraOffsets = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.04, 4.82, 8.55),
+    new THREE.Vector3(-0.04, 4.96, 8.76),
+    new THREE.Vector3(0.05, 4.86, 8.62),
+    new THREE.Vector3(-0.04, 5.0, 8.84),
+    new THREE.Vector3(0.05, 4.82, 8.58),
+    new THREE.Vector3(-0.04, 4.95, 8.78),
+    new THREE.Vector3(0.04, 4.82, 8.54),
+    new THREE.Vector3(0, 4.88, 8.64),
+  ], false, "catmullrom", 0.45);
+  const desktopTargetOffsets = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0.98, 0.1),
+    new THREE.Vector3(0.04, 1.02, 0.08),
+    new THREE.Vector3(-0.04, 0.95, 0.12),
+    new THREE.Vector3(0.04, 1.02, 0.08),
+    new THREE.Vector3(-0.03, 0.95, 0.1),
+    new THREE.Vector3(0.03, 1, 0.08),
+    new THREE.Vector3(0, 0.96, 0.1),
+  ], false, "catmullrom", 0.45);
+  const mobileTargetOffsets = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 1.58, 0.1),
+    new THREE.Vector3(0.03, 1.65, 0.08),
+    new THREE.Vector3(-0.03, 1.57, 0.12),
+    new THREE.Vector3(0.03, 1.66, 0.08),
+    new THREE.Vector3(-0.03, 1.56, 0.1),
+    new THREE.Vector3(0.02, 1.63, 0.08),
+    new THREE.Vector3(0, 1.6, 0.1),
+  ], false, "catmullrom", 0.45);
 
   function trackGeometry(geometry) {
     geometries.add(geometry);
@@ -276,9 +330,15 @@ export async function createAvatarWorld(options = {}) {
     const group = new THREE.Group();
     group.name = `avatar-chapter-${index}`;
     group.userData.fadeMaterials = [];
-    group.userData.stop = CHAPTER_STOPS[index];
+    group.userData.start = AVATAR_TIMELINE_RANGES[index];
+    group.userData.end = AVATAR_TIMELINE_RANGES[index + 1];
+    group.userData.stop = index === 0
+      ? 0.025
+      : index === CHAPTER_STOPS.length - 1
+        ? 0.97
+        : (group.userData.start + group.userData.end) * 0.5;
     group.userData.index = index;
-    path.getPointAt(CHAPTER_STOPS[index], pathPoint);
+    path.getPointAt(group.userData.stop, pathPoint);
     group.position.copy(pathPoint);
     chapterGroups[index] = group;
     world.add(group);
@@ -383,49 +443,92 @@ export async function createAvatarWorld(options = {}) {
   }
 
   function collectImportedResources(root) {
+    const polishedMaterials = new Map();
+
+    function polishMaterial(source, role) {
+      const materialKey = `${source.uuid}:${role}`;
+      if (polishedMaterials.has(materialKey)) return polishedMaterials.get(materialKey);
+
+      Object.values(source).forEach((value) => {
+        if (value?.isTexture) {
+          value.anisotropy = Math.min(8, renderer?.capabilities.getMaxAnisotropy() || 1);
+          textures.add(value);
+        }
+      });
+
+      const material = new THREE.MeshPhysicalMaterial();
+      if (source.isMeshPhysicalMaterial) material.copy(source);
+      else THREE.MeshStandardMaterial.prototype.copy.call(material, source);
+      material.name = source.name;
+      const isScreen = role === "screen";
+      const isDetail = role === "detail";
+      const isLight = role === "light";
+      material.envMapIntensity = isScreen ? 0.72 : isDetail ? 0.92 : 0.7;
+      material.clearcoat = isScreen ? 1 : 0.9;
+      material.clearcoatRoughness = isScreen ? 0.045 : isDetail ? 0.08 : 0.12;
+      material.roughness = isScreen ? 0.12 : isDetail ? 0.22 : 0.28;
+      material.metalness = isScreen ? 0.42 : isDetail ? 0.34 : 0.12;
+
+      // Use the authored maps for the visor, normals and surface response, but
+      // art-direct the large shells by mesh role. This keeps Poddy crisp and
+      // detailed without letting the original bronze atlas muddy the white,
+      // navy and cyan portfolio palette.
+      if (!isScreen && role !== "body") material.map = null;
+      material.color.setHex(isScreen ? 0xd9fbff : isDetail ? 0x132b3b : isLight ? 0xbff8ff : 0xf3f7f7);
+      if (isScreen) {
+        material.opacity = 0.3;
+        material.transparent = true;
+        material.depthWrite = false;
+      } else if (isLight) {
+        material.emissiveMap = null;
+        material.emissive.setHex(0x45e6ff);
+        material.emissiveIntensity = 2.7;
+      } else {
+        if (role === "body" && source.emissiveMap) {
+          material.emissiveMap = source.emissiveMap;
+          material.emissive.setHex(0x45e6ff);
+          material.emissiveIntensity = 2.25;
+        } else {
+          material.emissiveMap = null;
+          material.emissive.setHex(0x000000);
+          material.emissiveIntensity = 0;
+        }
+        material.sheen = 0.16;
+        material.sheenColor.setHex(0xdffaff);
+        material.sheenRoughness = 0.36;
+      }
+      material.needsUpdate = true;
+      materials.add(source);
+      trackMaterial(material);
+      polishedMaterials.set(materialKey, material);
+      return material;
+    }
+
     root.traverse((object) => {
       if (!object.isMesh) return;
       if (object.geometry) geometries.add(object.geometry);
+      const objectName = `${object.name} ${object.geometry?.name || ""}`.toLowerCase();
+      const role = objectName.includes("screen") || objectName.includes("object_33")
+        ? "screen"
+        : objectName.includes("lights") || objectName.includes("object_34")
+          ? "light"
+          : objectName.includes("details") || objectName.includes("object_32")
+            ? "detail"
+            : "body";
       const objectMaterials = Array.isArray(object.material) ? object.material : [object.material];
-      objectMaterials.filter(Boolean).forEach((material) => {
-        materials.add(material);
-        Object.values(material).forEach((value) => {
-          if (value?.isTexture) textures.add(value);
-        });
-        const materialName = material.name.toLowerCase();
-        if (materialName === "main") {
-          material.color?.setHex(COLORS.robotWhite);
-          material.roughness = 0.38;
-          material.metalness = 0.24;
-          material.envMapIntensity = 1.08;
-        } else if (materialName === "grey") {
-          material.color?.setHex(COLORS.robotGray);
-          material.roughness = 0.52;
-          material.metalness = 0.34;
-          material.envMapIntensity = 0.96;
-        } else if (materialName === "black") {
-          material.color?.setHex(COLORS.screen);
-          material.emissive?.setHex(0x03171d);
-          material.emissiveIntensity = 0.32;
-          material.roughness = 0.28;
-          material.metalness = 0.38;
-          material.envMapIntensity = 0.82;
-        } else {
-          material.envMapIntensity = 0.92;
-        }
-        material.needsUpdate = true;
-      });
+      const replacements = objectMaterials.filter(Boolean).map((material) => polishMaterial(material, role));
+      object.material = Array.isArray(object.material) ? replacements : replacements[0];
       object.castShadow = false;
       object.receiveShadow = false;
     });
   }
 
   function validateRobot(gltf) {
-    if (!gltf?.scene) throw new Error("RobotExpressive is missing its scene root.");
+    if (!gltf?.scene) throw new Error("Poddy M1 is missing its scene root.");
     const clipsByName = new Map((gltf.animations || []).map((clip) => [clip.name, clip]));
     const missingClips = REQUIRED_ROBOT_CLIPS.filter((name) => !clipsByName.has(name));
     if (missingClips.length) {
-      throw new Error(`RobotExpressive is missing required clips: ${missingClips.join(", ")}.`);
+      throw new Error(`Poddy M1 is missing required pose clips: ${missingClips.join(", ")}.`);
     }
 
     let drawCount = 0;
@@ -439,21 +542,21 @@ export async function createAvatarWorld(options = {}) {
       const elementCount = geometry?.index?.count ?? geometry?.attributes?.position?.count ?? 0;
       triangleCount += elementCount / 3;
     });
-    if (!skinnedMeshCount) throw new Error("RobotExpressive does not contain an animated skinned mesh.");
+    if (!skinnedMeshCount) throw new Error("Poddy M1 does not contain an animated skinned mesh.");
     if (drawCount > MAX_MODEL_DRAWS || triangleCount > MAX_MODEL_TRIANGLES) {
-      throw new Error(`RobotExpressive exceeds its render budget (${drawCount} draws, ${Math.ceil(triangleCount)} triangles).`);
+      throw new Error(`Poddy M1 exceeds its render budget (${drawCount} draws, ${Math.ceil(triangleCount)} triangles).`);
     }
     return clipsByName;
   }
 
   function prepareRobot(gltf, clipsByName) {
     const importedScene = gltf.scene;
-    importedScene.name = "robot-expressive-model";
+    importedScene.name = "poddy-m1-model";
     importedScene.updateMatrixWorld(true);
     const bounds = new THREE.Box3().setFromObject(importedScene);
     const size = bounds.getSize(new THREE.Vector3());
     if (!Number.isFinite(size.y) || size.y <= 0.0001) {
-      throw new Error("RobotExpressive has invalid model bounds.");
+      throw new Error("Poddy M1 has invalid model bounds.");
     }
 
     const center = bounds.getCenter(new THREE.Vector3());
@@ -462,30 +565,153 @@ export async function createAvatarWorld(options = {}) {
     importedScene.position.z -= center.z;
 
     const normalizedVisual = new THREE.Group();
-    normalizedVisual.name = "normalized-robot-expressive";
+    normalizedVisual.name = "normalized-poddy-m1";
     normalizedVisual.scale.setScalar(CANONICAL_ROBOT_HEIGHT / size.y);
     normalizedVisual.add(importedScene);
 
     avatar = new THREE.Group();
-    avatar.name = "imported-robot-expressive-avatar";
+    avatar.name = "poddy-m1-avatar";
     avatar.userData.baseScale = mobile ? 0.72 : 0.66;
     avatar.scale.setScalar(avatar.userData.baseScale);
     avatar.add(normalizedVisual);
     world.add(avatar);
 
     avatarMixer = new THREE.AnimationMixer(importedScene);
-    avatarClips = Object.fromEntries(REQUIRED_ROBOT_CLIPS.map((name) => [name, clipsByName.get(name)]));
-    avatarActions = Object.fromEntries(REQUIRED_ROBOT_CLIPS.map((name) => {
-      const action = avatarMixer.clipAction(avatarClips[name]);
+    avatarClips = Object.fromEntries(Object.entries(ROBOT_CLIPS).map(([key, name]) => [key, clipsByName.get(name)]));
+    avatarActions = Object.fromEntries(Object.entries(avatarClips).map(([key, clip]) => {
+      const action = avatarMixer.clipAction(clip);
       action.enabled = true;
-      action.setLoop(THREE.LoopRepeat, Infinity);
-      action.setEffectiveWeight(name === "Idle" ? 1 : 0);
+      action.setLoop(THREE.LoopOnce, 1);
+      action.clampWhenFinished = true;
+      action.setEffectiveWeight(0);
       action.play();
-      return [name, action];
+      return [key, action];
     }));
     avatarMixer.update(0);
+
+    const requiredBones = {
+      root: "root_b01_01",
+      head: "head01_02",
+      leftEye: "eye_l_01_03",
+      rightEye: "eye_r_01_05",
+      leftAntenna: "antenna_l_01_04",
+      rightAntenna: "antenna_r_01_06",
+      leftArm: "arm_l_01_07",
+      rightArm: "arm_r_01_08",
+    };
+    avatarRig = Object.fromEntries(Object.entries(requiredBones).map(([key, name]) => {
+      const bone = importedScene.getObjectByName(name);
+      if (!bone?.isBone) throw new Error(`Poddy M1 is missing its ${key} rig bone (${name}).`);
+      return [key, bone];
+    }));
+    avatarRig.leftEye.userData.baseScale = avatarRig.leftEye.scale.clone();
+    avatarRig.rightEye.userData.baseScale = avatarRig.rightEye.scale.clone();
+    const avatarBoneRest = [];
+    importedScene.traverse((object) => {
+      if (!object.isBone) return;
+      avatarBoneRest.push({
+        bone: object,
+        position: object.position.clone(),
+        quaternion: object.quaternion.clone(),
+        scale: object.scale.clone(),
+      });
+    });
+    animation.avatarBoneRest = avatarBoneRest;
+
     collectImportedResources(importedScene);
-    canvas.dataset.avatarModel = "robot-expressive";
+    canvas.dataset.avatarModel = "poddy-m1";
+    createAvatarShadow();
+    createScrewdriver();
+  }
+
+  function createAvatarShadow() {
+    const textureSize = 64;
+    const data = new Uint8Array(textureSize * textureSize * 4);
+    for (let y = 0; y < textureSize; y += 1) {
+      for (let x = 0; x < textureSize; x += 1) {
+        const dx = (x + 0.5) / textureSize * 2 - 1;
+        const dy = (y + 0.5) / textureSize * 2 - 1;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const alpha = Math.round(255 * Math.pow(clamp(1 - distance), 1.8));
+        const offset = (y * textureSize + x) * 4;
+        data[offset] = 255;
+        data[offset + 1] = 255;
+        data[offset + 2] = 255;
+        data[offset + 3] = alpha;
+      }
+    }
+    const shadowTexture = new THREE.DataTexture(data, textureSize, textureSize, THREE.RGBAFormat);
+    shadowTexture.needsUpdate = true;
+    textures.add(shadowTexture);
+    const shadowMaterial = trackMaterial(new THREE.MeshBasicMaterial({
+      color: 0x01060b,
+      map: shadowTexture,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+      toneMapped: false,
+    }));
+    shadowMaterial.userData.baseOpacity = 0.34;
+    const shadow = new THREE.Mesh(trackGeometry(new THREE.PlaneGeometry(1.65, 1.18)), shadowMaterial);
+    shadow.name = "poddy-contact-shadow";
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = 0.028;
+    shadow.renderOrder = -1;
+    world.add(shadow);
+    animation.avatarShadow = shadow;
+  }
+
+  function createScrewdriver() {
+    const tool = new THREE.Group();
+    tool.name = "poddy-screwdriver";
+    tool.visible = false;
+
+    const gripMaterial = standardMaterial(0x173243, {
+      roughness: 0.28,
+      metalness: 0.52,
+    });
+    const accentMaterial = standardMaterial(COLORS.cyan, {
+      emissive: 0x1c7788,
+      emissiveIntensity: 0.72,
+      roughness: 0.24,
+      metalness: 0.48,
+    });
+    const steelMaterial = standardMaterial(0xcbd8df, {
+      roughness: 0.2,
+      metalness: 0.9,
+    });
+
+    const grip = mesh(
+      trackGeometry(new THREE.CapsuleGeometry(0.105, 0.24, 10, 24)),
+      gripMaterial,
+      [0, 0, 0],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    const accent = mesh(
+      trackGeometry(new THREE.BoxGeometry(0.035, 0.15, 0.045)),
+      accentMaterial,
+      [0.087, 0, 0.035],
+      [1, 1, 1],
+      [0, 0, 0],
+    );
+    const shaft = mesh(
+      trackGeometry(new THREE.CylinderGeometry(0.027, 0.027, 0.38, 20)),
+      steelMaterial,
+      [0, 0, 0.3],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    const tip = mesh(
+      trackGeometry(new THREE.ConeGeometry(0.052, 0.11, 20)),
+      steelMaterial,
+      [0, 0, 0.535],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    tool.add(grip, accent, shaft, tip);
+    world.add(tool);
+    animation.screwdriver = tool;
   }
 
   function rebuildEnvironmentLighting(hdrTexture) {
@@ -721,8 +947,8 @@ export async function createAvatarWorld(options = {}) {
   function buildEmbeddedProps() {
     const group = makeChapterGroup(3);
     const boxGeometry = trackGeometry(new THREE.BoxGeometry(1, 1, 1));
-    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 12));
-    const torusGeometry = trackGeometry(new THREE.TorusGeometry(0.52, 0.045, 6, 18));
+    const cylinderGeometry = trackGeometry(new THREE.CylinderGeometry(0.5, 0.5, 1, 28));
+    const torusGeometry = trackGeometry(new THREE.TorusGeometry(0.52, 0.045, 10, 28));
     const boardMaterial = chapterMaterial(group, "standard", 0x174f4b, {
       roughness: 0.68,
       metalness: 0.08,
@@ -741,6 +967,14 @@ export async function createAvatarWorld(options = {}) {
       emissiveIntensity: 0.28,
       roughness: 0.42,
     });
+    const screwMaterial = chapterMaterial(group, "standard", 0xcbd7dc, {
+      roughness: 0.18,
+      metalness: 0.92,
+    });
+    const slotMaterial = chapterMaterial(group, "standard", 0x17222b, {
+      roughness: 0.34,
+      metalness: 0.72,
+    });
 
     const board = mesh(boxGeometry, boardMaterial, [0, 0.52, 0.12], [2.05, 0.1, 1.28], [0, 0.06, 0]);
     group.add(board);
@@ -756,11 +990,30 @@ export async function createAvatarWorld(options = {}) {
     components.computeBoundingSphere();
     group.add(components);
 
-    const motor = mesh(cylinderGeometry, motorMaterial, [0.94, 1.02, 0.22], [0.62, 0.54, 0.62], [0, 0, Math.PI / 2]);
-    const motorRing = mesh(torusGeometry, ringMaterial, [0.94, 1.02, 0.22], [0.88, 0.88, 0.88], [0, Math.PI / 2, 0]);
-    group.add(motor, motorRing);
+    const motorAssembly = new THREE.Group();
+    motorAssembly.position.set(0.86, 1.04, 0.2);
+    const motor = mesh(cylinderGeometry, motorMaterial, [0, 0, 0], [0.62, 0.54, 0.62], [Math.PI / 2, 0, 0]);
+    const motorRing = mesh(torusGeometry, ringMaterial, [0, 0, 0.34], [0.88, 0.88, 0.88]);
+    const fastener = mesh(
+      trackGeometry(new THREE.CylinderGeometry(0.14, 0.14, 0.075, 28)),
+      screwMaterial,
+      [0, 0, 0.39],
+      [1, 1, 1],
+      [Math.PI / 2, 0, 0],
+    );
+    const slotHorizontal = mesh(boxGeometry, slotMaterial, [0, 0, 0.432], [0.17, 0.038, 0.018]);
+    const slotVertical = mesh(boxGeometry, slotMaterial, [0, 0, 0.433], [0.038, 0.17, 0.018]);
+    const fastenerSlots = new THREE.Group();
+    fastenerSlots.add(slotHorizontal, slotVertical);
+    motorAssembly.add(motor, motorRing, fastener, fastenerSlots);
+    group.add(motorAssembly);
+    animation.motorAssembly = motorAssembly;
+    animation.motorBasePosition = motorAssembly.position.clone();
     animation.motor = motor;
     animation.motorRing = motorRing;
+    animation.motorFastener = fastener;
+    animation.motorFastenerSlots = fastenerSlots;
+    animation.motorContact = new THREE.Vector3(0.86, 1.04, 0.64);
   }
 
   function buildAiProps() {
@@ -869,12 +1122,15 @@ export async function createAvatarWorld(options = {}) {
     world.name = "continuous-avatar-world";
     scene.add(world);
 
-    const hemisphere = new THREE.HemisphereLight(0xc7f5ff, 0x08111d, mobile ? 1.35 : 1.55);
-    const key = new THREE.DirectionalLight(0xffe4b2, mobile ? 2.0 : 2.35);
+    const hemisphere = new THREE.HemisphereLight(0xe8fbff, 0x08111d, mobile ? 1.82 : 2.08);
+    const key = new THREE.DirectionalLight(0xf4fbff, mobile ? 2.65 : 3.1);
     key.position.set(3.5, 7.5, 5.5);
     const rim = new THREE.PointLight(COLORS.cyan, mobile ? 6 : 9, 12, 2);
     rim.position.set(-3.4, 3.8, 3.2);
-    scene.add(hemisphere, key, rim);
+    const avatarFill = new THREE.PointLight(0xe7faff, mobile ? 4.5 : 6.5, 8, 2);
+    avatarFill.position.set(2.2, 3.4, 2.8);
+    animation.avatarFill = avatarFill;
+    scene.add(hemisphere, key, rim, avatarFill);
 
     buildRoute();
     buildIntroProps();
@@ -930,7 +1186,7 @@ export async function createAvatarWorld(options = {}) {
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: !mobile,
+        antialias: true,
         powerPreference: "high-performance",
         premultipliedAlpha: true,
         preserveDrawingBuffer: false,
@@ -938,7 +1194,7 @@ export async function createAvatarWorld(options = {}) {
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
+      renderer.toneMappingExposure = 1.24;
       renderer.shadowMap.enabled = false;
       renderer.sortObjects = true;
 
@@ -973,8 +1229,16 @@ export async function createAvatarWorld(options = {}) {
 
   function updateChapterGroups(progress, timestamp) {
     chapterGroups.forEach((group, index) => {
-      const distance = Math.abs(progress - group.userData.stop);
-      const influence = 1 - smoothstep(0.052, 0.092, distance);
+      const start = group.userData.start;
+      const end = group.userData.end;
+      const span = Math.max(end - start, 0.00001);
+      const influenceIn = index === 0
+        ? 1
+        : smoothstep(start - 0.02, start + span * 0.16, progress);
+      const influenceOut = index === chapterGroups.length - 1
+        ? 1
+        : 1 - smoothstep(end - span * 0.16, end + 0.02, progress);
+      const influence = influenceIn * influenceOut;
       group.visible = influence > 0.002;
       if (!group.visible) return;
       const scale = 0.88 + influence * 0.12;
@@ -1014,8 +1278,6 @@ export async function createAvatarWorld(options = {}) {
       });
       animation.dronePropellers.instanceMatrix.needsUpdate = true;
     }
-    if (animation.motor) animation.motor.rotation.x = timestamp * 0.0016;
-    if (animation.motorRing) animation.motorRing.rotation.x = timestamp * -0.0011;
     if (animation.aiGroup) animation.aiGroup.rotation.y = Math.sin(timestamp * 0.00045) * 0.04;
     if (animation.aiSignals && animation.aiGroup?.userData.nodePositions) {
       const nodes = animation.aiGroup.userData.nodePositions;
@@ -1049,125 +1311,214 @@ export async function createAvatarWorld(options = {}) {
     }
   }
 
-  function gesturePhase(progress, center, radius) {
-    return clamp((progress - (center - radius)) / Math.max(radius * 2, 0.00001), 0, 0.9999);
+  function chapterLocalProgress(progress, chapterIndex) {
+    const start = AVATAR_TIMELINE_RANGES[chapterIndex];
+    const end = AVATAR_TIMELINE_RANGES[chapterIndex + 1];
+    return clamp((progress - start) / Math.max(end - start, 0.00001));
   }
 
-  function setAvatarAction(name, weight, normalizedTime) {
+  function chapterGesture(progress, chapterIndex, center = 0.5, radius = 0.42) {
+    if (progress < AVATAR_TIMELINE_RANGES[chapterIndex]
+      || progress > AVATAR_TIMELINE_RANGES[chapterIndex + 1]) return 0;
+    return pulse(chapterLocalProgress(progress, chapterIndex), center, radius);
+  }
+
+  function setAvatarAction(name, weight) {
     const action = avatarActions?.[name];
     const clip = avatarClips?.[name];
     if (!action || !clip) return;
     action.enabled = true;
     action.setEffectiveWeight(clamp(weight));
-    action.time = clip.duration * clamp(normalizedTime, 0, 0.9999);
+    action.time = Math.max(0, clip.duration - 0.00001);
   }
 
-  function updateAvatar(progress, timestamp) {
+  function updateAvatar(state) {
     if (!avatar || !avatarMixer || !avatarActions) return;
+    const { progress, timestamp } = state;
 
-    const introWave = pulse(progress, 0.035, 0.052);
-    const contactWave = pulse(progress, 0.962, 0.045);
-    const wave = clamp(introWave + contactWave);
-    const thumbsUp = pulse(progress, 0.145, 0.052);
-    const yes = pulse(progress, 0.365, 0.056);
-    const profilePause = pulse(progress, 0.842, 0.062);
-    const contactPause = smoothstep(0.93, 0.965, progress);
-    const stillness = clamp(Math.max(
-      profilePause * 0.82,
-      contactPause * 0.94,
-      thumbsUp * 0.42,
-      yes * 0.5,
-    ));
     const elapsed = lastAvatarTimestamp > 0
       ? clamp((timestamp - lastAvatarTimestamp) / 1000, 0, 0.08)
       : 0;
     const progressDelta = progress - lastAvatarProgress;
     if (Math.abs(progressDelta) > 0.00002) movementDirection = Math.sign(progressDelta);
-    const scrollSpeed = elapsed > 0 ? Math.abs(progressDelta) / elapsed : 0;
-    const targetGaitEnergy = clamp(scrollSpeed * 16);
-    const response = 1 - Math.exp(-elapsed * (targetGaitEnergy > gaitEnergy ? 12 : 7));
-    gaitEnergy = mix(gaitEnergy, targetGaitEnergy, response);
-    gaitPhase += movementDirection * elapsed * (4.6 + gaitEnergy * 3.8) * gaitEnergy;
-    if (Math.abs(gaitPhase) > TAU * 1000) gaitPhase %= TAU;
+    const measuredVelocity = Number.isFinite(state.velocity)
+      ? Math.abs(state.velocity)
+      : elapsed > 0
+        ? Math.abs(progressDelta) / elapsed
+        : 0;
+    const targetTravelEnergy = clamp(measuredVelocity * 9);
+    const response = 1 - Math.exp(-elapsed * (targetTravelEnergy > travelEnergy ? 11 : 6));
+    travelEnergy = mix(travelEnergy, targetTravelEnergy, response);
     lastAvatarProgress = progress;
     lastAvatarTimestamp = timestamp;
 
-    const gestureTotal = wave + thumbsUp + yes;
+    const introWave = chapterGesture(progress, 0, 0.38, 0.34);
+    const pocketPoint = chapterGesture(progress, 1, 0.5, 0.43);
+    const flightSurprise = chapterGesture(progress, 2, 0.48, 0.4) * 0.74;
+    const embeddedLocal = state.chapterIndex === 3
+      ? state.chapterProgress
+      : chapterLocalProgress(progress, 3);
+    const screwReach = state.chapterIndex === 3
+      ? smoothstep(0.08, 0.34, embeddedLocal) * (1 - smoothstep(0.84, 0.98, embeddedLocal))
+      : 0;
+    const aiWelcome = chapterGesture(progress, 4, 0.5, 0.42) * 0.55;
+    const profileWelcome = chapterGesture(progress, 7, 0.5, 0.43) * 0.72;
+    const contactWave = chapterGesture(progress, 8, 0.58, 0.39);
+    const wave = clamp(introWave + contactWave);
+    const welcome = clamp(aiWelcome + profileWelcome);
+    const gestureTotal = wave + pocketPoint + flightSurprise + screwReach + welcome;
     const gestureScale = gestureTotal > 1 ? 1 / gestureTotal : 1;
     const waveWeight = wave * gestureScale;
-    const thumbsUpWeight = thumbsUp * gestureScale;
-    const yesWeight = yes * gestureScale;
-    const expressiveWeight = waveWeight + thumbsUpWeight + yesWeight;
-    const walkingWeight = clamp((1 - stillness) * gaitEnergy * (1 - expressiveWeight));
-    const idleWeight = clamp(1 - expressiveWeight - walkingWeight);
-    const walkingPhase = ((gaitPhase / TAU) % 1 + 1) % 1;
-    const idlePhase = (timestamp * 0.00012) % 1;
-    const wavePhase = introWave >= contactWave
-      ? gesturePhase(progress, 0.035, 0.052)
-      : gesturePhase(progress, 0.962, 0.045);
-
-    setAvatarAction("Idle", idleWeight, idlePhase);
-    setAvatarAction("Walking", walkingWeight, walkingPhase);
-    setAvatarAction("Wave", waveWeight, wavePhase);
-    setAvatarAction("ThumbsUp", thumbsUpWeight, gesturePhase(progress, 0.145, 0.052));
-    setAvatarAction("Yes", yesWeight, gesturePhase(progress, 0.365, 0.056));
+    // Zero-duration pose clips do not necessarily rewrite every bone channel.
+    // Restore the imported local transforms first so head sway, antenna motion
+    // and scroll gestures are deterministic instead of accumulating each frame.
+    animation.avatarBoneRest?.forEach(({ bone, position, quaternion, scale }) => {
+      bone.position.copy(position);
+      bone.quaternion.copy(quaternion);
+      bone.scale.copy(scale);
+    });
+    setAvatarAction("wave", waveWeight);
+    setAvatarAction("presentFlipped", pocketPoint * gestureScale);
+    setAvatarAction("surprise", flightSurprise * gestureScale);
+    setAvatarAction("present", screwReach * gestureScale);
+    setAvatarAction("welcome", welcome * gestureScale);
+    setAvatarAction("sad", 0);
     avatarMixer.update(0);
+
+    const idleSway = Math.sin(timestamp * 0.00105);
+    if (avatarRig?.head) {
+      additiveEuler.set(0, idleSway * 0.035, Math.sin(timestamp * 0.00072) * 0.025, "XYZ");
+      avatarRig.head.quaternion.multiply(additiveQuaternion.setFromEuler(additiveEuler));
+    }
+    if (avatarRig?.leftAntenna && avatarRig?.rightAntenna) {
+      avatarRig.leftAntenna.rotation.z += Math.sin(timestamp * 0.0018) * 0.055;
+      avatarRig.rightAntenna.rotation.z -= Math.sin(timestamp * 0.0018 + 0.55) * 0.055;
+    }
+    const blinkCycle = (timestamp * 0.00028) % 1;
+    const blink = 1 - pulse(blinkCycle, 0.965, 0.025) * 0.84;
+    if (avatarRig?.leftEye && avatarRig?.rightEye) {
+      const leftBase = avatarRig.leftEye.userData.baseScale;
+      const rightBase = avatarRig.rightEye.userData.baseScale;
+      avatarRig.leftEye.scale.set(leftBase.x * blink, leftBase.y, leftBase.z);
+      avatarRig.rightEye.scale.set(rightBase.x * blink, rightBase.y, rightBase.z);
+    }
 
     path.getPointAt(progress, pathPoint);
     path.getTangentAt(clamp(progress, 0.001, 0.999), pathTangent).normalize();
-    const platformLift = smoothstep(0.91, 0.96, progress) * 0.1;
-    avatar.position.set(pathPoint.x, 0.035 + platformLift, pathPoint.z);
-    avatar.rotation.y = Math.atan2(pathTangent.x, pathTangent.z);
+    const deterministicHover = Math.sin(progress * TAU * 8.5) * 0.035;
+    const idleHover = Math.sin(timestamp * 0.00125) * 0.012;
+    const platformLift = smoothstep(0.94, 0.975, progress) * 0.08;
+    avatar.position.set(pathPoint.x, 0.105 + deterministicHover + idleHover + platformLift, pathPoint.z);
+    // Keep the expressive visor oriented toward the viewer while the floating
+    // chassis follows and banks along the route. This reads more like an
+    // attentive guide than a character drifting sideways along the spline.
+    avatar.rotation.y = Math.atan2(
+      camera.position.x - pathPoint.x,
+      camera.position.z - pathPoint.z,
+    );
+    avatar.rotation.z = -movementDirection * travelEnergy * 0.055;
     avatar.visible = progress < 0.9998;
+
+    if (animation.avatarShadow) {
+      animation.avatarShadow.position.x = pathPoint.x;
+      animation.avatarShadow.position.z = pathPoint.z;
+      const shadowScale = 0.9 - deterministicHover * 1.8;
+      animation.avatarShadow.scale.set(shadowScale, shadowScale, shadowScale);
+      animation.avatarShadow.material.opacity = animation.avatarShadow.material.userData.baseOpacity
+        * (0.86 - Math.abs(deterministicHover) * 2.2);
+      animation.avatarShadow.visible = avatar.visible;
+    }
+    if (animation.avatarFill) {
+      animation.avatarFill.position.set(pathPoint.x + 2.1, 3.15, pathPoint.z + 2.5);
+    }
+
+    updateScrewdriverInteraction(state, screwReach);
+  }
+
+  function updateScrewdriverInteraction(state, reach) {
+    const tool = animation.screwdriver;
+    if (!tool || !animation.motorAssembly) return;
+
+    const local = state.chapterIndex === 3 ? state.chapterProgress : chapterLocalProgress(state.progress, 3);
+    const engaged = state.chapterIndex === 3
+      ? smoothstep(0.3, 0.43, local) * (1 - smoothstep(0.76, 0.9, local))
+      : 0;
+    const spin = local * TAU * 7.5;
+    tool.visible = reach > 0.015;
+
+    if (tool.visible) {
+      toolStart.set(avatar.position.x + 0.42, avatar.position.y + 0.9, avatar.position.z + 0.04);
+      toolTarget.copy(animation.motorContact);
+      chapterGroups[3].localToWorld(toolTarget);
+      toolTarget.z -= 0.535;
+      tool.position.lerpVectors(toolStart, toolTarget, smoothstep(0.08, 0.72, reach));
+      tool.rotation.set(0, 0, spin * engaged);
+      const breathe = 1 + engaged * Math.sin(spin * 2) * 0.018;
+      tool.scale.setScalar(breathe);
+    }
+
+    const base = animation.motorBasePosition;
+    animation.motorAssembly.position.set(
+      base.x + Math.sin(spin * 2.2) * engaged * 0.012,
+      base.y + Math.cos(spin * 1.8) * engaged * 0.014,
+      base.z,
+    );
+    animation.motorAssembly.rotation.z = Math.sin(spin * 2) * engaged * 0.02;
+    if (animation.motorFastenerSlots) animation.motorFastenerSlots.rotation.z = spin * engaged;
+    if (animation.motorRing) {
+      const ringScale = 0.88 * (1 + engaged * (0.08 + Math.sin(spin * 2) * 0.025));
+      animation.motorRing.scale.setScalar(ringScale);
+    }
   }
 
   function updateCamera(progress) {
-    const desktopFrames = [
-      [0, 4.34, 7.45, 0, 0.96], [0.04, 4.4, 7.58, 0, 0.98],
-      [-0.04, 4.38, 7.62, 0, 0.96], [0.03, 4.32, 7.48, 0, 0.94],
-      [-0.03, 4.44, 7.62, 0, 1], [0.04, 4.3, 7.42, 0, 0.94],
-      [-0.03, 4.4, 7.56, 0, 0.98], [0.03, 4.3, 7.4, 0, 0.96],
-      [0, 4.36, 7.48, 0, 0.96],
-    ];
-    const mobileFrames = [
-      [0, 4.82, 8.55, 0, 1.58], [0.03, 4.9, 8.72, 0, 1.62],
-      [-0.03, 4.94, 8.78, 0, 1.62], [0.02, 4.84, 8.62, 0, 1.56],
-      [-0.02, 4.98, 8.82, 0, 1.65], [0.03, 4.82, 8.58, 0, 1.56],
-      [-0.02, 4.94, 8.76, 0, 1.62], [0.02, 4.8, 8.5, 0, 1.58],
-      [0, 4.86, 8.62, 0, 1.6],
-    ];
-    const frames = mobile ? mobileFrames : desktopFrames;
-    const scaled = progress * (frames.length - 1);
-    const frameIndex = Math.min(frames.length - 2, Math.floor(scaled));
-    const amount = smoothstep(0, 1, scaled - frameIndex);
-    const first = frames[frameIndex];
-    const second = frames[frameIndex + 1];
-
-    cameraPosition.set(
-      pathPoint.x + mix(first[0], second[0], amount),
-      mix(first[1], second[1], amount),
-      pathPoint.z + mix(first[2], second[2], amount),
-    );
+    (mobile ? mobileCameraOffsets : desktopCameraOffsets).getPointAt(progress, cameraOffset);
+    (mobile ? mobileTargetOffsets : desktopTargetOffsets).getPointAt(progress, targetOffset);
+    cameraPosition.copy(pathPoint).add(cameraOffset);
     const compactTargetOffset = compactViewport ? -0.2 : 0;
-    cameraTarget.set(
-      pathPoint.x + mix(first[3], second[3], amount) + compactTargetOffset,
-      mix(first[4], second[4], amount),
-      pathPoint.z + 0.08,
-    );
+    cameraTarget.copy(pathPoint).add(targetOffset);
+    cameraTarget.x += compactTargetOffset;
     camera.position.copy(cameraPosition);
     camera.lookAt(cameraTarget);
+  }
+
+  function locateChapter(progress) {
+    for (let index = 0; index < AVATAR_TIMELINE_RANGES.length - 1; index += 1) {
+      if (progress < AVATAR_TIMELINE_RANGES[index + 1]
+        || index === AVATAR_TIMELINE_RANGES.length - 2) {
+        return {
+          chapterIndex: index,
+          chapterProgress: chapterLocalProgress(progress, index),
+        };
+      }
+    }
+    return { chapterIndex: AVATAR_TIMELINE_RANGES.length - 2, chapterProgress: 1 };
   }
 
   function normalizeUpdateInput(progressOrState, timestamp) {
     if (typeof progressOrState === "object" && progressOrState !== null) {
       const progress = progressOrState.progress ?? progressOrState.globalProgress ?? 0;
+      const normalizedProgress = clamp(Number.isFinite(progress) ? progress : 0);
+      const located = locateChapter(normalizedProgress);
       return {
-        progress: clamp(Number.isFinite(progress) ? progress : 0),
+        progress: normalizedProgress,
+        chapterIndex: Number.isInteger(progressOrState.chapterIndex)
+          ? progressOrState.chapterIndex
+          : located.chapterIndex,
+        chapterProgress: Number.isFinite(progressOrState.chapterProgress)
+          ? clamp(progressOrState.chapterProgress)
+          : located.chapterProgress,
+        velocity: Number.isFinite(progressOrState.velocity) ? progressOrState.velocity : null,
         timestamp: Number.isFinite(progressOrState.timestamp) ? progressOrState.timestamp : timestamp,
       };
     }
+    const progress = clamp(Number.isFinite(progressOrState) ? progressOrState : 0);
+    const located = locateChapter(progress);
     return {
-      progress: clamp(Number.isFinite(progressOrState) ? progressOrState : 0),
+      progress,
+      chapterIndex: located.chapterIndex,
+      chapterProgress: located.chapterProgress,
+      velocity: null,
       timestamp,
     };
   }
@@ -1176,9 +1527,10 @@ export async function createAvatarWorld(options = {}) {
     if (!active || !renderer || !scene || !camera || contextLost || disposed) return;
     const state = normalizeUpdateInput(progressOrState, Number.isFinite(timestamp) ? timestamp : 0);
     currentProgress = state.progress;
-    updateAvatar(state.progress, state.timestamp);
-    updateChapterGroups(state.progress, state.timestamp);
+    path.getPointAt(state.progress, pathPoint);
     updateCamera(state.progress);
+    updateAvatar(state);
+    updateChapterGroups(state.progress, state.timestamp);
     if (routeMaterial) routeMaterial.opacity = 0.43 + Math.sin(state.timestamp * 0.0015) * 0.07;
     renderer.render(scene, camera);
     peakDrawCalls = Math.max(peakDrawCalls, renderer.info.render.calls);
@@ -1217,7 +1569,10 @@ export async function createAvatarWorld(options = {}) {
       });
     }
     const deviceRatio = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-    renderer.setPixelRatio(Math.min(deviceRatio, mobile ? 1 : 1.5));
+    const renderRatio = mobile
+      ? 1.5
+      : Math.min(Math.max(deviceRatio, 1.25), 1.75);
+    renderer.setPixelRatio(renderRatio);
     renderer.setSize(viewportWidth, viewportHeight, false);
     camera.aspect = viewportWidth / viewportHeight;
     camera.fov = compactViewport ? 46 : mobile ? 43 : tabletViewport || shortViewport ? 38 : 35;
@@ -1270,6 +1625,7 @@ export async function createAvatarWorld(options = {}) {
     avatarMixer = null;
     avatarActions = null;
     avatarClips = null;
+    avatarRig = null;
     environmentContext = null;
     environmentSourceTexture = null;
     assetAbortController = null;
