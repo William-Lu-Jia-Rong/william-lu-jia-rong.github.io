@@ -1,8 +1,11 @@
 "use strict";
 
+import { createAvatarTimeline } from "./avatar-timeline.js";
+
 const body = document.body;
 
 if (body.classList.contains("home-page")) {
+  body.dataset.scrollClock = "cinematic";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scenes = Array.from(document.querySelectorAll("[data-scene]"));
   const chapters = Array.from(document.querySelectorAll("[data-avatar-chapter]"));
@@ -10,23 +13,29 @@ if (body.classList.contains("home-page")) {
   const avatarCanvas = document.querySelector("[data-avatar-canvas]");
   const signalCanvas = document.querySelector("[data-signal-canvas]");
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const timeline = createAvatarTimeline({
+    chapters,
+    reducedMotion: reducedMotion.matches,
+    viewportAnchor: 0.52,
+    springFrequency: 14,
+  });
+  const sceneChapterIndices = new Map(
+    scenes.map((scene) => [scene, chapters.indexOf(scene)]),
+  );
 
   let avatarWorld = null;
   let avatarBootToken = 0;
+  let avatarBootAbortController = null;
   let signalCleanup = null;
   let animationFrame = 0;
   let scrollDirty = true;
   let resizeDirty = true;
+  let layoutDirty = true;
   let jumpToScroll = true;
-  let targetProgress = 0;
-  let visualProgress = 0;
-  let lastFrameTime = 0;
+  let nextMobileIdleFrameTime = 0;
   let lastScrollTime = performance.now();
   let pageActive = !document.hidden;
-  let lastNarrativePosition = null;
-  let pendingResizePosition = null;
-  let resizeSettleTimer = 0;
-  let applyingLayoutCorrection = false;
+  let toolbarResizeTimer = 0;
   let lastViewportWidth = window.innerWidth;
   let lastViewportHeight = window.innerHeight;
   const initialHash = window.location.hash;
@@ -47,13 +56,11 @@ if (body.classList.contains("home-page")) {
     const previousScrollBehavior = root.style.scrollBehavior;
     const maximum = Math.max(0, root.scrollHeight - window.innerHeight);
     root.style.scrollBehavior = "auto";
-    applyingLayoutCorrection = true;
     window.scrollTo({
       top: clamp(top, 0, maximum),
       left: window.scrollX,
       behavior: "auto",
     });
-    applyingLayoutCorrection = false;
     root.style.scrollBehavior = previousScrollBehavior;
   }
 
@@ -74,6 +81,8 @@ if (body.classList.contains("home-page")) {
   function setAvatarState(state) {
     body.classList.remove("avatar-ready", "avatar-fallback", "avatar-disabled");
     body.classList.add(`avatar-${state}`);
+    layoutDirty = true;
+    scrollDirty = true;
   }
 
   function finishLoader() {
@@ -181,14 +190,13 @@ if (body.classList.contains("home-page")) {
     items.forEach((item, index) => item.classList.toggle("is-active", index === active));
   }
 
-  function updateSceneEffects() {
-    let activeName = "";
-    const viewportAnchor = window.innerHeight * 0.52;
-
+  function updateSceneEffects(state) {
+    const activeName = chapters[state.chapterIndex]?.dataset.avatarChapter || "";
     scenes.forEach((scene) => {
-      const rect = scene.getBoundingClientRect();
-      const distance = Math.max(rect.height - window.innerHeight, 1);
-      const progress = clamp(-rect.top / distance);
+      const chapterIndex = sceneChapterIndices.get(scene);
+      const progress = chapterIndex >= 0
+        ? timeline.chapterProgress(chapterIndex, state.progress)
+        : 0;
       const exit = map(progress, 0.76, 1);
       const stage = scene.querySelector(".scene-stage");
       const target = stage || scene;
@@ -202,9 +210,6 @@ if (body.classList.contains("home-page")) {
       target.style.setProperty("--scene-rotate", `${(progress * 86).toFixed(1)}deg`);
       target.style.setProperty("--hud-y", `${(-52 * progress).toFixed(1)}px`);
 
-      if (rect.top <= viewportAnchor && rect.bottom >= viewportAnchor) {
-        activeName = scene.dataset.scene;
-      }
       if (scene.dataset.scene === "pocketpilot") updatePhoneSystem(scene, progress);
       if (scene.dataset.scene === "ai") updatePipeline(scene, progress);
     });
@@ -215,93 +220,30 @@ if (body.classList.contains("home-page")) {
       if (active) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
     });
-  }
 
-  function getChapterBounds(index) {
-    const chapter = chapters[index];
-    const nextChapter = chapters[index + 1];
-    const start = chapter.offsetTop;
-    const end = nextChapter
-      ? nextChapter.offsetTop
-      : Math.max(
-        document.documentElement.scrollHeight - window.innerHeight * 0.48,
-        chapter.offsetTop + 1,
-      );
-    return { start, end };
-  }
-
-  function readNarrativePosition() {
-    if (!chapters.length) return { index: 0, localProgress: 0 };
-    const viewportPosition = window.scrollY + window.innerHeight * 0.52;
-    let activeIndex = 0;
-
-    for (let index = 0; index < chapters.length; index += 1) {
-      if (chapters[index].offsetTop <= viewportPosition) activeIndex = index;
-      else break;
-    }
-
-    const { start, end } = getChapterBounds(activeIndex);
-    const localProgress = clamp((viewportPosition - start) / Math.max(end - start, 1));
-    return { index: activeIndex, localProgress };
-  }
-
-  function progressFromNarrativePosition(position) {
-    const stop = position.index * 0.12;
-    const nextStop = position.index === chapters.length - 1 ? 1 : stop + 0.12;
-    return clamp(stop + position.localProgress * (nextStop - stop));
-  }
-
-  function scrollTopFromNarrativePosition(position) {
-    if (!chapters.length) return window.scrollY;
-    const index = Math.min(chapters.length - 1, Math.max(0, position.index));
-    const { start, end } = getChapterBounds(index);
-    const viewportPosition = start + clamp(position.localProgress) * (end - start);
-    return viewportPosition - window.innerHeight * 0.52;
-  }
-
-  function measureNarrativeProgress() {
-    const position = readNarrativePosition();
-    lastNarrativePosition = position;
-    return progressFromNarrativePosition(position);
+    document.documentElement.style.setProperty(
+      "--scroll-progress",
+      `${(state.progress * 100).toFixed(3)}%`,
+    );
+    const progressBar = document.querySelector("[data-scroll-progress]");
+    if (progressBar) progressBar.style.transform = `scaleX(${state.progress.toFixed(4)})`;
+    const header = document.querySelector("[data-header]");
+    if (header) header.classList.toggle("is-scrolled", state.progress > 0.0005);
+    body.dataset.scrollChapter = activeName;
   }
 
   function updateMeasurements() {
-    updateSceneEffects();
-    targetProgress = measureNarrativeProgress();
-    if (jumpToScroll) {
-      visualProgress = targetProgress;
-      jumpToScroll = false;
+    if (layoutDirty) {
+      timeline.refresh({
+        scrollY: window.scrollY,
+        viewportHeight: window.innerHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+      });
+      layoutDirty = false;
+    } else if (scrollDirty) {
+      timeline.sample(window.scrollY);
     }
     scrollDirty = false;
-  }
-
-  function applyPendingResizePosition() {
-    resizeSettleTimer = 0;
-    const preservedPosition = pendingResizePosition;
-    pendingResizePosition = null;
-    if (!preservedPosition || initialHashPending) return;
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        setScrollTopImmediately(scrollTopFromNarrativePosition(preservedPosition));
-        jumpToScroll = true;
-        scrollDirty = true;
-        updateMeasurements();
-        scheduleAnimationFrame();
-      });
-    });
-  }
-
-  function scheduleResizePositionRestore(position) {
-    if (!pendingResizePosition && position) {
-      pendingResizePosition = {
-        index: position.index,
-        localProgress: position.localProgress,
-      };
-    }
-    if (!pendingResizePosition) return;
-    if (resizeSettleTimer) window.clearTimeout(resizeSettleTimer);
-    resizeSettleTimer = window.setTimeout(applyPendingResizePosition, 120);
   }
 
   function finishInitialHashAlignment() {
@@ -360,50 +302,49 @@ if (body.classList.contains("home-page")) {
       initialHashCancelled = true;
       finishInitialHashAlignment();
     }
-    if (pendingResizePosition) {
-      pendingResizePosition = null;
-      if (resizeSettleTimer) window.clearTimeout(resizeSettleTimer);
-      resizeSettleTimer = 0;
-    }
   }
 
   function scheduleAnimationFrame() {
-    if (animationFrame || !pageActive || !avatarWorld?.ready) return;
+    if (animationFrame || !pageActive) return;
     animationFrame = window.requestAnimationFrame(renderAvatarFrame);
   }
 
   function renderAvatarFrame(timestamp) {
     animationFrame = 0;
-    if (!pageActive || !avatarWorld?.ready) return;
+    if (!pageActive) return;
 
-    const elapsed = lastFrameTime ? Math.min(timestamp - lastFrameTime, 64) : 16.67;
-    const settled = Math.abs(targetProgress - visualProgress) < 0.00008;
+    const settled = timeline.isSettled();
     const mobile = window.innerWidth <= 820;
     const recentlyScrolled = timestamp - lastScrollTime < 180;
 
-    if (mobile && settled && !recentlyScrolled && lastFrameTime && elapsed < 32) {
-      scheduleAnimationFrame();
-      return;
+    if (mobile && avatarWorld?.ready && settled && !recentlyScrolled) {
+      if (timestamp < nextMobileIdleFrameTime) {
+        scheduleAnimationFrame();
+        return;
+      }
+      nextMobileIdleFrameTime = timestamp + 1000 / 30;
+    } else {
+      nextMobileIdleFrameTime = 0;
     }
 
-    lastFrameTime = timestamp;
-    if (resizeDirty) {
+    if (resizeDirty && avatarWorld?.ready) {
       avatarWorld.resize(window.innerWidth, window.innerHeight, mobile);
       resizeDirty = false;
     }
-    if (scrollDirty) updateMeasurements();
+    if (scrollDirty || layoutDirty) updateMeasurements();
 
-    const damping = 1 - Math.exp(-Math.max(elapsed, 1) * 0.0085);
-    visualProgress += (targetProgress - visualProgress) * damping;
-    if (Math.abs(targetProgress - visualProgress) < 0.00003) {
-      visualProgress = targetProgress;
-    }
+    const state = timeline.step(timestamp, jumpToScroll);
+    jumpToScroll = false;
+    updateSceneEffects(state);
 
-    const fadeProgress = map(visualProgress, 0.985, 1);
+    const fadeProgress = map(state.progress, 0.985, 1);
     const endOpacity = 1 - fadeProgress * fadeProgress * (3 - 2 * fadeProgress);
-    avatarCanvas.style.opacity = endOpacity.toFixed(3);
-    avatarWorld.update({ progress: visualProgress, timestamp });
-    scheduleAnimationFrame();
+    if (avatarCanvas) avatarCanvas.style.opacity = endOpacity.toFixed(3);
+    if (avatarWorld?.ready) avatarWorld.update(state);
+
+    if (avatarWorld?.ready || !timeline.isSettled() || scrollDirty || layoutDirty) {
+      scheduleAnimationFrame();
+    }
   }
 
   function stopSignalCanvas() {
@@ -516,11 +457,13 @@ if (body.classList.contains("home-page")) {
       setAvatarState("disabled");
       stopSignalCanvas();
       scheduleInitialHashAlignment();
+      scheduleAnimationFrame();
       return;
     }
     setAvatarState("fallback");
     setupSignalCanvas();
     scheduleInitialHashAlignment();
+    scheduleAnimationFrame();
   }
 
   function onContextLost() {
@@ -544,46 +487,72 @@ if (body.classList.contains("home-page")) {
 
   function disposeAvatarWorld() {
     avatarBootToken += 1;
+    avatarBootAbortController?.abort();
+    avatarBootAbortController = null;
     if (animationFrame) window.cancelAnimationFrame(animationFrame);
     animationFrame = 0;
-    lastFrameTime = 0;
+    nextMobileIdleFrameTime = 0;
     if (avatarWorld) avatarWorld.dispose();
     avatarWorld = null;
   }
 
   async function bootAvatarWorld() {
     const token = ++avatarBootToken;
+    avatarBootAbortController?.abort();
+    const bootController = new AbortController();
+    avatarBootAbortController = bootController;
     stopSignalCanvas();
 
     if (reducedMotion.matches || hasDataSaver() || !avatarCanvas) {
-      disposeAvatarWorld();
+      bootController.abort();
+      if (avatarBootAbortController === bootController) avatarBootAbortController = null;
+      if (avatarWorld) avatarWorld.dispose();
+      avatarWorld = null;
       setAvatarState("disabled");
       updateMeasurements();
       scheduleInitialHashAlignment();
+      scheduleAnimationFrame();
       return;
     }
 
+    let timeoutId = 0;
     const timeout = new Promise((_, reject) => {
-      window.setTimeout(() => reject(new Error("Avatar world startup timed out.")), 3000);
+      timeoutId = window.setTimeout(() => {
+        bootController.abort();
+        reject(new Error("Avatar world startup timed out."));
+      }, 12000);
     });
 
     try {
-      const module = await Promise.race([import("./avatar-world.js"), timeout]);
-      if (token !== avatarBootToken) return;
-
-      const world = module.createAvatarWorld({
-        canvas: avatarCanvas,
-        mobile: window.innerWidth <= 820,
-        onContextLost,
-        onContextRestored,
-        onError: enterFallback,
-      });
-      if (token !== avatarBootToken) {
+      const startup = import("./avatar-world.js").then((module) => module.createAvatarWorld({
+          canvas: avatarCanvas,
+          mobile: window.innerWidth <= 820,
+          signal: bootController.signal,
+          onContextLost,
+          onContextRestored,
+          onError: () => {
+            if (token !== avatarBootToken || bootController.signal.aborted) return;
+            if (avatarWorld) {
+              avatarWorld.dispose();
+              avatarWorld = null;
+            }
+            enterFallback();
+          },
+        })).then((world) => {
+          if (token !== avatarBootToken || bootController.signal.aborted) {
+            world.dispose();
+            throw new DOMException("Avatar world startup was superseded.", "AbortError");
+          }
+          return world;
+        });
+      const world = await Promise.race([startup, timeout]);
+      if (token !== avatarBootToken || bootController.signal.aborted) {
         world.dispose();
         return;
       }
 
       avatarWorld = world;
+      if (avatarBootAbortController === bootController) avatarBootAbortController = null;
       stopSignalCanvas();
       setAvatarState("ready");
       scheduleInitialHashAlignment();
@@ -593,15 +562,19 @@ if (body.classList.contains("home-page")) {
       updateMeasurements();
       scheduleAnimationFrame();
     } catch (_) {
-      if (token === avatarBootToken) enterFallback();
+      if (token === avatarBootToken) {
+        if (avatarBootAbortController === bootController) avatarBootAbortController = null;
+        enterFallback();
+      }
+    } finally {
+      if (timeoutId) window.clearTimeout(timeoutId);
     }
   }
 
   function onScroll() {
     scrollDirty = true;
     lastScrollTime = performance.now();
-    if (avatarWorld?.ready) scheduleAnimationFrame();
-    else updateSceneEffects();
+    scheduleAnimationFrame();
   }
 
   function onResize(event) {
@@ -616,22 +589,30 @@ if (body.classList.contains("home-page")) {
       || widthChanged
       || (heightChanged && !compactViewport);
 
-    if (
-      meaningfulLayoutResize
-      && !initialHashPending
-      && !applyingLayoutCorrection
-      && lastNarrativePosition
-    ) {
-      scheduleResizePositionRestore(lastNarrativePosition);
-    }
-
     lastViewportWidth = nextWidth;
     lastViewportHeight = nextHeight;
-    resizeDirty = true;
-    scrollDirty = true;
-    jumpToScroll = true;
-    if (avatarWorld?.ready) scheduleAnimationFrame();
-    else updateMeasurements();
+    if (meaningfulLayoutResize) {
+      if (toolbarResizeTimer) window.clearTimeout(toolbarResizeTimer);
+      toolbarResizeTimer = 0;
+      resizeDirty = true;
+      scrollDirty = true;
+      layoutDirty = true;
+      if (orientationChanged) jumpToScroll = true;
+      scheduleAnimationFrame();
+      return;
+    }
+
+    // Mobile browser chrome can emit dozens of height-only resize events while
+    // the URL toolbar opens or closes. Keep the scroll mapping stable and resize
+    // the WebGL buffer once after that animation settles.
+    if (heightChanged) {
+      if (toolbarResizeTimer) window.clearTimeout(toolbarResizeTimer);
+      toolbarResizeTimer = window.setTimeout(() => {
+        toolbarResizeTimer = 0;
+        resizeDirty = true;
+        scheduleAnimationFrame();
+      }, 140);
+    }
   }
 
   function onVisibilityChange() {
@@ -640,7 +621,6 @@ if (body.classList.contains("home-page")) {
     if (!pageActive && animationFrame) {
       window.cancelAnimationFrame(animationFrame);
       animationFrame = 0;
-      lastFrameTime = 0;
     } else if (pageActive) {
       scrollDirty = true;
       jumpToScroll = true;
@@ -649,6 +629,10 @@ if (body.classList.contains("home-page")) {
   }
 
   function onMotionPreferenceChange() {
+    timeline.setReducedMotion(reducedMotion.matches);
+    layoutDirty = true;
+    scrollDirty = true;
+    jumpToScroll = true;
     disposeAvatarWorld();
     stopSignalCanvas();
     bootAvatarWorld();
@@ -658,7 +642,13 @@ if (body.classList.contains("home-page")) {
 
   document.addEventListener("DOMContentLoaded", () => {
     updateMeasurements();
+    scheduleAnimationFrame();
     bootAvatarWorld();
+  }, { once: true });
+  window.addEventListener("load", () => {
+    layoutDirty = true;
+    scrollDirty = true;
+    scheduleAnimationFrame();
   }, { once: true });
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onResize, { passive: true });

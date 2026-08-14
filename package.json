@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node build/validate-site.mjs && node --check js/site.js && node --check js/cinematic.js && node --check js/avatar-world.js && node --check worker/index.js && tsc --noEmit",
+    "check": "node build/validate-site.mjs && node --check js/site.js && node --check js/avatar-timeline.js && node --check js/cinematic.js && node --check js/avatar-world.js && node --check worker/index.js && tsc --noEmit",
     "preview": "vite preview"
   },
   "devDependencies": {

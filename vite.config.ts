@@ -39,6 +39,7 @@ const buildEntries = { ...pageEntries, ...classicScripts };
 
 export default defineConfig({
   plugins: [sites()],
+  assetsInclude: ["**/*.glb", "**/*.hdr"],
   build: {
     outDir: "dist/client",
     target: "es2022",
