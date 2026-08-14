@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RouteOS Model-Routing Control Plane | Jiarong (Bill) Lu</title>
+  <meta name="description" content="RouteOS is a model-routing and feedback control plane built by Bill Lu, with hard-constraint filtering, multi-objective ranking, an OpenAI-compatible API, decision metadata, and feedback calibration.">
+  <meta name="theme-color" content="#050608">
+  <link rel="canonical" href="https://william-lu-jia-rong.github.io/project-smartrouteos.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Jiarong (Bill) Lu">
+  <meta property="og:title" content="RouteOS Model-Routing Control Plane | Jiarong (Bill) Lu">
+  <meta property="og:description" content="A model-routing and feedback control plane that filters by hard constraints, ranks eligible models, and exposes every routing decision.">
+  <meta property="og:url" content="https://william-lu-jia-rong.github.io/project-smartrouteos.html">
+  <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/smartrouteos/landing.webp">
+  <meta property="og:image:alt" content="RouteOS landing page with a live model-routing decision example">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="RouteOS Model-Routing Control Plane | Jiarong (Bill) Lu">
+  <meta name="twitter:description" content="Constraint-aware model routing, observable decisions, and outcome-driven feedback behind one OpenAI-compatible API.">
+  <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/smartrouteos/landing.webp">
+  <meta name="twitter:image:alt" content="RouteOS landing page with a live model-routing decision example">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/future.css">
+</head>
+<body class="case-page routeos-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="progress-line" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar site-nav site-shell" aria-label="Primary navigation">
+      <a class="logo wordmark" href="index.html" aria-label="Bill Lu, home">Bill Lu</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+      <ul class="nav-links" id="primary-navigation">
+        <li><a href="index.html">Home</a></li>
+        <li><a class="active" aria-current="page" href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-social" role="group" aria-label="Social profiles"><a href="https://github.com/William-Lu-Jia-Rong" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jiarong-lu-03b025212/" target="_blank" rel="noreferrer">LinkedIn</a></div>
+    </nav>
+  </header>
+
+  <main id="main-content" class="case-shell">
+    <section class="case-hero site-shell" aria-labelledby="routeos-title">
+      <div class="case-hero-copy" data-reveal>
+        <p class="eyebrow"><img src="images/smartrouteos/logo.svg" width="28" height="28" alt="" aria-hidden="true" fetchpriority="high"> Recent software product &middot; Invite-only gray release</p>
+        <h1 id="routeos-title">Make model selection an observable control decision.</h1>
+        <p class="lede">RouteOS is a recent product I built to route one request to an eligible model through a transparent control plane. It applies hard constraints first, then ranks the remaining models by quality, latency, reliability, and cost.</p>
+        <div class="button-row">
+          <a class="cta-btn" href="https://www.smartrouteos.com/" target="_blank" rel="noreferrer">Explore RouteOS</a>
+          <a class="ghost-btn" href="#routing-loop">See the routing loop</a>
+        </div>
+        <dl class="case-stats" aria-label="RouteOS project summary">
+          <div><dt>Interface</dt><dd>OpenAI-compatible API</dd></div>
+          <div><dt>Selection</dt><dd>Constraints + ranked utility</dd></div>
+          <div><dt>Release</dt><dd>Invite-only gray release</dd></div>
+        </dl>
+      </div>
+      <figure class="case-media case-media--routeos" data-reveal>
+        <img src="images/smartrouteos/landing.webp" width="2560" height="1280" alt="RouteOS landing page showing a live model-routing decision example" fetchpriority="high">
+        <figcaption>One request enters; RouteOS filters, ranks, routes, and exposes the decision.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="problem-title">
+      <div class="case-grid case-grid--split">
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Product problem</p>
+          <h2 id="problem-title">One model name cannot express every production constraint.</h2>
+        </div>
+        <div class="panel" data-reveal>
+          <p>Applications need more than a static provider choice. A request may require particular capabilities, a cost ceiling, dependable provider health, or a different quality and latency balance. RouteOS makes those requirements part of an explicit routing decision instead of scattering them across application code.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" id="routing-loop" aria-labelledby="routing-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Routing loop</p>
+        <h2 id="routing-title">Filter first. Rank second. Explain the result.</h2>
+        <p>The control plane keeps eligibility separate from preference: a model must satisfy the request before its expected utility can influence the final route.</p>
+      </div>
+      <div class="case-grid case-grid--steps">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">01 &middot; Constrain</span>
+          <h3>Remove ineligible routes.</h3>
+          <p>Hard requirements such as capabilities and request limits are evaluated before a model can enter the ranked set.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">02 &middot; Rank</span>
+          <h3>Compare the eligible models.</h3>
+          <p>RouteOS weighs expected quality, latency, reliability, and cost rather than optimizing one signal in isolation.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">03 &middot; Route</span>
+          <h3>Keep the application interface familiar.</h3>
+          <p>The application can use the standard OpenAI SDK, point it to RouteOS, and request <code>model: auto</code>.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">04 &middot; Expose</span>
+          <h3>Return the decision context.</h3>
+          <p>The normalized response includes decision metadata so the selected upstream model and routing result remain inspectable.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="decision-title">
+      <div class="case-grid case-grid--media case-grid--reverse">
+        <figure class="case-media case-media--routeos" data-reveal>
+          <img src="images/smartrouteos/decision.webp" width="1960" height="938" loading="lazy" alt="RouteOS live decision panel explaining model quality, cost fit, and provider health">
+          <figcaption>The public routing example presents the selected route and the signals behind it.</figcaption>
+        </figure>
+        <div class="case-copy" data-reveal>
+          <p class="eyebrow">Decision transparency</p>
+          <h2 id="decision-title">The route is an answer that can be inspected.</h2>
+          <p>RouteOS exposes why a model was selected instead of treating routing as an invisible gateway behavior. Operators can inspect decision metadata, usage, the exact charge, model availability, and provider health from the same product surface.</p>
+          <div class="chip-row" role="group" aria-label="RouteOS decision signals"><span class="chip">Quality</span><span class="chip">Latency</span><span class="chip">Reliability</span><span class="chip">Cost</span><span class="chip">Provider health</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="feedback-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Feedback control</p>
+        <h2 id="feedback-title">Use outcomes to improve the next decision.</h2>
+        <p>Catalog priors establish a starting point; observed signals make the router more specific to the work passing through it.</p>
+      </div>
+      <div class="case-grid case-grid--cards">
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Explicit feedback</span>
+          <h3>Capture direct evaluation.</h3>
+          <p>Ratings and accept-or-reject signals contribute evidence about how a model performed for a task.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Next-turn outcomes</span>
+          <h3>Observe what happened next.</h3>
+          <p>Follow-up interaction can provide an additional outcome signal for future recommendations.</p>
+        </article>
+        <article class="panel" data-reveal>
+          <span class="panel-kicker">Prompt boundary</span>
+          <h3>Learn without permanent prompt retention.</h3>
+          <p>RouteOS retains numeric quality, token, cost, and routing metadata for analysis without permanently storing prompt content.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="surfaces-title">
+      <div class="section-heading" data-reveal>
+        <p class="eyebrow">Operator surfaces</p>
+        <h2 id="surfaces-title">Put routing, access, and accounting in one control plane.</h2>
+      </div>
+      <div class="case-grid case-grid--steps">
+        <article class="panel" data-reveal><span class="panel-kicker">Access</span><h3>API keys.</h3><p>Issue and manage application credentials without embedding provider-specific routing logic in each product.</p></article>
+        <article class="panel" data-reveal><span class="panel-kicker">Observability</span><h3>Usage and requests.</h3><p>Review routed calls, decision context, token use, and final charges in one request history.</p></article>
+        <article class="panel" data-reveal><span class="panel-kicker">Supply</span><h3>Catalog and health.</h3><p>Inspect enabled models, capabilities, pricing, availability, and provider credential health.</p></article>
+        <article class="panel" data-reveal><span class="panel-kicker">Accounting</span><h3>Credits and billing.</h3><p>Reserve the maximum charge before a request, then settle against actual usage in a per-request ledger.</p></article>
+      </div>
+    </section>
+
+    <section class="case-section site-shell" aria-labelledby="release-title">
+      <article class="panel callout-panel" data-reveal>
+        <p class="eyebrow">Current release boundary</p>
+        <h2 id="release-title">A gray release with controlled access.</h2>
+        <p>RouteOS is currently invite-only and public registration is closed. The live site presents the product and routing model without implying customer scale, performance benchmarks, or general availability.</p>
+        <div class="button-row"><a class="cta-btn" href="https://www.smartrouteos.com/" target="_blank" rel="noreferrer">Visit the live product</a></div>
+      </article>
+    </section>
+
+    <nav class="case-nav site-shell" aria-label="Case study navigation">
+      <a class="ghost-btn" href="projects.html">All projects</a>
+      <a class="mini-link" href="project-pocketpilot.html">Next case: PocketPilot <span aria-hidden="true">&rarr;</span></a>
+    </nav>
+  </main>
+
+  <footer class="site-footer"><div class="footer-inner site-shell"><p>&copy; 2026 Jiarong (Bill) Lu</p><ul class="footer-links"><li><a href="projects.html">Projects</a></li><li><a href="experience.html">Experience</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div></footer>
+  <script type="module" src="js/site.js"></script>
+</body>
+</html>

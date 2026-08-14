@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Projects | Jiarong (Bill) Lu</title>
-  <meta name="description" content="Selected products and engineering systems by Bill Lu, including the PocketPilot iOS app, an STM32 water-quality monitor, aerial robotics software, embedded control, and AI automation.">
+  <meta name="description" content="Selected products and engineering systems by Bill Lu, including SmartRouteOS, PocketPilot, an STM32 water-quality monitor, aerial robotics software, and embedded control.">
   <meta name="theme-color" content="#050608">
   <link rel="canonical" href="https://william-lu-jia-rong.github.io/projects.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Jiarong (Bill) Lu">
   <meta property="og:title" content="Projects | Jiarong (Bill) Lu">
-  <meta property="og:description" content="Products and systems spanning native iOS, embedded hardware, robotics, and practical AI.">
+  <meta property="og:description" content="Products and systems spanning AI model routing, native iOS, embedded hardware, and robotics.">
   <meta property="og:url" content="https://william-lu-jia-rong.github.io/projects.html">
   <meta property="og:image" content="https://william-lu-jia-rong.github.io/images/og.png?v=robot">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Projects | Jiarong (Bill) Lu">
-  <meta name="twitter:description" content="Products and systems spanning native iOS, embedded hardware, robotics, and practical AI.">
+  <meta name="twitter:description" content="Products and systems spanning AI model routing, native iOS, embedded hardware, and robotics.">
   <meta name="twitter:image" content="https://william-lu-jia-rong.github.io/images/og.png?v=robot">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,9 +51,23 @@
     <section class="case-section site-shell" aria-labelledby="featured-title">
       <div class="section-heading" data-reveal>
         <p class="eyebrow">Flagship builds</p>
-        <h2 id="featured-title">Two complete product stories.</h2>
+        <h2 id="featured-title">Three complete product stories.</h2>
       </div>
       <div class="case-grid case-grid--featured">
+        <article class="panel project-feature project-feature--wide project-feature--routeos" data-reveal>
+          <div class="project-feature-copy">
+            <span class="panel-kicker">AI infrastructure &middot; Recent product</span>
+            <h3>SmartRouteOS</h3>
+            <p>A model-routing and feedback control plane that applies hard constraints first, then ranks eligible models by predicted quality, latency, reliability, and cost. One OpenAI-compatible API exposes every routing decision.</p>
+            <div class="chip-row"><span class="chip">Model routing</span><span class="chip">OpenAI-compatible API</span><span class="chip">Supabase</span><span class="chip">Postgres</span></div>
+            <div class="button-row"><a class="cta-btn" href="project-smartrouteos.html">Read the case study</a><a class="mini-link" href="https://www.smartrouteos.com/" target="_blank" rel="noreferrer">Visit SmartRouteOS <span aria-hidden="true">&nearr;</span></a></div>
+          </div>
+          <figure class="case-media case-media--routeos">
+            <img src="images/smartrouteos/landing.webp" width="2560" height="1280" loading="lazy" alt="SmartRouteOS public landing page showing the model routing decision interface">
+            <figcaption>Public RouteOS interface &middot; live routing example</figcaption>
+          </figure>
+        </article>
+
         <article class="panel project-feature" data-reveal>
           <div class="project-feature-copy">
             <span class="panel-kicker">Native iOS &middot; 2026</span>

@@ -13,6 +13,7 @@ const publishedPages = [
   "experience.html",
   "about.html",
   "contact.html",
+  "project-smartrouteos.html",
   "project-pocketpilot.html",
   "experience-warg.html",
   "experience-embedded-control.html",
