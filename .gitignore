@@ -1,9 +1,11 @@
 # Dependencies
 /node_modules/
+/output/playwright/
 
 # Build output and local tool caches
 /dist/
 /.vite/
+/.playwright-cli/
 /.wrangler/
 *.tsbuildinfo
 

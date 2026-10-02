@@ -55,6 +55,10 @@ export function sites(): Plugin {
 
       await copyFile(workerSource, workerOutput);
 
+      for (const name of ["Resume_Hardware.pdf", "Resume_Software.pdf"]) {
+        await copyFile(resolve(root, name), resolve(clientOutputDirectory, name));
+      }
+
       if (await exists(socialCardSource)) {
         await mkdir(resolve(clientOutputDirectory, "images"), {
           recursive: true,

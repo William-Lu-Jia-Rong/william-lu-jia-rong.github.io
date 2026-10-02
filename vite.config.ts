@@ -31,7 +31,7 @@ const pageEntries = Object.fromEntries(
 // Named module entries preserve stable source-compatible URLs for both the
 // branch-served GitHub Pages site and the compiled Sites package.
 const classicScripts = Object.fromEntries(
-  ["site", "cinematic"]
+  ["site"]
     .map((name) => [name, resolve(root, "js", `${name}.js`)] as const)
     .filter(([, filePath]) => existsSync(filePath))
     .map(([name, filePath]) => [`js/${name}`, filePath]),
