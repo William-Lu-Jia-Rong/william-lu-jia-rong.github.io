@@ -1,8 +1,6 @@
 # Keep source-only files and private résumé artifacts out of branch-based
 # GitHub Pages builds. The Vite/Sites production build also excludes them.
 exclude:
-  - Resume_Hardware.pdf
-  - Resume_Software.pdf
   - node_modules
   - dist
   - build
